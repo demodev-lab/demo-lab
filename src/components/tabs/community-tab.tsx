@@ -400,16 +400,68 @@ export function CommunityTab() {
     setCommentText("");
   };
 
-  const handleDeleteComment = (commentId: number) => {
-    if (!selectedPost) return;
+  const handleEditClick = (comment) => {
+    setEditCommentId(comment.id);
+    setEditCommentText(comment.content);
+  };
+
+  const handleEditSave = () => {
+    if (!selectedPost || !editCommentId) return;
+    function updateContent(comments) {
+      return comments.map((comment) => {
+        if (comment.id === editCommentId) {
+          return { ...comment, content: editCommentText };
+        } else if (comment.replies && comment.replies.length > 0) {
+          return { ...comment, replies: updateContent(comment.replies) };
+        } else {
+          return comment;
+        }
+      });
+    }
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === selectedPost.id
           ? {
               ...post,
-              commentsList: post.commentsList.filter(
-                (comment) => comment.id !== commentId,
-              ),
+              commentsList: updateContent(post.commentsList),
+            }
+          : post,
+      ),
+    );
+    setSelectedPost((prev) =>
+      prev
+        ? {
+            ...prev,
+            commentsList: updateContent(prev.commentsList),
+          }
+        : prev,
+    );
+    setEditCommentId(null);
+    setEditCommentText("");
+  };
+
+  const handleEditCancel = () => {
+    setEditCommentId(null);
+    setEditCommentText("");
+  };
+
+  const handleDeleteComment = (commentId: number) => {
+    if (!selectedPost) return;
+    function deleteComment(comments) {
+      return comments
+        .filter((comment) => comment.id !== commentId)
+        .map((comment) =>
+          comment.replies && comment.replies.length > 0
+            ? { ...comment, replies: deleteComment(comment.replies) }
+            : comment,
+        );
+    }
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === selectedPost.id
+          ? {
+              ...post,
+              commentsList: deleteComment(post.commentsList),
               comments: post.comments - 1,
             }
           : post,
@@ -419,53 +471,11 @@ export function CommunityTab() {
       prev
         ? {
             ...prev,
-            commentsList: prev.commentsList.filter(
-              (comment) => comment.id !== commentId,
-            ),
+            commentsList: deleteComment(prev.commentsList),
             comments: prev.comments - 1,
           }
         : prev,
     );
-  };
-
-  const handleEditClick = (comment) => {
-    setEditCommentId(comment.id);
-    setEditCommentText(comment.content);
-  };
-
-  const handleEditSave = () => {
-    if (!selectedPost || !editCommentId) return;
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === selectedPost.id
-          ? {
-              ...post,
-              commentsList: post.commentsList.map((comment) =>
-                comment.id === editCommentId
-                  ? { ...comment, content: editCommentText }
-                  : comment,
-              ),
-            }
-          : post,
-      ),
-    );
-    setSelectedPost((prev) =>
-      prev
-        ? {
-            ...prev,
-            commentsList: prev.commentsList.map((comment) =>
-              comment.id === editCommentId
-                ? { ...comment, content: editCommentText }
-                : comment,
-            ),
-          }
-        : prev,
-    );
-    setEditCommentId(null);
-    setEditCommentText("");
-  };
-
-  const handleEditCancel = () => {
     setEditCommentId(null);
     setEditCommentText("");
   };
@@ -493,89 +503,141 @@ export function CommunityTab() {
     );
   };
 
-  const renderComments = (comments) =>
-    comments.map((comment) => (
-      <div key={comment.id}>
-        <div className="flex gap-2 mt-4">
-          <Avatar className="h-8 w-8">
-            <AvatarImage
-              src={`/placeholder.svg?text=${comment.author.charAt(0)}`}
-            />
-            <AvatarFallback>
-              <User className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{comment.author}</span>
-              <span className="text-xs text-muted-foreground">
-                {comment.date}
-              </span>
-              {comment.authorUsername === "current-user" && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs"
-                    onClick={() => handleEditClick(comment)}
-                  >
-                    수정
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs text-red-500"
-                    onClick={() => handleDeleteComment(comment.id)}
-                  >
-                    삭제
-                  </Button>
-                </>
-              )}
-            </div>
-            {editCommentId === comment.id ? (
-              <div className="flex flex-col gap-2 mt-2">
-                <Textarea
-                  value={editCommentText}
-                  onChange={(e) => setEditCommentText(e.target.value)}
-                  className="flex-1 min-h-[60px]"
-                  autoFocus
-                />
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    className="bg-[#2F80ED] hover:bg-[#2F80ED]/90"
-                    onClick={handleEditSave}
-                    disabled={!editCommentText.trim()}
-                  >
-                    저장
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleEditCancel}
-                  >
-                    취소
-                  </Button>
-                </div>
-              </div>
-            ) : (
+  const handleToggleCommentLike = (commentId: number) => {
+    if (!selectedPost) return;
+    function toggleLike(comments) {
+      return comments.map((comment) => {
+        if (comment.id === commentId) {
+          return {
+            ...comment,
+            isLiked: !comment.isLiked,
+            likeCount: comment.isLiked
+              ? (comment.likeCount || 0) - 1
+              : (comment.likeCount || 0) + 1,
+          };
+        } else if (comment.replies && comment.replies.length > 0) {
+          return {
+            ...comment,
+            replies: toggleLike(comment.replies),
+          };
+        } else {
+          return comment;
+        }
+      });
+    }
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === selectedPost.id
+          ? {
+              ...post,
+              commentsList: toggleLike(post.commentsList),
+            }
+          : post,
+      ),
+    );
+    setSelectedPost((prev) =>
+      prev
+        ? {
+            ...prev,
+            commentsList: toggleLike(prev.commentsList),
+          }
+        : prev,
+    );
+  };
+
+  const CommentItem = ({ comment }) => (
+    <div className={comment.depth >= 1 ? "pl-6" : ""}>
+      <div className="flex gap-2 mt-4">
+        <Avatar className="h-8 w-8">
+          <AvatarImage
+            src={`/placeholder.svg?text=${comment.author.charAt(0)}`}
+          />
+          <AvatarFallback>
+            <User className="h-4 w-4" />
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{comment.author}</span>
+            <span className="text-xs text-muted-foreground">
+              {comment.date}
+            </span>
+            {comment.authorUsername === "current-user" && (
               <>
-                <p className="text-sm mt-1">{comment.content}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs"
-                  >
-                    <Heart className="h-3 w-3 mr-1" />
-                    <span>{comment.likes}</span>
-                  </Button>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={() => handleEditClick(comment)}
+                >
+                  수정
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs text-red-500"
+                  onClick={() => handleDeleteComment(comment.id)}
+                >
+                  삭제
+                </Button>
               </>
             )}
           </div>
+          {editCommentId === comment.id ? (
+            <div className="flex flex-col gap-2 mt-2">
+              <Textarea
+                value={editCommentText}
+                onChange={(e) => setEditCommentText(e.target.value)}
+                className="flex-1 min-h-[60px]"
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="bg-[#2F80ED] hover:bg-[#2F80ED]/90"
+                  onClick={handleEditSave}
+                  disabled={!editCommentText.trim()}
+                >
+                  저장
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleEditCancel}>
+                  취소
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm mt-1">{comment.content}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={() => handleToggleCommentLike(comment.id)}
+                >
+                  <Heart
+                    className={`h-3 w-3 mr-1 ${comment.isLiked ? "text-red-500 fill-red-500" : "text-gray-400"}`}
+                  />
+                  <span>{comment.likeCount || 0}</span>
+                </Button>
+              </div>
+            </>
+          )}
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="mt-2">
+              {comment.replies.map((reply) => (
+                <CommentItem key={reply.id} comment={{ ...reply, depth: 1 }} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
+    </div>
+  );
+
+  const renderComments = (comments) =>
+    comments.map((comment) => (
+      <CommentItem key={comment.id} comment={{ ...comment, depth: 0 }} />
     ));
 
   const toggleCategories = () => {
