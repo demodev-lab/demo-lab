@@ -754,6 +754,7 @@ export function CommunityTab() {
                   className={`mb-1 ${category.id === activeCategory ? "bg-[#2F80ED] text-white" : ""}`}
                   onClick={() => {
                     setActiveCategory(category.id);
+                    setSelectedCategory(category.label);
                     if (category.id === "all") {
                       router.push("/");
                     } else if (category.id === "classroom") {
@@ -837,63 +838,79 @@ export function CommunityTab() {
       </div>
 
       <div className="space-y-4">
-        {getSortedPosts().map((post) => (
-          <Card
-            key={post.id}
-            className={`${post.pinned ? "border-[#2F80ED]" : ""} cursor-pointer hover:shadow-md transition-shadow`}
-            onClick={() => handleOpenModal(post)}
-          >
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={`/placeholder.svg?text=${post.author.charAt(0)}`}
-                    />
-                    <AvatarFallback>
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">{post.author}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {post.date} • {post.category}
-                      {post.pinned && " • 📌 Pinned"}
+        {/* 카테고리별 게시글 필터링 및 렌더링 */}
+        {(() => {
+          const filteredPosts =
+            selectedCategory === "All" || selectedCategory === "all"
+              ? getSortedPosts()
+              : getSortedPosts().filter(
+                  (post) => post.category === selectedCategory,
+                );
+          if (filteredPosts.length === 0) {
+            return (
+              <div className="flex justify-center items-center h-40 text-muted-foreground text-lg">
+                관련된 게시글이 없습니다
+              </div>
+            );
+          }
+          return filteredPosts.map((post) => (
+            <Card
+              key={post.id}
+              className={`${post.pinned ? "border-[#2F80ED]" : ""} cursor-pointer hover:shadow-md transition-shadow`}
+              onClick={() => handleOpenModal(post)}
+            >
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={`/placeholder.svg?text=${post.author.charAt(0)}`}
+                      />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium">{post.author}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {post.date} • {post.category}
+                        {post.pinned && " • 📌 Pinned"}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <h3 className="text-xl font-bold mt-2">{post.title}</h3>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground line-clamp-3">
-                {post.content}
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="flex gap-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggleLike(post.id);
-                  }}
-                >
-                  <Heart
-                    className={`h-4 w-4 ${post.isLiked ? "text-red-500 fill-red-500" : ""}`}
-                  />
-                  <span>{post.likeCount}</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="gap-1">
-                  <MessageSquare className="h-4 w-4" />
-                  <span>{post.comments}</span>
-                </Button>
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
+                <h3 className="text-xl font-bold mt-2">{post.title}</h3>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground line-clamp-3">
+                  {post.content}
+                </p>
+              </CardContent>
+              <CardFooter>
+                <div className="flex gap-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleLike(post.id);
+                    }}
+                  >
+                    <Heart
+                      className={`h-4 w-4 ${post.isLiked ? "text-red-500 fill-red-500" : ""}`}
+                    />
+                    <span>{post.likeCount}</span>
+                  </Button>
+                  <Button variant="ghost" size="sm" className="gap-1">
+                    <MessageSquare className="h-4 w-4" />
+                    <span>{post.comments}</span>
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          ));
+        })()}
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
