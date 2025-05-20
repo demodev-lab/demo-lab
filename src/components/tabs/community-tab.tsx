@@ -340,11 +340,46 @@ export function CommunityTab() {
   };
 
   const handleAddComment = () => {
-    if (!commentText.trim()) return;
-    // In a real app, you would add the comment to the database
-    // For now, we'll just close the modal
+    if (!commentText.trim() || !selectedPost) return;
+    // 새 댓글 객체 생성
+    const newComment = {
+      id:
+        selectedPost.commentsList.length > 0
+          ? Math.max(...selectedPost.commentsList.map((c) => c.id)) + 1
+          : 1,
+      author: "Current User", // 실제 앱에서는 로그인 유저 정보 사용
+      authorUsername: "current-user",
+      date: new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      content: commentText,
+      likes: 0,
+    };
+    // posts 배열에서 해당 post의 commentsList에 새 댓글 추가
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === selectedPost.id
+          ? {
+              ...post,
+              commentsList: [...post.commentsList, newComment],
+              comments: post.comments + 1,
+            }
+          : post,
+      ),
+    );
+    // 선택된 post의 commentsList도 업데이트
+    setSelectedPost((prev) =>
+      prev
+        ? {
+            ...prev,
+            commentsList: [...prev.commentsList, newComment],
+            comments: prev.comments + 1,
+          }
+        : prev,
+    );
     setCommentText("");
-    // You could also update the local state to show the new comment
   };
 
   const toggleCategories = () => {
@@ -644,6 +679,12 @@ export function CommunityTab() {
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       className="flex-1"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleAddComment();
+                        }
+                      }}
                     />
                     <Button
                       size="sm"
