@@ -794,7 +794,7 @@ export function CourseDetail({ courseId }: { courseId: string }) {
                                 <div
                                   className={cn(
                                     "flex-shrink-0 w-6 h-6 rounded-full text-white flex items-center justify-center text-xs",
-                                    isActive ? "bg-[#2F80ED]" : "bg-gray-400",
+                                    isActive ? "bg-[#5046E4]" : "bg-gray-400",
                                   )}
                                 >
                                   {moduleIndex + 1}.{lessonIndex + 1}
@@ -925,7 +925,7 @@ export function CourseDetail({ courseId }: { courseId: string }) {
                       {nextLesson && (
                         <Button
                           onClick={() => navigateToLesson(nextLesson)}
-                          className="flex items-center bg-[#2F80ED] hover:bg-[#2F80ED]/90"
+                          className="flex items-center bg-[#5046E4] hover:bg-[#5046E4]/90"
                         >
                           다음 강의
                           <ChevronRight className="h-4 w-4 ml-2" />
@@ -963,7 +963,7 @@ export function CourseDetail({ courseId }: { courseId: string }) {
                 <ul className="space-y-2">
                   {course.requirements.map((requirement, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <div className="h-2 w-2 rounded-full bg-[#2F80ED] mt-2 flex-shrink-0" />
+                      <div className="h-2 w-2 rounded-full bg-[#5046E4] mt-2 flex-shrink-0" />
                       <span>{requirement}</span>
                     </li>
                   ))}
@@ -996,7 +996,7 @@ export function CourseDetail({ courseId }: { courseId: string }) {
                         onClick={() => navigateToLesson(lesson)}
                       >
                         <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#2F80ED] text-white flex items-center justify-center text-xs">
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#5046E4] text-white flex items-center justify-center text-xs">
                             {moduleIndex + 1}.{lessonIndex + 1}
                           </div>
                           <div>

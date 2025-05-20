@@ -110,7 +110,7 @@ export function CalendarTab() {
                       day.date === null
                         ? "text-muted-foreground opacity-50 bg-transparent"
                         : day.date === 19
-                          ? "bg-[#2F80ED] text-white"
+                          ? "bg-[#5046E4] text-white"
                           : "hover:bg-muted"
                     }`}
                   >

@@ -24,7 +24,7 @@ export function TabNavigation({ activeTab, setActiveTab }: TabNavigationProps) {
             className={cn(
               "px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors",
               activeTab === tab.id
-                ? "border-b-2 border-[#2F80ED] text-[#2F80ED]"
+                ? "border-b-2 border-[#5046E4] text-[#5046E4]"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

@@ -608,7 +608,7 @@ export function CommunityTab() {
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  className="bg-[#2F80ED] hover:bg-[#2F80ED]/90"
+                  className="bg-[#5046E4] hover:bg-[#5046E4]/90"
                   onClick={handleEditSave}
                   disabled={!editCommentText.trim()}
                 >
@@ -731,7 +731,7 @@ export function CommunityTab() {
                 취소
               </Button>
               <Button
-                className="bg-[#2F80ED] hover:bg-[#2F80ED]/90"
+                className="bg-[#5046E4] hover:bg-[#5046E4]/90"
                 onClick={handlePostSubmit}
                 disabled={!postTitle.trim() || !postContent.trim()}
               >
@@ -751,7 +751,7 @@ export function CommunityTab() {
                   key={category.id}
                   variant={category.id === activeCategory ? "default" : "ghost"}
                   size="sm"
-                  className={`mb-1 ${category.id === activeCategory ? "bg-[#2F80ED] text-white" : ""}`}
+                  className={`mb-1 ${category.id === activeCategory ? "bg-[#5046E4] text-white" : ""}`}
                   onClick={() => {
                     setActiveCategory(category.id);
                     setSelectedCategory(category.label);
@@ -856,7 +856,7 @@ export function CommunityTab() {
           return filteredPosts.map((post) => (
             <Card
               key={post.id}
-              className={`${post.pinned ? "border-[#2F80ED]" : ""} cursor-pointer hover:shadow-md transition-shadow`}
+              className={`${post.pinned ? "border-[#5046E4]" : ""} cursor-pointer hover:shadow-md transition-shadow`}
               onClick={() => handleOpenModal(post)}
             >
               <CardHeader className="pb-2">
@@ -988,7 +988,7 @@ export function CommunityTab() {
                     />
                     <Button
                       size="sm"
-                      className="bg-[#2F80ED] hover:bg-[#2F80ED]/90"
+                      className="bg-[#5046E4] hover:bg-[#5046E4]/90"
                       onClick={handleAddComment}
                       disabled={!commentText.trim()}
                     >

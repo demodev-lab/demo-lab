@@ -16,7 +16,7 @@ export function Header() {
       <div className="flex h-14 items-center px-4">
         <Link
           href="/"
-          className="flex items-center font-bold text-2xl text-[#2F80ED] mr-4"
+          className="flex items-center font-bold text-2xl text-[#5046E4] mr-4"
         >
           ClassHive
         </Link>

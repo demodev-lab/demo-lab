@@ -29,7 +29,7 @@ export function Sidebar() {
             </div>
           </div>
 
-          <Button className="w-full bg-[#2F80ED] hover:bg-[#2F80ED]/90">
+          <Button className="w-full bg-[#5046E4] hover:bg-[#5046E4]/90">
             INVITE PEOPLE
           </Button>
 

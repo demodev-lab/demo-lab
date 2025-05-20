@@ -572,7 +572,7 @@ export function CourseLesson({
                 {nextLesson && (
                   <Button
                     onClick={() => navigateToLesson(nextLesson.id)}
-                    className="flex items-center bg-[#2F80ED] hover:bg-[#2F80ED]/90"
+                    className="flex items-center bg-[#5046E4] hover:bg-[#5046E4]/90"
                   >
                     Next Lesson
                     <ChevronRight className="h-4 w-4 ml-2" />
