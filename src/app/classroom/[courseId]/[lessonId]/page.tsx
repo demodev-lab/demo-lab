@@ -1,4 +1,4 @@
-import { CourseLesson } from "@/components/course-lesson";
+import { CourseLesson } from "@/src/components/course-lesson";
 
 export default function CourseLessonPage({
   params,
