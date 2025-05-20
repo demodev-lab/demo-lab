@@ -331,21 +331,35 @@ export function CommunityTab() {
 
   const getSortedPosts = () => {
     const postsToSort = [...posts];
-
+    // pinned/비pinned 분리
+    const pinnedPosts = postsToSort.filter((p) => p.pinned);
+    const normalPosts = postsToSort.filter((p) => !p.pinned);
+    // pinned 게시물은 생성일(날짜) 오름차순
+    pinnedPosts.sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
+    // 나머지 게시물은 필터에 따라 정렬
+    let sortedNormalPosts = [];
     switch (sortOption) {
       case "new":
-        return postsToSort.sort(
+        sortedNormalPosts = normalPosts.sort(
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
+        break;
       case "top":
-        return postsToSort.sort((a, b) => b.likes - a.likes);
+        sortedNormalPosts = normalPosts.sort(
+          (a, b) => b.likeCount - a.likeCount,
+        );
+        break;
       default:
-        return postsToSort.sort((a, b) => {
-          if (a.pinned && !b.pinned) return -1;
-          if (!a.pinned && b.pinned) return 1;
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
+        // 기본순: 최신순(내림차순)
+        sortedNormalPosts = normalPosts.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
+        break;
     }
+    // pinned + 나머지
+    return [...pinnedPosts, ...sortedNormalPosts];
   };
 
   const handleOpenModal = (post) => {
