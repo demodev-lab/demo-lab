@@ -71,6 +71,8 @@ export function CommunityTab() {
         "안녕하세요! 이 공간은 학습하고, 나누고, 함께 성장하는 커뮤니티입니다. 혼자였다면 어려웠을 여정도, 함께라서 훨씬 즐겁고 빠르게 나아갈 수 있어요.\n\n이 커뮤니티에서 누릴 수 있는 것들:\n✔ 커뮤니티 전용 독점 콘텐츠 공유\n✔ 실전 프로젝트 및 튜토리얼\n✔ 최신 학습 자료와 실전 사례 소개\n✔ 다양한 분야의 전문가들과 교류\n\n함께해주셔서 정말 감사합니다. 그리고, 더 재밌게, 더 유익하게 만들어가요!",
       comments: 5,
       likes: 24,
+      likeCount: 24,
+      isLiked: false,
       commentsList: [
         {
           id: 1,
@@ -131,6 +133,8 @@ export function CommunityTab() {
         "안녕하세요, 처음 시작하는 입장에서 어떤 순서로 강의를 들어야 할지 추천해주실 수 있을까요? 효율적인 학습 로드맵이 궁금합니다.\n\n현재 기초 지식은 있지만, 체계적으로 학습하고 싶습니다. 추천해주시면 정말 감사하겠습니다!",
       comments: 3,
       likes: 7,
+      likeCount: 7,
+      isLiked: false,
       commentsList: [
         {
           id: 1,
@@ -176,6 +180,8 @@ export function CommunityTab() {
         "최근에 발견한 좋은 학습 자료들을 공유합니다. 특히 입문자분들에게 도움이 될 것 같아요.\n\n1. 기초 개념 정리 문서: [링크]\n2. 실전 예제 모음: [링크]\n3. 유용한 툴 소개: [링크]\n4. 커뮤니티 추천 자료: [링크]\n\n다들 학습에 도움이 되셨으면 좋겠습니다!",
       comments: 8,
       likes: 15,
+      likeCount: 15,
+      isLiked: false,
       commentsList: [
         {
           id: 1,
@@ -311,6 +317,8 @@ export function CommunityTab() {
       content: postContent,
       comments: 0,
       likes: 0,
+      likeCount: 0,
+      isLiked: false,
       commentsList: [],
     };
 
@@ -460,6 +468,29 @@ export function CommunityTab() {
   const handleEditCancel = () => {
     setEditCommentId(null);
     setEditCommentText("");
+  };
+
+  const handleToggleLike = (postId: number) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              isLiked: !post.isLiked,
+              likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
+            }
+          : post,
+      ),
+    );
+    setSelectedPost((prev) =>
+      prev && prev.id === postId
+        ? {
+            ...prev,
+            isLiked: !prev.isLiked,
+            likeCount: prev.isLiked ? prev.likeCount - 1 : prev.likeCount + 1,
+          }
+        : prev,
+    );
   };
 
   const renderComments = (comments) =>
@@ -765,13 +796,23 @@ export function CommunityTab() {
             </CardContent>
             <CardFooter>
               <div className="flex gap-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleLike(post.id);
+                  }}
+                >
+                  <Heart
+                    className={`h-4 w-4 ${post.isLiked ? "text-red-500 fill-red-500" : ""}`}
+                  />
+                  <span>{post.likeCount}</span>
+                </Button>
                 <Button variant="ghost" size="sm" className="gap-1">
                   <MessageSquare className="h-4 w-4" />
                   <span>{post.comments}</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="gap-1">
-                  <Heart className="h-4 w-4" />
-                  <span>{post.likes}</span>
                 </Button>
               </div>
             </CardFooter>
@@ -810,9 +851,16 @@ export function CommunityTab() {
               </DialogHeader>
 
               <div className="flex gap-4 my-4">
-                <Button variant="outline" size="sm" className="gap-1">
-                  <Heart className="h-4 w-4" />
-                  <span>좋아요 {selectedPost.likes}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1"
+                  onClick={() => handleToggleLike(selectedPost.id)}
+                >
+                  <Heart
+                    className={`h-4 w-4 ${selectedPost.isLiked ? "text-red-500 fill-red-500" : ""}`}
+                  />
+                  <span>좋아요 {selectedPost.likeCount}</span>
                 </Button>
                 <Button variant="outline" size="sm" className="gap-1">
                   <MessageSquare className="h-4 w-4" />
