@@ -12,8 +12,6 @@ export function TabNavigation({ activeTab, setActiveTab }: TabNavigationProps) {
     { id: "community", label: "Community" },
     { id: "classroom", label: "Classroom" },
     { id: "calendar", label: "Calendar" },
-    { id: "members", label: "Members" },
-    { id: "about", label: "About" },
   ];
 
   return (
