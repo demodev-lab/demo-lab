@@ -79,6 +79,7 @@ export function CommunityTab() {
           date: "May 18, 2025",
           content: "환영합니다! 좋은 커뮤니티가 될 것 같아요.",
           likes: 3,
+          replies: [],
         },
         {
           id: 2,
@@ -87,6 +88,7 @@ export function CommunityTab() {
           date: "May 18, 2025",
           content: "기대가 큽니다. 함께 성장해요!",
           likes: 2,
+          replies: [],
         },
         {
           id: 3,
@@ -95,6 +97,7 @@ export function CommunityTab() {
           date: "May 19, 2025",
           content: "안녕하세요! 잘 부탁드립니다.",
           likes: 1,
+          replies: [],
         },
         {
           id: 4,
@@ -103,6 +106,7 @@ export function CommunityTab() {
           date: "May 19, 2025",
           content: "좋은 커뮤니티네요. 열심히 참여하겠습니다!",
           likes: 0,
+          replies: [],
         },
         {
           id: 5,
@@ -111,6 +115,7 @@ export function CommunityTab() {
           date: "May 19, 2025",
           content: "반갑습니다! 함께 배워가요.",
           likes: 1,
+          replies: [],
         },
       ],
     },
@@ -135,6 +140,7 @@ export function CommunityTab() {
           content:
             "안녕하세요! 기초 강의부터 시작하시는 것을 추천드립니다. 'ClassHive 입문자를 위한 필수 가이드'를 먼저 수강하시고, 그 다음에 관심 있는 분야의 강의를 들으시면 좋을 것 같아요.",
           likes: 2,
+          replies: [],
         },
         {
           id: 2,
@@ -144,6 +150,7 @@ export function CommunityTab() {
           content:
             "저도 Hyungwoo님 의견에 동의합니다. 기초 강의 후에 실습 위주의 강의를 들으시면 효과적일 거예요.",
           likes: 1,
+          replies: [],
         },
         {
           id: 3,
@@ -153,6 +160,7 @@ export function CommunityTab() {
           content:
             "저는 로드맵을 따라가면서 작은 프로젝트를 병행했을 때 가장 효과적이었어요. 강의만 듣기보다는 배운 내용을 바로 적용해보세요!",
           likes: 3,
+          replies: [],
         },
       ],
     },
@@ -176,6 +184,7 @@ export function CommunityTab() {
           date: "May 17, 2025",
           content: "정말 유용한 자료네요! 감사합니다.",
           likes: 2,
+          replies: [],
         },
         {
           id: 2,
@@ -185,6 +194,7 @@ export function CommunityTab() {
           content:
             "특히 실전 예제 모음이 정말 도움이 됐어요. 추가 자료도 있으면 공유해주세요!",
           likes: 1,
+          replies: [],
         },
         {
           id: 3,
@@ -194,6 +204,7 @@ export function CommunityTab() {
           content:
             "좋은 자료 감사합니다. 저도 유용한 자료가 있으면 공유하겠습니다.",
           likes: 0,
+          replies: [],
         },
         {
           id: 4,
@@ -203,6 +214,7 @@ export function CommunityTab() {
           content:
             "자료 잘 보고 있습니다. 특히 기초 개념 정리 문서가 체계적이어서 좋네요.",
           likes: 1,
+          replies: [],
         },
         {
           id: 5,
@@ -211,6 +223,7 @@ export function CommunityTab() {
           date: "May 18, 2025",
           content: "감사합니다! 많은 도움이 되고 있어요.",
           likes: 0,
+          replies: [],
         },
         {
           id: 6,
@@ -220,6 +233,7 @@ export function CommunityTab() {
           content:
             "좋은 자료 공유 감사합니다. 저도 몇 가지 추천하고 싶은 자료가 있는데, 나중에 별도 포스트로 공유할게요.",
           likes: 2,
+          replies: [],
         },
         {
           id: 7,
@@ -229,6 +243,7 @@ export function CommunityTab() {
           content:
             "정말 유용한 자료네요. 특히 3번 유용한 툴 소개가 실무에 많은 도움이 됩니다.",
           likes: 1,
+          replies: [],
         },
         {
           id: 8,
@@ -238,14 +253,16 @@ export function CommunityTab() {
           content:
             "좋은 자료 공유 감사합니다! 커뮤니티 자료실에도 추가해두었습니다.",
           likes: 3,
+          replies: [],
         },
       ],
     },
   ]);
 
-  // Add this useEffect after the other state declarations
+  const [editCommentId, setEditCommentId] = useState<number | null>(null);
+  const [editCommentText, setEditCommentText] = useState("");
+
   useEffect(() => {
-    // Check URL for category parameter
     const url = new URL(window.location.href);
     const categoryParam = url.searchParams.get("category");
     if (categoryParam) {
@@ -268,7 +285,6 @@ export function CommunityTab() {
     { id: "jobs", label: "Jobs" },
   ];
 
-  // Display only the first 5 categories or all categories based on state
   const visibleCategories = showAllCategories
     ? categories
     : categories.slice(0, 5);
@@ -277,15 +293,13 @@ export function CommunityTab() {
     e.preventDefault();
 
     if (!postTitle.trim() || !postContent.trim()) {
-      // Don't submit if title or content is empty
       return;
     }
 
-    // Create a new post object
     const newPost = {
       id: posts.length > 0 ? Math.max(...posts.map((post) => post.id)) + 1 : 1,
       pinned: false,
-      author: "Current User", // In a real app, this would be the logged-in user
+      author: "Current User",
       authorUsername: "current-user",
       date: new Date().toLocaleDateString("en-US", {
         month: "short",
@@ -300,30 +314,28 @@ export function CommunityTab() {
       commentsList: [],
     };
 
-    // Add the new post to the beginning of the posts array
     setPosts([newPost, ...posts]);
 
-    // Reset the form
     setPostTitle("");
     setPostContent("");
     setIsExpanded(false);
   };
 
-  // Sort posts based on selected option
   const getSortedPosts = () => {
     const postsToSort = [...posts];
 
     switch (sortOption) {
       case "new":
-        return postsToSort.sort((a, b) => new Date(b.date) - new Date(a.date));
+        return postsToSort.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
       case "top":
         return postsToSort.sort((a, b) => b.likes - a.likes);
       default:
-        // Default sorting: pinned posts first, then by date
         return postsToSort.sort((a, b) => {
           if (a.pinned && !b.pinned) return -1;
           if (!a.pinned && b.pinned) return 1;
-          return new Date(b.date) - new Date(a.date);
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
         });
     }
   };
@@ -341,13 +353,12 @@ export function CommunityTab() {
 
   const handleAddComment = () => {
     if (!commentText.trim() || !selectedPost) return;
-    // 새 댓글 객체 생성
     const newComment = {
       id:
         selectedPost.commentsList.length > 0
           ? Math.max(...selectedPost.commentsList.map((c) => c.id)) + 1
           : 1,
-      author: "Current User", // 실제 앱에서는 로그인 유저 정보 사용
+      author: "Current User",
       authorUsername: "current-user",
       date: new Date().toLocaleDateString("en-US", {
         month: "short",
@@ -356,8 +367,8 @@ export function CommunityTab() {
       }),
       content: commentText,
       likes: 0,
+      replies: [],
     };
-    // posts 배열에서 해당 post의 commentsList에 새 댓글 추가
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === selectedPost.id
@@ -369,7 +380,6 @@ export function CommunityTab() {
           : post,
       ),
     );
-    // 선택된 post의 commentsList도 업데이트
     setSelectedPost((prev) =>
       prev
         ? {
@@ -382,13 +392,167 @@ export function CommunityTab() {
     setCommentText("");
   };
 
+  const handleDeleteComment = (commentId: number) => {
+    if (!selectedPost) return;
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === selectedPost.id
+          ? {
+              ...post,
+              commentsList: post.commentsList.filter(
+                (comment) => comment.id !== commentId,
+              ),
+              comments: post.comments - 1,
+            }
+          : post,
+      ),
+    );
+    setSelectedPost((prev) =>
+      prev
+        ? {
+            ...prev,
+            commentsList: prev.commentsList.filter(
+              (comment) => comment.id !== commentId,
+            ),
+            comments: prev.comments - 1,
+          }
+        : prev,
+    );
+  };
+
+  const handleEditClick = (comment) => {
+    setEditCommentId(comment.id);
+    setEditCommentText(comment.content);
+  };
+
+  const handleEditSave = () => {
+    if (!selectedPost || !editCommentId) return;
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === selectedPost.id
+          ? {
+              ...post,
+              commentsList: post.commentsList.map((comment) =>
+                comment.id === editCommentId
+                  ? { ...comment, content: editCommentText }
+                  : comment,
+              ),
+            }
+          : post,
+      ),
+    );
+    setSelectedPost((prev) =>
+      prev
+        ? {
+            ...prev,
+            commentsList: prev.commentsList.map((comment) =>
+              comment.id === editCommentId
+                ? { ...comment, content: editCommentText }
+                : comment,
+            ),
+          }
+        : prev,
+    );
+    setEditCommentId(null);
+    setEditCommentText("");
+  };
+
+  const handleEditCancel = () => {
+    setEditCommentId(null);
+    setEditCommentText("");
+  };
+
+  const renderComments = (comments) =>
+    comments.map((comment) => (
+      <div key={comment.id}>
+        <div className="flex gap-2 mt-4">
+          <Avatar className="h-8 w-8">
+            <AvatarImage
+              src={`/placeholder.svg?text=${comment.author.charAt(0)}`}
+            />
+            <AvatarFallback>
+              <User className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{comment.author}</span>
+              <span className="text-xs text-muted-foreground">
+                {comment.date}
+              </span>
+              {comment.authorUsername === "current-user" && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => handleEditClick(comment)}
+                  >
+                    수정
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs text-red-500"
+                    onClick={() => handleDeleteComment(comment.id)}
+                  >
+                    삭제
+                  </Button>
+                </>
+              )}
+            </div>
+            {editCommentId === comment.id ? (
+              <div className="flex flex-col gap-2 mt-2">
+                <Textarea
+                  value={editCommentText}
+                  onChange={(e) => setEditCommentText(e.target.value)}
+                  className="flex-1 min-h-[60px]"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    className="bg-[#2F80ED] hover:bg-[#2F80ED]/90"
+                    onClick={handleEditSave}
+                    disabled={!editCommentText.trim()}
+                  >
+                    저장
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleEditCancel}
+                  >
+                    취소
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm mt-1">{comment.content}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                  >
+                    <Heart className="h-3 w-3 mr-1" />
+                    <span>{comment.likes}</span>
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    ));
+
   const toggleCategories = () => {
     setShowAllCategories(!showAllCategories);
   };
 
   return (
     <div className="w-full h-full px-4 py-6">
-      {/* Post Creation Card */}
       {!isExpanded ? (
         <Card className="mb-6">
           <CardContent className="p-4">
@@ -471,7 +635,6 @@ export function CommunityTab() {
         </Card>
       )}
 
-      {/* Category Tabs */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div className="flex-1 flex flex-col">
@@ -484,7 +647,6 @@ export function CommunityTab() {
                   className={`mb-1 ${category.id === activeCategory ? "bg-[#2F80ED] text-white" : ""}`}
                   onClick={() => {
                     setActiveCategory(category.id);
-                    // Handle route navigation based on category
                     if (category.id === "all") {
                       router.push("/");
                     } else if (category.id === "classroom") {
@@ -496,7 +658,6 @@ export function CommunityTab() {
                     } else if (category.id === "about") {
                       router.push("/about");
                     } else {
-                      // For other categories, stay on community page with query param
                       router.push(`/?category=${category.id}`);
                     }
                   }}
@@ -568,7 +729,6 @@ export function CommunityTab() {
         </div>
       </div>
 
-      {/* Posts List */}
       <div className="space-y-4">
         {getSortedPosts().map((post) => (
           <Card
@@ -619,7 +779,6 @@ export function CommunityTab() {
         ))}
       </div>
 
-      {/* Post Detail Modal */}
       <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           {selectedPost && (
@@ -666,7 +825,7 @@ export function CommunityTab() {
               <div className="space-y-4">
                 <h4 className="font-medium">댓글 {selectedPost.comments}개</h4>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-4">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/placeholder.svg?text=Me" />
                     <AvatarFallback>
@@ -698,44 +857,7 @@ export function CommunityTab() {
                 </div>
 
                 <div className="space-y-4 mt-6">
-                  {selectedPost.commentsList.map((comment) => (
-                    <div key={comment.id} className="flex gap-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={`/placeholder.svg?text=${comment.author.charAt(0)}`}
-                        />
-                        <AvatarFallback>
-                          <User className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{comment.author}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {comment.date}
-                          </span>
-                        </div>
-                        <p className="text-sm mt-1">{comment.content}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 px-2 text-xs"
-                          >
-                            <Heart className="h-3 w-3 mr-1" />
-                            <span>{comment.likes}</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 px-2 text-xs"
-                          >
-                            답글
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                  {renderComments(selectedPost.commentsList)}
                 </div>
               </div>
             </>
