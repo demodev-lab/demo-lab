@@ -18,7 +18,7 @@ export function Header() {
           href="/"
           className="flex items-center font-bold text-2xl text-[#5046E4] mr-4"
         >
-          ClassHive
+          demo-lab
         </Link>
 
         {/* Desktop Search */}
