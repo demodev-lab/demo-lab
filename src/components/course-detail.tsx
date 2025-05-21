@@ -66,6 +66,461 @@ interface Course {
   relatedCourses: string[];
 }
 
+// getCourseData 함수 선언을 useState 위로 이동
+const getCourseData = (id: string): Course => {
+  const courses = {
+    "ai-agency-masterclass": {
+      id: "ai-agency-masterclass",
+      title: "ClassHive 입문자를 위한 필수 가이드",
+      subtitle: "ClassHive Ready: 기초 개념부터 실전까지",
+      description:
+        "ClassHive를 제대로 활용하기 위한 필수 기초 지식을 배워봅시다! 경험이 없다면, 반드시 이 강의를 먼저 수강하세요. 이 강의는 ClassHive 플랫폼의 모든 기능을 효과적으로 활용하는 방법을 단계별로 안내합니다. 초보자도 쉽게 따라할 수 있는 실습 중심의 커리큘럼으로 구성되어 있습니다.",
+      level: "입문",
+      duration: "3시간 30분",
+      totalLessons: 12,
+      imageUrl: "/placeholder.svg?text=ClassHive+입문",
+      modules: [
+        {
+          id: "getting-started",
+          title: "시작하기",
+          description:
+            "ClassHive 플랫폼의 기본 개념과 인터페이스를 소개합니다.",
+          lessons: [
+            {
+              id: "the-ai-brain",
+              title: "ClassHive 소개 (여기서 시작하세요)",
+              duration: "10:25",
+              completed: false,
+              videoUrl:
+                "/placeholder.svg?height=720&width=1280&text=ClassHive+소개",
+              content: `
+              <h2>ClassHive 소개</h2>
+              <p>안녕하세요! ClassHive 플랫폼에 오신 것을 환영합니다. 이 강의에서는 ClassHive의 기본 개념과 주요 기능을 소개합니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>ClassHive 플랫폼의 철학과 목표</li>
+                <li>주요 기능 및 인터페이스 소개</li>
+                <li>효과적인 학습을 위한 기본 설정</li>
+                <li>첫 번째 학습 세션 시작하기</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">ClassHive 시작 가이드 PDF</a></li>
+                <li><a href="#">플랫폼 둘러보기 체크리스트</a></li>
+              </ul>
+              `,
+            },
+            {
+              id: "whats-possible",
+              title: "ClassHive로 무엇을 할 수 있나요?",
+              duration: "8:15",
+              completed: false,
+              videoUrl:
+                "/placeholder.svg?height=720&width=1280&text=ClassHive+가능성",
+              content: `
+              <h2>ClassHive로 무엇을 할 수 있나요?</h2>
+              <p>이 강의에서는 ClassHive 플랫폼을 활용하여 할 수 있는 다양한 활동과 프로젝트에 대해 알아봅니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>개인 학습 및 그룹 학습 시나리오</li>
+                <li>프로젝트 기반 학습 사례</li>
+                <li>커뮤니티 참여 및 네트워킹</li>
+                <li>학습 성과 추적 및 분석</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">성공 사례 모음집</a></li>
+                <li><a href="#">프로젝트 아이디어 템플릿</a></li>
+              </ul>
+              `,
+            },
+          ],
+        },
+        {
+          id: "basic-features",
+          title: "기본 기능 익히기",
+          description: "ClassHive의 핵심 기능을 배우고 실습합니다.",
+          lessons: [
+            {
+              id: "community-features",
+              title: "커뮤니티 기능 활용하기",
+              duration: "15:30",
+              completed: false,
+              videoUrl:
+                "/placeholder.svg?height=720&width=1280&text=커뮤니티+기능",
+              content: `
+              <h2>커뮤니티 기능 활용하기</h2>
+              <p>이 강의에서는 ClassHive의 커뮤니티 기능을 효과적으로 활용하는 방법을 배웁니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>토론 참여 및 질문하기</li>
+                <li>자료 공유 및 피드백 받기</li>
+                <li>스터디 그룹 찾기 및 참여하기</li>
+                <li>네트워킹 전략</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">효과적인 질문 작성법</a></li>
+                <li><a href="#">커뮤니티 에티켓 가이드</a></li>
+              </ul>
+              `,
+            },
+            {
+              id: "classroom-features",
+              title: "강의실 기능 활용하기",
+              duration: "12:45",
+              completed: false,
+              videoUrl:
+                "/placeholder.svg?height=720&width=1280&text=강의실+기능",
+              content: `
+              <h2>강의실 기능 활용하기</h2>
+              <p>이 강의에서는 ClassHive의 강의실 기능을 효과적으로 활용하는 방법을 배웁니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>강의 검색 및 필터링</li>
+                <li>노트 작성 및 관리</li>
+                <li>학습 진도 추적</li>
+                <li>퀴즈 및 과제 제출</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">효과적인 노트 작성법</a></li>
+                <li><a href="#">학습 계획 템플릿</a></li>
+              </ul>
+              `,
+            },
+            {
+              id: "calendar-features",
+              title: "캘린더 기능 활용하기",
+              duration: "9:20",
+              completed: false,
+              videoUrl:
+                "/placeholder.svg?height=720&width=1280&text=캘린더+기능",
+              content: `
+              <h2>캘린더 기능 활용하기</h2>
+              <p>이 강의에서는 ClassHive의 캘린더 기능을 효과적으로 활용하는 방법을 배웁니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>학습 일정 계획 및 관리</li>
+                <li>이벤트 및 마감일 설정</li>
+                <li>알림 설정 및 관리</li>
+                <li>일정 공유 및 협업</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">효과적인 시간 관리 가이드</a></li>
+                <li><a href="#">학습 일정 템플릿</a></li>
+              </ul>
+              `,
+            },
+          ],
+        },
+        {
+          id: "advanced-features",
+          title: "고급 기능 익히기",
+          description: "더 효율적인 학습을 위한 고급 기능을 배웁니다.",
+          lessons: [
+            {
+              id: "collaboration-tools",
+              title: "협업 도구 활용하기",
+              duration: "14:15",
+              completed: false,
+              videoUrl: "/placeholder.svg?height=720&width=1280&text=협업+도구",
+              content: `
+              <h2>협업 도구 활용하기</h2>
+              <p>이 강의에서는 ClassHive의 협업 도구를 효과적으로 활용하는 방법을 배웁니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>그룹 프로젝트 관리</li>
+                <li>실시간 문서 공동 편집</li>
+                <li>피드백 주고받기</li>
+                <li>화상 회의 및 스터디 세션</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">효과적인 협업 가이드</a></li>
+                <li><a href="#">프로젝트 관리 템플릿</a></li>
+              </ul>
+              `,
+            },
+            {
+              id: "progress-tracking",
+              title: "학습 진도 관리하기",
+              duration: "11:30",
+              completed: false,
+              videoUrl: "/placeholder.svg?height=720&width=1280&text=진도+관리",
+              content: `
+              <h2>학습 진도 관리하기</h2>
+              <p>이 강의에서는 ClassHive에서 학습 진도를 효과적으로 관리하는 방법을 배웁니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>학습 목표 설정</li>
+                <li>진도 추적 및 분석</li>
+                <li>학습 패턴 파악</li>
+                <li>개선 전략 수립</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">학습 목표 설정 가이드</a></li>
+                <li><a href="#">진도 추적 템플릿</a></li>
+              </ul>
+              `,
+            },
+            {
+              id: "custom-settings",
+              title: "개인 설정 최적화하기",
+              duration: "8:45",
+              completed: false,
+              videoUrl: "/placeholder.svg?height=720&width=1280&text=개인+설정",
+              content: `
+              <h2>개인 설정 최적화하기</h2>
+              <p>이 강의에서는 ClassHive의 개인 설정을 최적화하여 학습 경험을 향상시키는 방법을 배웁니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>인터페이스 사용자 정의</li>
+                <li>알림 및 이메일 설정</li>
+                <li>개인 정보 및 보안 설정</li>
+                <li>접근성 옵션</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">개인 설정 체크리스트</a></li>
+                <li><a href="#">보안 가이드</a></li>
+              </ul>
+              `,
+            },
+          ],
+        },
+        {
+          id: "practical-application",
+          title: "실전 활용",
+          description: "배운 내용을 실제 학습에 적용하는 방법을 배웁니다.",
+          lessons: [
+            {
+              id: "learning-path",
+              title: "나만의 학습 경로 만들기",
+              duration: "16:20",
+              completed: false,
+              videoUrl: "/placeholder.svg?height=720&width=1280&text=학습+경로",
+              content: `
+              <h2>나만의 학습 경로 만들기</h2>
+              <p>이 강의에서는 ClassHive를 활용하여 개인화된 학습 경로를 설계하는 방법을 배웁니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>학습 목표 및 우선순위 설정</li>
+                <li>강의 및 자료 선택</li>
+                <li>학습 일정 계획</li>
+                <li>진도 관리 및 조정</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">학습 경로 설계 템플릿</a></li>
+                <li><a href="#">성공적인 학습 경로 사례</a></li>
+              </ul>
+              `,
+            },
+            {
+              id: "study-group",
+              title: "스터디 그룹 만들고 운영하기",
+              duration: "13:10",
+              completed: false,
+              videoUrl:
+                "/placeholder.svg?height=720&width=1280&text=스터디+그룹",
+              content: `
+              <h2>스터디 그룹 만들고 운영하기</h2>
+              <p>이 강의에서는 ClassHive에서 효과적인 스터디 그룹을 만들고 운영하는 방법을 배웁니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>스터디 그룹 목적 및 규칙 설정</li>
+                <li>멤버 모집 및 관리</li>
+                <li>효과적인 스터디 세션 진행</li>
+                <li>그룹 활동 평가 및 개선</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">스터디 그룹 운영 가이드</a></li>
+                <li><a href="#">스터디 세션 템플릿</a></li>
+              </ul>
+              `,
+            },
+            {
+              id: "final-project",
+              title: "최종 프로젝트: 학습 계획 수립하기",
+              duration: "20:15",
+              completed: false,
+              videoUrl:
+                "/placeholder.svg?height=720&width=1280&text=최종+프로젝트",
+              content: `
+              <h2>최종 프로젝트: 학습 계획 수립하기</h2>
+              <p>이 강의에서는 지금까지 배운 내용을 종합하여 자신만의 학습 계획을 수립합니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>학습 목표 및 기간 설정</li>
+                <li>필요한 자료 및 강의 선택</li>
+                <li>일정 및 마일스톤 계획</li>
+                <li>진도 추적 및 평가 방법</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">종합 학습 계획 템플릿</a></li>
+                <li><a href="#">자기 평가 체크리스트</a></li>
+              </ul>
+              `,
+            },
+          ],
+        },
+      ],
+      instructors: [
+        {
+          id: "hyungwoo",
+          name: "박형우",
+          role: "ClassHive 창립자 & 수석 강사",
+          bio: "10년 이상의 교육 경험을 가진 전문가로, 학습자 중심의 교육 방법론을 연구하고 적용합니다. ClassHive 플랫폼의 모든 기능을 설계하고 개발한 주역입니다.",
+          avatarUrl: "/placeholder.svg?text=H",
+        },
+        {
+          id: "sunghyun",
+          name: "고성현",
+          role: "커뮤니티 매니저",
+          bio: "커뮤니티 활성화와 회원 관리를 담당하며, 모든 회원이 편안하게 참여할 수 있는 환경을 조성합니다. 학습 커뮤니티 운영 전문가입니다.",
+          avatarUrl: "/placeholder.svg?text=S",
+        },
+      ],
+      requirements: [
+        "기본적인 컴퓨터 사용 능력",
+        "인터넷 브라우저 사용 경험",
+        "학습에 대한 열정과 의지",
+      ],
+      objectives: [
+        "ClassHive 플랫폼의 모든 기능을 능숙하게 활용할 수 있습니다.",
+        "효율적인 학습 계획을 수립하고 실행할 수 있습니다.",
+        "커뮤니티 기능을 활용하여 다른 학습자들과 효과적으로 소통할 수 있습니다.",
+        "자신만의 학습 경로를 설계하고 관리할 수 있습니다.",
+        "스터디 그룹을 만들고 운영할 수 있습니다.",
+      ],
+      relatedCourses: ["ai-tips", "ai-challenge", "ai-gallery"],
+    },
+    "ai-tips": {
+      id: "ai-tips",
+      title: "10X ClassHive TIPS",
+      subtitle: "ClassHive를 10배 더 활용하는 팁 자료 모음",
+      description:
+        "ClassHive의 숨겨진 기능과 활용법을 배워 학습 효율을 높여보세요. 이 강의는 ClassHive를 이미 기본적으로 사용해본 사용자를 위한 중급 과정입니다. 플랫폼을 더욱 효율적으로 활용하는 다양한 팁과 트릭을 배울 수 있습니다.",
+      level: "중급",
+      duration: "2시간 45분",
+      totalLessons: 10,
+      imageUrl: "/placeholder.svg?text=10X+TIPS",
+      modules: [
+        {
+          id: "tips-basics",
+          title: "기본 팁",
+          description:
+            "ClassHive를 더 효율적으로 사용하기 위한 기본 팁을 소개합니다.",
+          lessons: [
+            {
+              id: "intro-lesson",
+              title: "팁 소개",
+              duration: "5:30",
+              completed: false,
+              videoUrl: "/placeholder.svg?height=720&width=1280&text=팁+소개",
+              content: `
+              <h2>팁 소개</h2>
+              <p>이 강의에서는 ClassHive를 더 효율적으로 활용하기 위한 다양한 팁을 소개합니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>이 강의 시리즈의 목적과 구성</li>
+                <li>팁을 효과적으로 활용하는 방법</li>
+                <li>학습 효율성 향상의 기본 원칙</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">팁 활용 가이드</a></li>
+                <li><a href="#">효율성 체크리스트</a></li>
+              </ul>
+              `,
+            },
+            {
+              id: "whats-possible",
+              title: "ClassHive 팁으로 가능한 것들",
+              duration: "8:15",
+              completed: false,
+              videoUrl: "/placeholder.svg?height=720&width=1280&text=팁+가능성",
+              content: `
+              <h2>ClassHive 팁으로 가능한 것들</h2>
+              <p>이 강의에서는 ClassHive 팁을 활용하여 할 수 있는 다양한 활동과 개선점에 대해 알아봅니다.</p>
+              
+              <h3>주요 내용:</h3>
+              <ul>
+                <li>학습 시간 단축 사례</li>
+                <li>정보 관리 효율화 방법</li>
+                <li>협업 품질 향상 전략</li>
+                <li>학습 성과 극대화 방안</li>
+              </ul>
+              
+              <h3>학습 자료:</h3>
+              <ul>
+                <li><a href="#">성공 사례 모음집</a></li>
+                <li><a href="#">효율성 향상 템플릿</a></li>
+              </ul>
+              `,
+            },
+          ],
+        },
+        // 다른 모듈 생략...
+      ],
+      instructors: [
+        {
+          id: "tim",
+          name: "팀 넬름스",
+          role: "콘텐츠 디렉터",
+          bio: "교육 콘텐츠 개발과 품질 관리를 담당하며, 최신 트렌드를 반영한 커리큘럼을 설계합니다. ClassHive 플랫폼을 가장 효율적으로 활용하는 전문가입니다.",
+          avatarUrl: "/placeholder.svg?text=T",
+        },
+      ],
+      requirements: [
+        "ClassHive 기본 기능에 대한 이해",
+        "ClassHive 입문자를 위한 필수 가이드 수강 완료",
+        "중급 수준의 컴퓨터 활용 능력",
+      ],
+      objectives: [
+        "ClassHive의 숨겨진 고급 기능을 활용할 수 있습니다.",
+        "학습 생산성을 크게 향상시킬 수 있습니다.",
+        "키보드 단축키를 활용하여 작업 속도를 높일 수 있습니다.",
+        "맞춤형 템플릿을 만들고 활용할 수 있습니다.",
+        "학습 데이터를 분석하여 학습 효율을 개선할 수 있습니다.",
+      ],
+      relatedCourses: ["ai-agency-masterclass", "ai-challenge", "ai-gallery"],
+    },
+    // 다른 강의 데이터 생략...
+  };
+
+  return courses[id] || courses["ai-agency-masterclass"]; // 기본값으로 첫 번째 강의 반환
+};
+
 export function CourseDetail({ courseId }: { courseId: string }) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -75,468 +530,7 @@ export function CourseDetail({ courseId }: { courseId: string }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
-
-  // 강의 데이터 - 실제 앱에서는 API에서 가져올 것입니다
-  const getCourseData = (id: string): Course => {
-    const courses = {
-      "ai-agency-masterclass": {
-        id: "ai-agency-masterclass",
-        title: "ClassHive 입문자를 위한 필수 가이드",
-        subtitle: "ClassHive Ready: 기초 개념부터 실전까지",
-        description:
-          "ClassHive를 제대로 활용하기 위한 필수 기초 지식을 배워봅시다! 경험이 없다면, 반드시 이 강의를 먼저 수강하세요. 이 강의는 ClassHive 플랫폼의 모든 기능을 효과적으로 활용하는 방법을 단계별로 안내합니다. 초보자도 쉽게 따라할 수 있는 실습 중심의 커리큘럼으로 구성되어 있습니다.",
-        level: "입문",
-        duration: "3시간 30분",
-        totalLessons: 12,
-        imageUrl: "/placeholder.svg?text=ClassHive+입문",
-        modules: [
-          {
-            id: "getting-started",
-            title: "시작하기",
-            description:
-              "ClassHive 플랫폼의 기본 개념과 인터페이스를 소개합니다.",
-            lessons: [
-              {
-                id: "the-ai-brain",
-                title: "ClassHive 소개 (여기서 시작하세요)",
-                duration: "10:25",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=ClassHive+소개",
-                content: `
-                <h2>ClassHive 소개</h2>
-                <p>안녕하세요! ClassHive 플랫폼에 오신 것을 환영합니다. 이 강의에서는 ClassHive의 기본 개념과 주요 기능을 소개합니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>ClassHive 플랫폼의 철학과 목표</li>
-                  <li>주요 기능 및 인터페이스 소개</li>
-                  <li>효과적인 학습을 위한 기본 설정</li>
-                  <li>첫 번째 학습 세션 시작하기</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">ClassHive 시작 가이드 PDF</a></li>
-                  <li><a href="#">플랫폼 둘러보기 체크리스트</a></li>
-                </ul>
-                `,
-              },
-              {
-                id: "whats-possible",
-                title: "ClassHive로 무엇을 할 수 있나요?",
-                duration: "8:15",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=ClassHive+가능성",
-                content: `
-                <h2>ClassHive로 무엇을 할 수 있나요?</h2>
-                <p>이 강의에서는 ClassHive 플랫폼을 활용하여 할 수 있는 다양한 활동과 프로젝트에 대해 알아봅니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>개인 학습 및 그룹 학습 시나리오</li>
-                  <li>프로젝트 기반 학습 사례</li>
-                  <li>커뮤니티 참여 및 네트워킹</li>
-                  <li>학습 성과 추적 및 분석</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">성공 사례 모음집</a></li>
-                  <li><a href="#">프로젝트 아이디어 템플릿</a></li>
-                </ul>
-                `,
-              },
-            ],
-          },
-          {
-            id: "basic-features",
-            title: "기본 기능 익히기",
-            description: "ClassHive의 핵심 기능을 배우고 실습합니다.",
-            lessons: [
-              {
-                id: "community-features",
-                title: "커뮤니티 기능 활용하기",
-                duration: "15:30",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=커뮤니티+기능",
-                content: `
-                <h2>커뮤니티 기능 활용하기</h2>
-                <p>이 강의에서는 ClassHive의 커뮤니티 기능을 효과적으로 활용하는 방법을 배웁니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>토론 참여 및 질문하기</li>
-                  <li>자료 공유 및 피드백 받기</li>
-                  <li>스터디 그룹 찾기 및 참여하기</li>
-                  <li>네트워킹 전략</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">효과적인 질문 작성법</a></li>
-                  <li><a href="#">커뮤니티 에티켓 가이드</a></li>
-                </ul>
-                `,
-              },
-              {
-                id: "classroom-features",
-                title: "강의실 기능 활용하기",
-                duration: "12:45",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=강의실+기능",
-                content: `
-                <h2>강의실 기능 활용하기</h2>
-                <p>이 강의에서는 ClassHive의 강의실 기능을 효과적으로 활용하는 방법을 배웁니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>강의 검색 및 필터링</li>
-                  <li>노트 작성 및 관리</li>
-                  <li>학습 진도 추적</li>
-                  <li>퀴즈 및 과제 제출</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">효과적인 노트 작성법</a></li>
-                  <li><a href="#">학습 계획 템플릿</a></li>
-                </ul>
-                `,
-              },
-              {
-                id: "calendar-features",
-                title: "캘린더 기능 활용하기",
-                duration: "9:20",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=캘린더+기능",
-                content: `
-                <h2>캘린더 기능 활용하기</h2>
-                <p>이 강의에서는 ClassHive의 캘린더 기능을 효과적으로 활용하는 방법을 배웁니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>학습 일정 계획 및 관리</li>
-                  <li>이벤트 및 마감일 설정</li>
-                  <li>알림 설정 및 관리</li>
-                  <li>일정 공유 및 협업</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">효과적인 시간 관리 가이드</a></li>
-                  <li><a href="#">학습 일정 템플릿</a></li>
-                </ul>
-                `,
-              },
-            ],
-          },
-          {
-            id: "advanced-features",
-            title: "고급 기능 익히기",
-            description: "더 효율적인 학습을 위한 고급 기능을 배웁니다.",
-            lessons: [
-              {
-                id: "collaboration-tools",
-                title: "협업 도구 활용하기",
-                duration: "14:15",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=협업+도구",
-                content: `
-                <h2>협업 도구 활용하기</h2>
-                <p>이 강의에서는 ClassHive의 협업 도구를 효과적으로 활용하는 방법을 배웁니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>그룹 프로젝트 관리</li>
-                  <li>실시간 문서 공동 편집</li>
-                  <li>피드백 주고받기</li>
-                  <li>화상 회의 및 스터디 세션</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">효과적인 협업 가이드</a></li>
-                  <li><a href="#">프로젝트 관리 템플릿</a></li>
-                </ul>
-                `,
-              },
-              {
-                id: "progress-tracking",
-                title: "학습 진도 관리하기",
-                duration: "11:30",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=진도+관리",
-                content: `
-                <h2>학습 진도 관리하기</h2>
-                <p>이 강의에서는 ClassHive에서 학습 진도를 효과적으로 관리하는 방법을 배웁니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>학습 목표 설정</li>
-                  <li>진도 추적 및 분석</li>
-                  <li>학습 패턴 파악</li>
-                  <li>개선 전략 수립</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">학습 목표 설정 가이드</a></li>
-                  <li><a href="#">진도 추적 템플릿</a></li>
-                </ul>
-                `,
-              },
-              {
-                id: "custom-settings",
-                title: "개인 설정 최적화하기",
-                duration: "8:45",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=개인+설정",
-                content: `
-                <h2>개인 설정 최적화하기</h2>
-                <p>이 강의에서는 ClassHive의 개인 설정을 최적화하여 학습 경험을 향상시키는 방법을 배웁니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>인터페이스 사용자 정의</li>
-                  <li>알림 및 이메일 설정</li>
-                  <li>개인 정보 및 보안 설정</li>
-                  <li>접근성 옵션</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">개인 설정 체크리스트</a></li>
-                  <li><a href="#">보안 가이드</a></li>
-                </ul>
-                `,
-              },
-            ],
-          },
-          {
-            id: "practical-application",
-            title: "실전 활용",
-            description: "배운 내용을 실제 학습에 적용하는 방법을 배웁니다.",
-            lessons: [
-              {
-                id: "learning-path",
-                title: "나만의 학습 경로 만들기",
-                duration: "16:20",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=학습+경로",
-                content: `
-                <h2>나만의 학습 경로 만들기</h2>
-                <p>이 강의에서는 ClassHive를 활용하여 개인화된 학습 경로를 설계하는 방법을 배웁니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>학습 목표 및 우선순위 설정</li>
-                  <li>강의 및 자료 선택</li>
-                  <li>학습 일정 계획</li>
-                  <li>진도 관리 및 조정</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">학습 경로 설계 템플릿</a></li>
-                  <li><a href="#">성공적인 학습 경로 사례</a></li>
-                </ul>
-                `,
-              },
-              {
-                id: "study-group",
-                title: "스터디 그룹 만들고 운영하기",
-                duration: "13:10",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=스터디+그룹",
-                content: `
-                <h2>스터디 그룹 만들고 운영하기</h2>
-                <p>이 강의에서는 ClassHive에서 효과적인 스터디 그룹을 만들고 운영하는 방법을 배웁니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>스터디 그룹 목적 및 규칙 설정</li>
-                  <li>멤버 모집 및 관리</li>
-                  <li>효과적인 스터디 세션 진행</li>
-                  <li>그룹 활동 평가 및 개선</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">스터디 그룹 운영 가이드</a></li>
-                  <li><a href="#">스터디 세션 템플릿</a></li>
-                </ul>
-                `,
-              },
-              {
-                id: "final-project",
-                title: "최종 프로젝트: 학습 계획 수립하기",
-                duration: "20:15",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=최종+프로젝트",
-                content: `
-                <h2>최종 프로젝트: 학습 계획 수립하기</h2>
-                <p>이 강의에서는 지금까지 배운 내용을 종합하여 자신만의 학습 계획을 수립합니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>학습 목표 및 기간 설정</li>
-                  <li>필요한 자료 및 강의 선택</li>
-                  <li>일정 및 마일스톤 계획</li>
-                  <li>진도 추적 및 평가 방법</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">종합 학습 계획 템플릿</a></li>
-                  <li><a href="#">자기 평가 체크리스트</a></li>
-                </ul>
-                `,
-              },
-            ],
-          },
-        ],
-        instructors: [
-          {
-            id: "hyungwoo",
-            name: "박형우",
-            role: "ClassHive 창립자 & 수석 강사",
-            bio: "10년 이상의 교육 경험을 가진 전문가로, 학습자 중심의 교육 방법론을 연구하고 적용합니다. ClassHive 플랫폼의 모든 기능을 설계하고 개발한 주역입니다.",
-            avatarUrl: "/placeholder.svg?text=H",
-          },
-          {
-            id: "sunghyun",
-            name: "고성현",
-            role: "커뮤니티 매니저",
-            bio: "커뮤니티 활성화와 회원 관리를 담당하며, 모든 회원이 편안하게 참여할 수 있는 환경을 조성합니다. 학습 커뮤니티 운영 전문가입니다.",
-            avatarUrl: "/placeholder.svg?text=S",
-          },
-        ],
-        requirements: [
-          "기본적인 컴퓨터 사용 능력",
-          "인터넷 브라우저 사용 경험",
-          "학습에 대한 열정과 의지",
-        ],
-        objectives: [
-          "ClassHive 플랫폼의 모든 기능을 능숙하게 활용할 수 있습니다.",
-          "효율적인 학습 계획을 수립하고 실행할 수 있습니다.",
-          "커뮤니티 기능을 활용하여 다른 학습자들과 효과적으로 소통할 수 있습니다.",
-          "자신만의 학습 경로를 설계하고 관리할 수 있습니다.",
-          "스터디 그룹을 만들고 운영할 수 있습니다.",
-        ],
-        relatedCourses: ["ai-tips", "ai-challenge", "ai-gallery"],
-      },
-      "ai-tips": {
-        id: "ai-tips",
-        title: "10X ClassHive TIPS",
-        subtitle: "ClassHive를 10배 더 활용하는 팁 자료 모음",
-        description:
-          "ClassHive의 숨겨진 기능과 활용법을 배워 학습 효율을 높여보세요. 이 강의는 ClassHive를 이미 기본적으로 사용해본 사용자를 위한 중급 과정입니다. 플랫폼을 더욱 효율적으로 활용하는 다양한 팁과 트릭을 배울 수 있습니다.",
-        level: "중급",
-        duration: "2시간 45분",
-        totalLessons: 10,
-        imageUrl: "/placeholder.svg?text=10X+TIPS",
-        modules: [
-          {
-            id: "tips-basics",
-            title: "기본 팁",
-            description:
-              "ClassHive를 더 효율적으로 사용하기 위한 기본 팁을 소개합니다.",
-            lessons: [
-              {
-                id: "intro-lesson",
-                title: "팁 소개",
-                duration: "5:30",
-                completed: false,
-                videoUrl: "/placeholder.svg?height=720&width=1280&text=팁+소개",
-                content: `
-                <h2>팁 소개</h2>
-                <p>이 강의에서는 ClassHive를 더 효율적으로 활용하기 위한 다양한 팁을 소개합니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>이 강의 시리즈의 목적과 구성</li>
-                  <li>팁을 효과적으로 활용하는 방법</li>
-                  <li>학습 효율성 향상의 기본 원칙</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">팁 활용 가이드</a></li>
-                  <li><a href="#">효율성 체크리스트</a></li>
-                </ul>
-                `,
-              },
-              {
-                id: "whats-possible",
-                title: "ClassHive 팁으로 가능한 것들",
-                duration: "8:15",
-                completed: false,
-                videoUrl:
-                  "/placeholder.svg?height=720&width=1280&text=팁+가능성",
-                content: `
-                <h2>ClassHive 팁으로 가능한 것들</h2>
-                <p>이 강의에서는 ClassHive 팁을 활용하여 할 수 있는 다양한 활동과 개선점에 대해 알아봅니다.</p>
-                
-                <h3>주요 내용:</h3>
-                <ul>
-                  <li>학습 시간 단축 사례</li>
-                  <li>정보 관리 효율화 방법</li>
-                  <li>협업 품질 향상 전략</li>
-                  <li>학습 성과 극대화 방안</li>
-                </ul>
-                
-                <h3>학습 자료:</h3>
-                <ul>
-                  <li><a href="#">성공 사례 모음집</a></li>
-                  <li><a href="#">효율성 향상 템플릿</a></li>
-                </ul>
-                `,
-              },
-            ],
-          },
-          // 다른 모듈 생략...
-        ],
-        instructors: [
-          {
-            id: "tim",
-            name: "팀 넬름스",
-            role: "콘텐츠 디렉터",
-            bio: "교육 콘텐츠 개발과 품질 관리를 담당하며, 최신 트렌드를 반영한 커리큘럼을 설계합니다. ClassHive 플랫폼을 가장 효율적으로 활용하는 전문가입니다.",
-            avatarUrl: "/placeholder.svg?text=T",
-          },
-        ],
-        requirements: [
-          "ClassHive 기본 기능에 대한 이해",
-          "ClassHive 입문자를 위한 필수 가이드 수강 완료",
-          "중급 수준의 컴퓨터 활용 능력",
-        ],
-        objectives: [
-          "ClassHive의 숨겨진 고급 기능을 활용할 수 있습니다.",
-          "학습 생산성을 크게 향상시킬 수 있습니다.",
-          "키보드 단축키를 활용하여 작업 속도를 높일 수 있습니다.",
-          "맞춤형 템플릿을 만들고 활용할 수 있습니다.",
-          "학습 데이터를 분석하여 학습 효율을 개선할 수 있습니다.",
-        ],
-        relatedCourses: ["ai-agency-masterclass", "ai-challenge", "ai-gallery"],
-      },
-      // 다른 강의 데이터 생략...
-    };
-
-    return courses[id] || courses["ai-agency-masterclass"]; // 기본값으로 첫 번째 강의 반환
-  };
-
-  const course = getCourseData(courseId);
+  const [course, setCourse] = useState<Course>(getCourseData(courseId));
 
   // 모든 강의 목록을 하나의 배열로 합치기
   const allLessons = useMemo(() => {
@@ -713,6 +707,21 @@ export function CourseDetail({ courseId }: { courseId: string }) {
       default:
         router.push("/");
     }
+  };
+
+  // 강의 완료 상태 토글
+  const toggleLessonCompleted = (lessonId: string) => {
+    setCourse((prev) => {
+      const updatedModules = prev.modules.map((module) => ({
+        ...module,
+        lessons: module.lessons.map((lesson) =>
+          lesson.id === lessonId
+            ? { ...lesson, completed: !lesson.completed }
+            : lesson,
+        ),
+      }));
+      return { ...prev, modules: updatedModules };
+    });
   };
 
   return (
@@ -1006,11 +1015,22 @@ export function CourseDetail({ courseId }: { courseId: string }) {
                             </p>
                           </div>
                         </div>
-                        {lesson.completed && (
-                          <div className="flex-shrink-0 bg-green-100 rounded-full p-1">
-                            <Check className="h-4 w-4 text-green-600" />
-                          </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={lesson.completed}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              toggleLessonCompleted(lesson.id);
+                            }}
+                            className="w-5 h-5 accent-blue-500"
+                          />
+                          {lesson.completed && (
+                            <div className="flex-shrink-0 bg-green-100 rounded-full p-1">
+                              <Check className="h-4 w-4 text-green-600" />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
