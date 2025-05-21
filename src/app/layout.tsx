@@ -7,9 +7,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ClassHive",
+  title: "demo-lab",
   description: "A community platform for learning and collaboration",
-  generator: "v0.dev",
 };
 
 export default function RootLayout({
