@@ -1,7 +1,9 @@
 "use client";
 import CategoryManager from "@/app/admin/CategoryManager";
+import CommunityManager from "@/app/admin/CommunityManager";
 
 import CourseManager from "@/app/admin/CourseManager";
+
 import DashboardCards from "@/app/admin/DashboardCards";
 import UserTable from "@/app/admin/UserTable";
 // 관리자 대시보드 메인 페이지
@@ -12,7 +14,7 @@ const MENU = [
   { key: "dashboard", label: "대시보드" },
   { key: "user", label: "회원 관리" },
   { key: "lecture", label: "코스 관리" },
-  { key: "email", label: "이메일" },
+  { key: "community", label: "커뮤니티 관리" },
   { key: "student", label: "수강 정보" },
 ];
 
@@ -64,13 +66,18 @@ export default function AdminPage() {
             <CourseManager />
           </>
         )}
+        {tab === "community" && (
+          <>
+            <h2 className="text-xl font-semibold mb-4">커뮤니티 관리</h2>
+            <CommunityManager />
+          </>
+        )}
         {tab === "student" && (
           <>
             <h2 className="text-xl font-semibold mb-4">카테고리 관리</h2>
             <CategoryManager />
           </>
         )}
-        {/* 이메일 탭은 추후 구현 */}
       </main>
     </div>
   );
