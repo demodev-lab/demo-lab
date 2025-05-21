@@ -9,9 +9,10 @@ import React, { useState } from "react";
 
 const MENU = [
   { key: "dashboard", label: "대시보드" },
-  { key: "user", label: "수강 정보" },
+  { key: "user", label: "회원 관리" },
   { key: "lecture", label: "강의 관리" },
-  { key: "student", label: "회원 관리" },
+  { key: "email", label: "이메일" },
+  { key: "student", label: "수강 정보" },
 ];
 
 export default function AdminPage() {
