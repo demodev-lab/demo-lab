@@ -15,7 +15,6 @@ const MENU = [
   { key: "user", label: "회원 관리" },
   { key: "lecture", label: "코스 관리" },
   { key: "community", label: "커뮤니티 관리" },
-  { key: "student", label: "수강 정보" },
 ];
 
 export default function AdminPage() {
