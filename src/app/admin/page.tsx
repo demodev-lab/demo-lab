@@ -1,5 +1,4 @@
 "use client";
-import CategoryManager from "@/app/admin/CategoryManager";
 import CommunityManager from "@/app/admin/CommunityManager";
 
 import CourseManager from "@/app/admin/CourseManager";
@@ -69,12 +68,6 @@ export default function AdminPage() {
           <>
             <h2 className="text-xl font-semibold mb-4">커뮤니티 관리</h2>
             <CommunityManager />
-          </>
-        )}
-        {tab === "student" && (
-          <>
-            <h2 className="text-xl font-semibold mb-4">카테고리 관리</h2>
-            <CategoryManager />
           </>
         )}
       </main>
