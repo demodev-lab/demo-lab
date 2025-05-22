@@ -57,7 +57,8 @@ export function CommunityTab() {
   const [sortOption, setSortOption] = useState("default");
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
-  const [selectedCategory, setSelectedCategory] = useState("Questions");
+  const [newPostCategory, setNewPostCategory] = useState("Questions");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [editPostId, setEditPostId] = useState<number | null>(null);
   const [editPostTitle, setEditPostTitle] = useState("");
   const [editPostContent, setEditPostContent] = useState("");
@@ -317,7 +318,7 @@ export function CommunityTab() {
         day: "numeric",
         year: "numeric",
       }),
-      category: selectedCategory,
+      category: newPostCategory,
       title: postTitle,
       content: postContent,
       comments: 0,
@@ -764,8 +765,8 @@ export function CommunityTab() {
               </label>
               <select
                 className="w-full p-2 border rounded-md"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                value={newPostCategory}
+                onChange={(e) => setNewPostCategory(e.target.value)}
               >
                 {categories.slice(1).map((category) => (
                   <option key={category.id} value={category.label}>
