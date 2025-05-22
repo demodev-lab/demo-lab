@@ -58,6 +58,11 @@ export function CommunityTab() {
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("Questions");
+  const [editPostId, setEditPostId] = useState<number | null>(null);
+  const [editPostTitle, setEditPostTitle] = useState("");
+  const [editPostContent, setEditPostContent] = useState("");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<number | null>(null);
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -419,8 +424,73 @@ export function CommunityTab() {
     setEditCommentText(comment.content);
   };
 
+  const handleEditPostClick = (post) => {
+    setEditPostId(post.id);
+    setEditPostTitle(post.title);
+    setEditPostContent(post.content);
+  };
+
+  const handleEditPostSave = () => {
+    if (!editPostId) return;
+
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === editPostId
+          ? {
+              ...post,
+              title: editPostTitle,
+              content: editPostContent,
+            }
+          : post,
+      ),
+    );
+
+    if (selectedPost && selectedPost.id === editPostId) {
+      setSelectedPost({
+        ...selectedPost,
+        title: editPostTitle,
+        content: editPostContent,
+      });
+    }
+
+    setEditPostId(null);
+    setEditPostTitle("");
+    setEditPostContent("");
+  };
+
+  const handleEditPostCancel = () => {
+    setEditPostId(null);
+    setEditPostTitle("");
+    setEditPostContent("");
+  };
+
+  const handleDeletePost = (postId) => {
+    setPostToDelete(postId);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDeletePost = () => {
+    if (!postToDelete) return;
+
+    setPosts((prevPosts) =>
+      prevPosts.filter((post) => post.id !== postToDelete),
+    );
+
+    if (selectedPost && selectedPost.id === postToDelete) {
+      handleCloseModal();
+    }
+
+    setPostToDelete(null);
+    setDeleteConfirmOpen(false);
+  };
+
+  const cancelDeletePost = () => {
+    setPostToDelete(null);
+    setDeleteConfirmOpen(false);
+  };
+
   const handleEditSave = () => {
-    if (!selectedPost || !editCommentId) return;
+    if (!editCommentId) return;
     function updateContent(comments) {
       return comments.map((comment) => {
         if (comment.id === editCommentId) {
@@ -927,82 +997,161 @@ export function CommunityTab() {
                       <User className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <div className="font-medium">{selectedPost.author}</div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <div className="font-medium">{selectedPost.author}</div>
+                      {selectedPost.authorUsername === "current-user" && (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => handleEditPostClick(selectedPost)}
+                          >
+                            수정
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs text-red-500"
+                            onClick={() => handleDeletePost(selectedPost.id)}
+                          >
+                            삭제
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {selectedPost.date} • {selectedPost.category}
                       {selectedPost.pinned && " • 📌 Pinned"}
                     </div>
                   </div>
                 </div>
-                <DialogTitle className="text-2xl font-bold">
-                  {selectedPost.title}
-                </DialogTitle>
-                <DialogDescription className="whitespace-pre-line mt-4">
-                  {selectedPost.content}
-                </DialogDescription>
+                {editPostId === selectedPost.id ? (
+                  <div className="space-y-4 mt-4">
+                    <Input
+                      value={editPostTitle}
+                      onChange={(e) => setEditPostTitle(e.target.value)}
+                      className="text-xl font-bold"
+                      autoFocus
+                    />
+                    <Textarea
+                      value={editPostContent}
+                      onChange={(e) => setEditPostContent(e.target.value)}
+                      className="min-h-[150px] resize-none"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        className="bg-[#5046E4] hover:bg-[#5046E4]/90"
+                        onClick={handleEditPostSave}
+                        disabled={
+                          !editPostTitle.trim() || !editPostContent.trim()
+                        }
+                      >
+                        저장
+                      </Button>
+                      <Button variant="outline" onClick={handleEditPostCancel}>
+                        취소
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <DialogTitle className="text-2xl font-bold">
+                      {selectedPost.title}
+                    </DialogTitle>
+                    <DialogDescription className="whitespace-pre-line mt-4">
+                      {selectedPost.content}
+                    </DialogDescription>
+                  </>
+                )}
               </DialogHeader>
 
-              <div className="flex gap-4 my-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-1"
-                  onClick={() => handleToggleLike(selectedPost.id)}
-                >
-                  <Heart
-                    className={`h-4 w-4 ${selectedPost.isLiked ? "text-red-500 fill-red-500" : ""}`}
-                  />
-                  <span>좋아요 {selectedPost.likeCount}</span>
-                </Button>
-                <Button variant="outline" size="sm" className="gap-1">
-                  <MessageSquare className="h-4 w-4" />
-                  <span>댓글 {selectedPost.comments}</span>
-                </Button>
-              </div>
-
-              <Separator className="my-4" />
-
-              <div className="space-y-4">
-                <h4 className="font-medium">댓글 {selectedPost.comments}개</h4>
-
-                <div className="flex gap-2 mb-4">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?text=Me" />
-                    <AvatarFallback>
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 flex gap-2">
-                    <Input
-                      placeholder="댓글을 입력하세요..."
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      className="flex-1"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          handleAddComment();
-                        }
-                      }}
-                    />
+              {!editPostId && (
+                <>
+                  <div className="flex gap-4 my-4">
                     <Button
+                      variant="outline"
                       size="sm"
-                      className="bg-[#5046E4] hover:bg-[#5046E4]/90"
-                      onClick={handleAddComment}
-                      disabled={!commentText.trim()}
+                      className="gap-1"
+                      onClick={() => handleToggleLike(selectedPost.id)}
                     >
-                      <Send className="h-4 w-4" />
+                      <Heart
+                        className={`h-4 w-4 ${selectedPost.isLiked ? "text-red-500 fill-red-500" : ""}`}
+                      />
+                      <span>좋아요 {selectedPost.likeCount}</span>
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-1">
+                      <MessageSquare className="h-4 w-4" />
+                      <span>댓글 {selectedPost.comments}</span>
                     </Button>
                   </div>
-                </div>
 
-                <div className="space-y-4 mt-6">
-                  {renderComments(selectedPost.commentsList)}
-                </div>
-              </div>
+                  <Separator className="my-4" />
+
+                  <div className="space-y-4">
+                    <h4 className="font-medium">
+                      댓글 {selectedPost.comments}개
+                    </h4>
+
+                    <div className="flex gap-2 mb-4">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="/placeholder.svg?text=Me" />
+                        <AvatarFallback>
+                          <User className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 flex gap-2">
+                        <Input
+                          placeholder="댓글을 입력하세요..."
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                          className="flex-1"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              handleAddComment();
+                            }
+                          }}
+                        />
+                        <Button
+                          size="sm"
+                          className="bg-[#5046E4] hover:bg-[#5046E4]/90"
+                          onClick={handleAddComment}
+                          disabled={!commentText.trim()}
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 mt-6">
+                      {renderComments(selectedPost.commentsList)}
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>게시글 삭제</DialogTitle>
+            <DialogDescription>
+              정말로 이 게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={cancelDeletePost}>
+              취소
+            </Button>
+            <Button variant="destructive" onClick={confirmDeletePost}>
+              삭제
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
