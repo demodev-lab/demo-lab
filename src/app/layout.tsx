@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/contexts/AuthContext";
+import Script from "next/script"; // Next.js Script 컴포넌트 임포트
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,8 +27,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
+        {/* Lemon Squeezy의 lemon.js 스크립트 추가 */}
+        {/* `strategy="afterInteractive"`는 페이지의 주요 콘텐츠가 로드된 후 스크립트를 로드하도록 합니다. */}
+        <Script
+          src="https://assets.lemonsqueezy.com/lemon.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
