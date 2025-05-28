@@ -3,13 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { Bell, MessageSquare, Search, User } from "lucide-react";
+import { Bell, MessageSquare, Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
@@ -63,12 +76,48 @@ export function Header() {
           <Button variant="ghost" size="icon" className="hidden md:flex">
             <Bell className="h-5 w-5" />
           </Button>
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg" alt="Profile" />
-            <AvatarFallback>
-              <User className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
+
+          {/* User Menu */}
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-8 w-8 rounded-full"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/placeholder.svg" alt="Profile" />
+                    <AvatarFallback>
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{user.email}</p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  로그아웃
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  로그인
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="sm">회원가입</Button>
+              </Link>
+            </div>
+          )}
 
           {/* Mobile Menu */}
           <Sheet>
@@ -94,18 +143,44 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <div className="flex flex-col gap-4 py-4">
-                <Button variant="ghost" className="justify-start">
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  Messages
-                </Button>
-                <Button variant="ghost" className="justify-start">
-                  <Bell className="mr-2 h-5 w-5" />
-                  Notifications
-                </Button>
-                <Button variant="ghost" className="justify-start">
-                  <User className="mr-2 h-5 w-5" />
-                  Profile
-                </Button>
+                {user ? (
+                  <>
+                    <div className="pb-2 border-b">
+                      <p className="font-medium">{user.email}</p>
+                    </div>
+                    <Button variant="ghost" className="justify-start">
+                      <MessageSquare className="mr-2 h-5 w-5" />
+                      Messages
+                    </Button>
+                    <Button variant="ghost" className="justify-start">
+                      <Bell className="mr-2 h-5 w-5" />
+                      Notifications
+                    </Button>
+                    <Button variant="ghost" className="justify-start">
+                      <User className="mr-2 h-5 w-5" />
+                      Profile
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="justify-start"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="mr-2 h-5 w-5" />
+                      로그아웃
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login">
+                      <Button variant="ghost" className="justify-start w-full">
+                        로그인
+                      </Button>
+                    </Link>
+                    <Link href="/signup">
+                      <Button className="justify-start w-full">회원가입</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>
