@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { Bell, MessageSquare, Search, User, LogOut } from "lucide-react";
+import { Bell, MessageSquare, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/components/auth/auth-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,14 +15,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LogoutButton } from "@/components/auth/buttons";
 
 export function Header() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const { user, signOut } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
+  const { user } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
@@ -100,9 +97,8 @@ export function Header() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  로그아웃
+                <DropdownMenuItem>
+                  <LogoutButton />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -160,14 +156,7 @@ export function Header() {
                       <User className="mr-2 h-5 w-5" />
                       Profile
                     </Button>
-                    <Button
-                      variant="ghost"
-                      className="justify-start"
-                      onClick={handleSignOut}
-                    >
-                      <LogOut className="mr-2 h-5 w-5" />
-                      로그아웃
-                    </Button>
+                    <LogoutButton />
                   </>
                 ) : (
                   <>

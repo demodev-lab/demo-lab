@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/components/auth/auth-provider";
 
 declare global {
   interface Window {
@@ -16,7 +16,7 @@ declare global {
 
 export default function PaymentPage() {
   const [loading, setLoading] = useState<boolean>(false);
-  const { session } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   const NEXTJS_COURSE_VARIANT_ID: number = Number(
@@ -24,7 +24,7 @@ export default function PaymentPage() {
   );
 
   const handlePurchase = async () => {
-    if (!session?.user) {
+    if (!user) {
       alert("로그인이 필요합니다.");
       router.push("/login");
       return;
@@ -86,12 +86,12 @@ export default function PaymentPage() {
       <h1>Next.js 마스터 클래스</h1>
       <p>강력한 풀스택 웹 개발자가 되어 보세요!</p>
 
-      {!session?.user ? (
+      {!user ? (
         <p>구매를 위해 로그인 해주세요.</p>
       ) : (
         <>
           <p>
-            현재 로그인: <strong>{session.user.email}</strong>
+            현재 로그인: <strong>{user.email}</strong>
           </p>
           <button
             onClick={handlePurchase}
@@ -110,31 +110,6 @@ export default function PaymentPage() {
       <p style={{ marginTop: "20px", fontSize: "14px", color: "#666" }}>
         결제 시 Lemon Squeezy의 보안 결제 페이지로 이동합니다.
       </p>
-
-      {/* 디버깅용 - 개발 중에만 사용 */}
-      {process.env.NODE_ENV === "development" && (
-        <div style={{ marginTop: "20px", fontSize: "12px", color: "#999" }}>
-          <p>Debug Info:</p>
-          <pre>
-            {JSON.stringify(
-              {
-                hasUser: !!session?.user,
-                userId: session?.user?.id,
-                hasAccessToken: !!session?.access_token,
-                variantId: NEXTJS_COURSE_VARIANT_ID,
-                variantIdRaw:
-                  process.env
-                    .NEXT_PUBLIC_LEMON_SQUEEZY_BASIC_DEFAULT_VARIANT_ID,
-                variantIdType:
-                  typeof process.env
-                    .NEXT_PUBLIC_LEMON_SQUEEZY_BASIC_DEFAULT_VARIANT_ID,
-              },
-              null,
-              2,
-            )}
-          </pre>
-        </div>
-      )}
     </div>
   );
 }
