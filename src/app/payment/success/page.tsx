@@ -30,7 +30,7 @@ export default function PaymentSuccessPage() {
         </h2>
         <p style={{ marginBottom: 24 }}>결제가 성공적으로 처리되었습니다.</p>
         <button
-          onClick={() => router.push("/dashboard")}
+          onClick={() => router.push("/")}
           style={{
             background: "#2563eb",
             color: "white",
@@ -41,7 +41,7 @@ export default function PaymentSuccessPage() {
             cursor: "pointer",
           }}
         >
-          대시보드로 이동
+          홈으로 이동
         </button>
       </div>
     </div>
