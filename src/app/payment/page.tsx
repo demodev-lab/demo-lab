@@ -3,6 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-provider";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Check } from "lucide-react";
 
 declare global {
   interface Window {
@@ -82,34 +92,66 @@ export default function PaymentPage() {
   };
 
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <h1>Next.js 마스터 클래스</h1>
-      <p>강력한 풀스택 웹 개발자가 되어 보세요!</p>
+    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Next.js 마스터 클래스</CardTitle>
+          <CardDescription>
+            강력한 풀스택 웹 개발자가 되어 보세요!
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="bg-muted rounded-lg p-6 space-y-3">
+              <h3 className="text-lg font-semibold">코스 주요 특징</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span>최신 Next.js 기능 심층 분석</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span>실전 프로젝트 기반 학습</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span>평생 소장 및 업데이트 제공</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span>1:1 코드 리뷰 및 Q&A</span>
+                </li>
+              </ul>
+            </div>
 
-      {!user ? (
-        <p>구매를 위해 로그인 해주세요.</p>
-      ) : (
-        <>
-          <p>
-            현재 로그인: <strong>{user.email}</strong>
+            {!user ? (
+              <p className="text-center text-sm text-muted-foreground">
+                구매를 위해 로그인 해주세요.
+              </p>
+            ) : (
+              <div className="text-center text-sm">
+                <p>
+                  현재 로그인:{" "}
+                  <strong className="font-medium">{user.email}</strong>
+                </p>
+              </div>
+            )}
+            <Button
+              onClick={handlePurchase}
+              disabled={loading || !user}
+              className="w-full"
+              size="lg"
+            >
+              {loading ? "결제 준비 중..." : "평생 수강권 구매하기 (₩99,000)"}
+            </Button>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <p className="text-xs text-muted-foreground text-center w-full">
+            결제 시 Lemon Squeezy의 보안 결제 페이지로 이동합니다.
           </p>
-          <button
-            onClick={handlePurchase}
-            disabled={loading}
-            style={{
-              padding: "10px 20px",
-              fontSize: "18px",
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-          >
-            {loading ? "결제 준비 중..." : "평생 수강권 구매하기 (₩99,000)"}
-          </button>
-        </>
-      )}
-
-      <p style={{ marginTop: "20px", fontSize: "14px", color: "#666" }}>
-        결제 시 Lemon Squeezy의 보안 결제 페이지로 이동합니다.
-      </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

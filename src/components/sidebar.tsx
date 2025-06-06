@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function Sidebar() {
   return (
@@ -31,6 +32,10 @@ export function Sidebar() {
 
           <Button className="w-full bg-[#5046E4] hover:bg-[#5046E4]/90">
             INVITE PEOPLE
+          </Button>
+
+          <Button asChild className="w-full">
+            <Link href="/payment">코스 결제하기</Link>
           </Button>
 
           <div className="space-y-2 pt-2">
