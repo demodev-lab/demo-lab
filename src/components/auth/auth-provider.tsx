@@ -67,17 +67,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = useCallback(async () => {
     console.log("[AuthProvider] 인증 상태 갱신 중...");
     setIsLoading(true);
+    setError(null); // 에러 초기화
     try {
       const { data, error } = await supabase.auth.getUser();
       if (error) {
+        // 로그인하지 않은 상태는 정상이므로 에러로 처리하지 않음
+        if (
+          error.message?.includes("User not logged in") ||
+          error.message?.includes("No JWT present") ||
+          error.message?.includes("Auth session missing") ||
+          error.name === "AuthSessionMissingError" ||
+          !error.message
+        ) {
+          console.log("[AuthProvider] 로그인하지 않은 상태");
+          setUser(null);
+          return null;
+        }
         throw error;
       }
-      console.log("[AuthProvider] 인증 상태 갱신 성공:", data.user);
+      console.log(
+        "[AuthProvider] 인증 상태 갱신 성공:",
+        data.user?.id ? "로그인됨" : "비로그인",
+      );
       setUser(data.user);
       return data.user; // 갱신된 사용자 반환
-    } catch (err) {
+    } catch (err: any) {
+      // AuthSessionMissingError는 로그인하지 않은 정상 상태
+      if (
+        err?.name === "AuthSessionMissingError" ||
+        err?.message?.includes("Auth session missing")
+      ) {
+        console.log("[AuthProvider] 세션 없음 (정상)");
+        setUser(null);
+        return null;
+      }
+
       console.error("[AuthProvider] 사용자 정보 가져오기 오류:", err);
       setError("사용자 정보를 가져오는데 실패했습니다.");
+      setUser(null);
       return null;
     } finally {
       setIsLoading(false);

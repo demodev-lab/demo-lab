@@ -3,6 +3,8 @@ import {
   createServerSupabaseClient,
   createServerSupabaseAdminClient,
 } from "@/utils/supabase/server";
+import { PERMISSIONS } from "@/config/permissions";
+import { checkPermission } from "@/utils/auth/permission-check";
 
 export const dynamic = "force-dynamic";
 
@@ -15,39 +17,15 @@ type UserProfileSelect = {
 };
 
 export async function GET() {
+  // 목록 조회 권한 체크 (Manager도 가능)
+  const permissionCheck = await checkPermission(
+    PERMISSIONS.USER_LIST_VIEW.minRole,
+  );
+  if (!permissionCheck.success) {
+    return permissionCheck.response!;
+  }
+
   const supabase = await createServerSupabaseClient();
-
-  // First, check if the requesting user is authenticated and has proper permissions
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // Get the requesting user's profile to check their role
-  const { data: userProfile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profileError || !userProfile) {
-    return NextResponse.json(
-      { error: "User profile not found" },
-      { status: 404 },
-    );
-  }
-
-  // Check if user has admin privileges
-  if (userProfile.role !== "admin") {
-    return NextResponse.json(
-      { error: "Insufficient permissions. Admin role required." },
-      { status: 403 },
-    );
-  }
 
   // If user has proper permissions, proceed with fetching user list
   const supabaseAdmin = await createServerSupabaseAdminClient();

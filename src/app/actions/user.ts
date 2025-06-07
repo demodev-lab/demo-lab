@@ -2,6 +2,8 @@
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { PERMISSIONS } from "@/config/permissions";
+import { checkPermission } from "@/utils/auth/permission-check";
 
 type FormState = {
   message: string;
@@ -19,15 +21,18 @@ export async function updateUserRole(
     return { message: "허용되지 않는 역할입니다.", error: true };
   }
 
-  const supabase = await createServerSupabaseClient();
-
-  // 현재 로그인한 사용자가 admin인지 확인 (DB의 RLS가 실제 방어를 수행)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return { message: "인증이 필요합니다.", error: true };
+  // 권한 체크 - Admin만 권한 변경 가능
+  const permissionCheck = await checkPermission(
+    PERMISSIONS.USER_ROLE_MANAGEMENT.minRole,
+  );
+  if (!permissionCheck.success) {
+    return {
+      message: "권한 변경 권한이 없습니다. Admin 권한이 필요합니다.",
+      error: true,
+    };
   }
+
+  const supabase = await createServerSupabaseClient();
 
   // 대상 사용자의 role을 업데이트
   const { error } = await supabase
