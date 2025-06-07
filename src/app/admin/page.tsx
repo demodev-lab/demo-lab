@@ -1,12 +1,8 @@
 "use client";
 import CommunityManager from "@/app/admin/CommunityManager";
-
 import CourseManager from "@/app/admin/CourseManager";
-
 import DashboardCards from "@/app/admin/DashboardCards";
-import UserTable from "@/app/admin/UserTable";
-// 관리자 대시보드 메인 페이지
-
+import { UserManagement } from "@/components/admin/UserManagement";
 import React, { useState } from "react";
 
 const MENU = [
@@ -22,7 +18,7 @@ export default function AdminPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* 사이드바 */}
-      <aside className="w-60 bg-white border-r flex flex-col py-8 px-6 min-h-screen">
+      <aside className="w-60 bg-white border-r flex flex-col py-8 px-6">
         <div className="mb-8">
           <div className="text-xl font-bold text-[#5046E4]">demo-lab</div>
           <div className="text-xs text-gray-400 mt-1">관리자 백오피스</div>
@@ -52,12 +48,7 @@ export default function AdminPage() {
             <DashboardCards />
           </>
         )}
-        {tab === "user" && (
-          <>
-            <h2 className="text-xl font-semibold mb-4">회원 관리</h2>
-            <UserTable />
-          </>
-        )}
+        {tab === "user" && <UserManagement />}
         {tab === "lecture" && (
           <>
             <h2 className="text-xl font-semibold mb-4">코스 관리</h2>
