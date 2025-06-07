@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -26,30 +26,20 @@ import {
 import { createCategory, createTag } from "@/app/actions/admin";
 import { Category, Tag } from "@/utils/lib/communityService";
 
-// Form의 제출 버튼 컴포넌트
-function SubmitButton({ label }: { label: string }) {
-  // useFormStatus는 form의 자식 컴포넌트에서만 사용 가능
-  const { pending } = require("react-dom");
-  return (
-    <Button type="submit" disabled={pending}>
-      {pending ? "저장 중..." : label}
-    </Button>
-  );
-}
-
 export default function CommunityManager() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
 
   // 카테고리/태그 생성 Form 상태
-  const [createCategoryState, createCategoryAction] = useFormState(
-    createCategory,
-    { message: "", error: false },
+  const [createCategoryState, createCategoryAction, isCategoryPending] =
+    useActionState(createCategory, { message: "", error: false });
+  const [createTagState, createTagAction, isTagPending] = useActionState(
+    createTag,
+    {
+      message: "",
+      error: false,
+    },
   );
-  const [createTagState, createTagAction] = useFormState(createTag, {
-    message: "",
-    error: false,
-  });
 
   // 데이터 로딩
   useEffect(() => {
@@ -127,7 +117,9 @@ export default function CommunityManager() {
                   defaultValue="#888888"
                 />
               </div>
-              <SubmitButton label="카테고리 생성" />
+              <Button type="submit" disabled={isCategoryPending}>
+                {isCategoryPending ? "저장 중..." : "카테고리 생성"}
+              </Button>
               {createCategoryState.message && (
                 <p
                   className={
@@ -217,7 +209,9 @@ export default function CommunityManager() {
                   defaultValue="#888888"
                 />
               </div>
-              <SubmitButton label="태그 생성" />
+              <Button type="submit" disabled={isTagPending}>
+                {isTagPending ? "저장 중..." : "태그 생성"}
+              </Button>
               {createTagState.message && (
                 <p
                   className={

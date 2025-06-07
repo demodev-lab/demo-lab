@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -86,11 +85,8 @@ export function PostEditor({
   );
 
   return (
-    <Card className="w-full shadow-none border-0">
-      <CardHeader>
-        <CardTitle>{initialData ? "게시글 수정" : "새 게시글 작성"}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="w-full">
+      <div className="space-y-6">
         <form onSubmit={handleFormSubmit} className="space-y-6">
           <div className="space-y-2">
             <label htmlFor="title" className="font-medium">
@@ -153,14 +149,29 @@ export function PostEditor({
             </DropdownMenu>
           </div>
           <div className="space-y-2">
-            <label className="font-medium">태그 (선택)</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="font-medium">
+              태그 (선택사항, 최대 5개)
+              {selectedTagIds.size > 0 && (
+                <span className="text-sm text-muted-foreground ml-2">
+                  {selectedTagIds.size}/5 선택됨
+                </span>
+              )}
+            </label>
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border rounded-md">
               {tags.map((tag) => (
                 <Badge
                   key={tag.id}
                   variant={selectedTagIds.has(tag.id) ? "default" : "outline"}
-                  onClick={() => handleTagClick(tag.id)}
-                  className="cursor-pointer"
+                  onClick={() => {
+                    if (selectedTagIds.has(tag.id) || selectedTagIds.size < 5) {
+                      handleTagClick(tag.id);
+                    }
+                  }}
+                  className={`cursor-pointer transition-all ${
+                    !selectedTagIds.has(tag.id) && selectedTagIds.size >= 5
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                   style={
                     selectedTagIds.has(tag.id)
                       ? { backgroundColor: tag.color, color: "white" }
@@ -170,6 +181,11 @@ export function PostEditor({
                   {tag.name}
                 </Badge>
               ))}
+              {tags.length === 0 && (
+                <p className="text-sm text-muted-foreground py-2">
+                  아직 생성된 태그가 없습니다.
+                </p>
+              )}
             </div>
           </div>
           <div className="space-y-2">
@@ -206,7 +222,7 @@ export function PostEditor({
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -12,7 +12,6 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Settings,
   Loader2,
   PlusCircle,
 } from "lucide-react";
@@ -29,7 +28,6 @@ import { Badge } from "@/components/ui/badge";
 // 분리된 컴포넌트들 가져오기
 import { PostItem } from "./post-item";
 import { PostEditor } from "../community/PostEditor"; // 새로 만든 에디터 컴포넌트
-import { CategoryTagManager } from "./category-tag-manager";
 
 // 커뮤니티 상태 스토어
 import {
@@ -68,9 +66,6 @@ export function CommunityTab() {
   // 게시글 편집/삭제 상태
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<number | null>(null);
-
-  // 카테고리 및 태그 관리 상태
-  const [showCategoryTagManager, setShowCategoryTagManager] = useState(false);
 
   useEffect(() => {
     // 컴포넌트 마운트 시 첫 페이지 게시글 로드 및 카테고리/태그 로드
@@ -178,15 +173,6 @@ export function CommunityTab() {
         </div>
         <div className="flex items-center gap-2">
           {/* ... 기존 정렬 드롭다운 ... */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-2"
-            onClick={() => setShowCategoryTagManager(true)}
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            카테고리/태그 관리
-          </Button>
         </div>
       </div>
 
@@ -242,6 +228,12 @@ export function CommunityTab() {
       {/* 게시글 작성 다이얼로그 */}
       <Dialog open={isPostEditorOpen} onOpenChange={setIsPostEditorOpen}>
         <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>새 게시글 작성</DialogTitle>
+            <DialogDescription>
+              커뮤니티에 공유할 내용을 작성해주세요.
+            </DialogDescription>
+          </DialogHeader>
           <PostEditor
             categories={categories}
             tags={tags}
@@ -372,12 +364,6 @@ export function CommunityTab() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* 카테고리 및 태그 관리 다이얼로그 */}
-      <CategoryTagManager
-        open={showCategoryTagManager}
-        onOpenChange={setShowCategoryTagManager}
-      />
     </div>
   );
 }
