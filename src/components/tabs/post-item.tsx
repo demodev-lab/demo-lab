@@ -14,19 +14,13 @@ import { Post } from "@/utils/lib/communityService";
 interface PostItemProps {
   post: Post;
   onOpenModal: (post: Post) => void;
-  onToggleLike: (postId: number) => void;
-  categoryColors: Record<string, string>;
+  onToggleLike: (postId: number, isLiked: boolean) => void;
 }
 
-export function PostItem({
-  post,
-  onOpenModal,
-  onToggleLike,
-  categoryColors,
-}: PostItemProps) {
+export function PostItem({ post, onOpenModal, onToggleLike }: PostItemProps) {
   return (
     <Card
-      className={`${post.pinned ? "border-[#5046E4]" : ""} cursor-pointer hover:shadow-md transition-shadow`}
+      className={`${post.is_pinned ? "border-[#5046E4]" : ""} cursor-pointer hover:shadow-md transition-shadow`}
       onClick={() => onOpenModal(post)}
     >
       <CardHeader className="pb-2">
@@ -34,26 +28,30 @@ export function PostItem({
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
               <AvatarImage
-                src={`/placeholder.svg?text=${post.author.charAt(0)}`}
+                src={`/placeholder.svg?text=${post.author_name.charAt(0)}`}
               />
               <AvatarFallback>
                 <User className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
             <div>
-              <div className="font-medium">{post.author}</div>
+              <div className="font-medium">{post.author_name}</div>
               <div className="text-xs text-muted-foreground">
-                {post.date} •
+                {new Date(post.created_at).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}{" "}
+                •
                 <Badge
                   style={{
-                    backgroundColor: categoryColors[post.category] || "#888888",
+                    backgroundColor: post.category_color || "#888888",
                     marginLeft: "4px",
                   }}
                   className="text-white text-xs"
                 >
-                  {post.category}
+                  {post.category_name}
                 </Badge>
-                {post.pinned && " • 📌 고정됨"}
+                {post.is_pinned && " • 📌 고정됨"}
               </div>
             </div>
           </div>
@@ -64,9 +62,17 @@ export function PostItem({
         <p className="text-muted-foreground line-clamp-3">{post.content}</p>
         {post.tags && post.tags.length > 0 && (
           <div className="flex gap-1 mt-2 flex-wrap">
-            {post.tags.map((tag, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {tag}
+            {post.tags.map((tag) => (
+              <Badge
+                key={tag.id}
+                variant="outline"
+                className="text-xs"
+                style={{
+                  borderColor: tag.color,
+                  color: tag.color,
+                }}
+              >
+                {tag.name}
               </Badge>
             ))}
           </div>
@@ -80,17 +86,17 @@ export function PostItem({
             className="gap-1"
             onClick={(e) => {
               e.stopPropagation();
-              onToggleLike(post.id);
+              onToggleLike(post.id, post.is_liked);
             }}
           >
             <Heart
-              className={`h-4 w-4 ${post.isLiked ? "text-red-500 fill-red-500" : ""}`}
+              className={`h-4 w-4 ${post.is_liked ? "text-red-500 fill-red-500" : ""}`}
             />
-            <span>{post.likeCount}</span>
+            <span>{post.like_count}</span>
           </Button>
           <Button variant="ghost" size="sm" className="gap-1">
             <MessageSquare className="h-4 w-4" />
-            <span>{post.comments}</span>
+            <span>{post.comment_count}</span>
           </Button>
         </div>
       </CardFooter>
