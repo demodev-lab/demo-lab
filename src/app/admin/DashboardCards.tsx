@@ -180,22 +180,21 @@ export default function DashboardCards() {
             config={{
               count: { label: "회원수", color: "#6366f1" },
             }}
+            className="h-[200px]"
           >
-            <RechartsPrimitive.ResponsiveContainer width="100%" height={200}>
-              <RechartsPrimitive.LineChart data={memberTrend}>
-                <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
-                <RechartsPrimitive.XAxis dataKey="date" />
-                <RechartsPrimitive.YAxis allowDecimals={false} />
-                <RechartsPrimitive.Tooltip />
-                <RechartsPrimitive.Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#6366f1"
-                  strokeWidth={2}
-                  dot
-                />
-              </RechartsPrimitive.LineChart>
-            </RechartsPrimitive.ResponsiveContainer>
+            <RechartsPrimitive.LineChart data={memberTrend}>
+              <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+              <RechartsPrimitive.XAxis dataKey="date" />
+              <RechartsPrimitive.YAxis allowDecimals={false} />
+              <RechartsPrimitive.Tooltip />
+              <RechartsPrimitive.Line
+                type="monotone"
+                dataKey="count"
+                stroke="#6366f1"
+                strokeWidth={2}
+                dot
+              />
+            </RechartsPrimitive.LineChart>
           </ChartContainer>
         </div>
         {/* 게시글 변화 추세 선 그래프 */}
@@ -207,22 +206,21 @@ export default function DashboardCards() {
             config={{
               count: { label: "게시글 수", color: "#f59e42" },
             }}
+            className="h-[200px]"
           >
-            <RechartsPrimitive.ResponsiveContainer width="100%" height={200}>
-              <RechartsPrimitive.LineChart data={postTrend}>
-                <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
-                <RechartsPrimitive.XAxis dataKey="date" />
-                <RechartsPrimitive.YAxis allowDecimals={false} />
-                <RechartsPrimitive.Tooltip />
-                <RechartsPrimitive.Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#f59e42"
-                  strokeWidth={2}
-                  dot
-                />
-              </RechartsPrimitive.LineChart>
-            </RechartsPrimitive.ResponsiveContainer>
+            <RechartsPrimitive.LineChart data={postTrend}>
+              <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+              <RechartsPrimitive.XAxis dataKey="date" />
+              <RechartsPrimitive.YAxis allowDecimals={false} />
+              <RechartsPrimitive.Tooltip />
+              <RechartsPrimitive.Line
+                type="monotone"
+                dataKey="count"
+                stroke="#f59e42"
+                strokeWidth={2}
+                dot
+              />
+            </RechartsPrimitive.LineChart>
           </ChartContainer>
         </div>
         {/* 최근 7일간 추가 게시글 수 그래프 */}
@@ -234,22 +232,21 @@ export default function DashboardCards() {
             config={{
               count: { label: "추가 게시글 수", color: "#f43f5e" },
             }}
+            className="h-[200px]"
           >
-            <RechartsPrimitive.ResponsiveContainer width="100%" height={200}>
-              <RechartsPrimitive.LineChart data={postDailyTrend}>
-                <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
-                <RechartsPrimitive.XAxis dataKey="date" />
-                <RechartsPrimitive.YAxis allowDecimals={false} />
-                <RechartsPrimitive.Tooltip />
-                <RechartsPrimitive.Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#f43f5e"
-                  strokeWidth={2}
-                  dot
-                />
-              </RechartsPrimitive.LineChart>
-            </RechartsPrimitive.ResponsiveContainer>
+            <RechartsPrimitive.LineChart data={postDailyTrend}>
+              <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+              <RechartsPrimitive.XAxis dataKey="date" />
+              <RechartsPrimitive.YAxis allowDecimals={false} />
+              <RechartsPrimitive.Tooltip />
+              <RechartsPrimitive.Line
+                type="monotone"
+                dataKey="count"
+                stroke="#f43f5e"
+                strokeWidth={2}
+                dot
+              />
+            </RechartsPrimitive.LineChart>
           </ChartContainer>
         </div>
         {/* 최근 7일간 추가 댓글 수 그래프 */}
@@ -261,22 +258,21 @@ export default function DashboardCards() {
             config={{
               count: { label: "추가 댓글 수", color: "#6366f1" },
             }}
+            className="h-[200px]"
           >
-            <RechartsPrimitive.ResponsiveContainer width="100%" height={200}>
-              <RechartsPrimitive.LineChart data={commentDailyTrend}>
-                <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
-                <RechartsPrimitive.XAxis dataKey="date" />
-                <RechartsPrimitive.YAxis allowDecimals={false} />
-                <RechartsPrimitive.Tooltip />
-                <RechartsPrimitive.Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#6366f1"
-                  strokeWidth={2}
-                  dot
-                />
-              </RechartsPrimitive.LineChart>
-            </RechartsPrimitive.ResponsiveContainer>
+            <RechartsPrimitive.LineChart data={commentDailyTrend}>
+              <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+              <RechartsPrimitive.XAxis dataKey="date" />
+              <RechartsPrimitive.YAxis allowDecimals={false} />
+              <RechartsPrimitive.Tooltip />
+              <RechartsPrimitive.Line
+                type="monotone"
+                dataKey="count"
+                stroke="#6366f1"
+                strokeWidth={2}
+                dot
+              />
+            </RechartsPrimitive.LineChart>
           </ChartContainer>
         </div>
         {/* 강의별 수강률 막대 그래프 */}
@@ -288,16 +284,15 @@ export default function DashboardCards() {
             config={{
               progress: { label: "수강률", color: "#10b981" },
             }}
+            className="h-[240px]"
           >
-            <RechartsPrimitive.ResponsiveContainer width="100%" height={240}>
-              <RechartsPrimitive.BarChart data={lectures}>
-                <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
-                <RechartsPrimitive.XAxis dataKey="name" />
-                <RechartsPrimitive.YAxis domain={[0, 100]} />
-                <RechartsPrimitive.Tooltip />
-                <RechartsPrimitive.Bar dataKey="progress" fill="#10b981" />
-              </RechartsPrimitive.BarChart>
-            </RechartsPrimitive.ResponsiveContainer>
+            <RechartsPrimitive.BarChart data={lectures}>
+              <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+              <RechartsPrimitive.XAxis dataKey="name" />
+              <RechartsPrimitive.YAxis domain={[0, 100]} />
+              <RechartsPrimitive.Tooltip />
+              <RechartsPrimitive.Bar dataKey="progress" fill="#10b981" />
+            </RechartsPrimitive.BarChart>
           </ChartContainer>
         </div>
       </div>
