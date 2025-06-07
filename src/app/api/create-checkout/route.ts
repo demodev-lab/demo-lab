@@ -1,36 +1,12 @@
 // src/app/api/create-checkout/route.ts
 import { NextResponse } from "next/server";
 import { createLemonSqueezyCheckoutUrl } from "@/utils/lib/lemonsqueezy";
-import { createServerClient } from "@supabase/ssr";
+import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   try {
-    // 1. 환경변수 검증
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.error("Missing Supabase environment variables");
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 },
-      );
-    }
-
-    // 2. Supabase 클라이언트 생성
-    const cookieStore = await cookies();
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        get: (name: string) => cookieStore.get(name)?.value,
-        set: (name: string, value: string, options: any) => {
-          cookieStore.set(name, value, options);
-        },
-        remove: (name: string) => {
-          cookieStore.delete(name);
-        },
-      },
-    });
+    const supabase = await createServerSupabaseClient();
 
     // 3. 세션 확인
     const {
