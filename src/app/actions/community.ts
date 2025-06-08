@@ -54,6 +54,56 @@ export async function addPost(formData: FormData) {
   revalidatePath("/api/posts"); // API 루트 캐시 무효화
 }
 
+export async function updatePost(postId: number, formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Authentication required");
+
+  const updateData = {
+    title: formData.get("title") as string,
+    content: formData.get("content") as string,
+    category_id: parseInt(formData.get("categoryId") as string),
+  };
+
+  // 게시글 업데이트
+  const { error: postError } = await supabase
+    .from("posts")
+    .update(updateData)
+    .eq("id", postId);
+
+  if (postError) {
+    console.error("Error updating post:", postError);
+    throw postError;
+  }
+
+  // 기존 태그 관계 삭제
+  await supabase.from("post_tags").delete().eq("post_id", postId);
+
+  // 새 태그 추가
+  const tagIds = JSON.parse(formData.get("tagIds") as string) as number[];
+  if (tagIds && tagIds.length > 0) {
+    const postTags = tagIds.map((tagId) => ({
+      post_id: postId,
+      tag_id: tagId,
+    }));
+
+    const { error: tagsError } = await supabase
+      .from("post_tags")
+      .insert(postTags);
+
+    if (tagsError) {
+      console.error("Error updating post tags:", tagsError);
+      throw tagsError;
+    }
+  }
+
+  revalidatePath("/");
+  revalidatePath("/api/posts");
+}
+
 export async function deletePost(postId: number) {
   const supabase = await createServerSupabaseClient();
   const { error } = await supabase.from("posts").delete().eq("id", postId);

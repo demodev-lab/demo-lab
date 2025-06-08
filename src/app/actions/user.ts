@@ -2,32 +2,21 @@
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { PERMISSIONS } from "@/config/permissions";
-import { checkPermission } from "@/utils/auth/permission-check";
+import { canUpdateUserRole } from "@/utils/permissions/permissions";
+import { Role } from "@/types/auth";
 
 type FormState = {
   message: string;
   error: boolean;
 };
 
-// 허용된 역할 목록 (DB Enum과 일치)
-const ALLOWED_ROLES = ["admin", "manager", "user"];
-
 export async function updateUserRole(
   userId: string,
-  newRole: string,
+  newRole: Role,
 ): Promise<FormState> {
-  if (!ALLOWED_ROLES.includes(newRole)) {
-    return { message: "허용되지 않는 역할입니다.", error: true };
-  }
-
-  // 권한 체크 - Admin만 권한 변경 가능
-  const permissionCheck = await checkPermission(
-    PERMISSIONS.USER_ROLE_MANAGEMENT.minRole,
-  );
-  if (!permissionCheck.success) {
+  if (!(await canUpdateUserRole())) {
     return {
-      message: "권한 변경 권한이 없습니다. Admin 권한이 필요합니다.",
+      message: "권한 변경 권한이 없습니다.",
       error: true,
     };
   }
