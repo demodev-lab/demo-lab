@@ -7,17 +7,42 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageSquare, User } from "lucide-react";
+import {
+  Heart,
+  MessageSquare,
+  User,
+  Edit,
+  Trash2,
+  MoreHorizontal,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Post } from "@/utils/lib/communityService";
+import type { Post } from "../types";
 
 interface PostItemProps {
   post: Post;
   onOpenModal: (post: Post) => void;
   onToggleLike: (postId: number, isLiked: boolean) => void;
+  onEdit?: (post: Post) => void;
+  onDelete?: (postId: number) => void;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
-export function PostItem({ post, onOpenModal, onToggleLike }: PostItemProps) {
+export function PostItem({
+  post,
+  onOpenModal,
+  onToggleLike,
+  onEdit,
+  onDelete,
+  canEdit = false,
+  canDelete = false,
+}: PostItemProps) {
   return (
     <Card
       className={`${post.is_pinned ? "border-[#5046E4]" : ""} cursor-pointer hover:shadow-md transition-shadow`}
@@ -55,6 +80,44 @@ export function PostItem({ post, onOpenModal, onToggleLike }: PostItemProps) {
               </div>
             </div>
           </div>
+          {(canEdit || canDelete) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {canEdit && onEdit && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(post);
+                    }}
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    수정
+                  </DropdownMenuItem>
+                )}
+                {canDelete && onDelete && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(post.id);
+                    }}
+                    className="text-red-600"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    삭제
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
         <h3 className="text-xl font-bold mt-2">{post.title}</h3>
       </CardHeader>

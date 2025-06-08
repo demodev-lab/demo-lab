@@ -26,16 +26,15 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
 // 분리된 컴포넌트들 가져오기
-import { PostItem } from "./post-item";
-import { PostEditor } from "../community/PostEditor"; // 새로 만든 에디터 컴포넌트
+import { PostItem } from "./PostItem";
+import { PostEditor } from "./PostEditor";
 
-// 커뮤니티 상태 스토어
-import {
-  useCommunityStore,
-  Post,
-  Category,
-  Tag,
-} from "@/utils/lib/communityService";
+// 커뮤니티 도메인
+import { useCommunityStore } from "../store";
+import { usePermission } from "@/hooks/use-permission";
+import { useAuth } from "@/components/auth/auth-provider";
+import { Role } from "@/types/auth";
+import type { Post } from "../types";
 
 export function CommunityTab() {
   const {
@@ -44,6 +43,7 @@ export function CommunityTab() {
     loading,
     fetchPosts,
     addPost,
+    updatePost,
     deletePost,
     toggleLikePost,
     categories,
@@ -52,9 +52,36 @@ export function CommunityTab() {
     fetchTags,
   } = useCommunityStore();
 
+  // 권한 관리
+  const { userRole, isLoading: permissionLoading } = usePermission();
+  const { user: authUser } = useAuth();
+
+  // 커뮤니티 권한 체크 함수들
+  const canEditPost = (post: Post) => {
+    if (!userRole || !authUser) return false;
+    return (
+      userRole === Role.ADMIN ||
+      userRole === Role.MANAGER ||
+      post.author_id === authUser.id
+    );
+  };
+
+  const canDeletePost = (post: Post) => {
+    if (!userRole || !authUser) return false;
+    return (
+      userRole === Role.ADMIN ||
+      userRole === Role.MANAGER ||
+      post.author_id === authUser.id
+    );
+  };
+
   // 포스트 작성 상태
   const [isPostEditorOpen, setIsPostEditorOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 포스트 수정 상태
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   // 게시글 표시 상태
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -77,7 +104,13 @@ export function CommunityTab() {
   const handlePostSubmit = async (formData: FormData) => {
     setIsSubmitting(true);
     try {
-      await addPost(formData);
+      if (isEditMode && editingPost) {
+        await updatePost(editingPost.id, formData);
+        setIsEditMode(false);
+        setEditingPost(null);
+      } else {
+        await addPost(formData);
+      }
       setIsPostEditorOpen(false);
     } catch (error) {
       console.error("Failed to submit post:", error);
@@ -97,6 +130,12 @@ export function CommunityTab() {
     setSelectedPost(null);
   };
 
+  const handleEditPost = (post: Post) => {
+    setEditingPost(post);
+    setIsEditMode(true);
+    setIsPostEditorOpen(true);
+  };
+
   const handleDeletePost = (postId: number) => {
     setPostToDelete(postId);
     setDeleteConfirmOpen(true);
@@ -104,13 +143,21 @@ export function CommunityTab() {
 
   const confirmDeletePost = async () => {
     if (!postToDelete) return;
-    await deletePost(postToDelete);
 
-    if (selectedPost && selectedPost.id === postToDelete) {
-      handleCloseModal();
+    try {
+      await deletePost(postToDelete);
+
+      // 상세보기 모달이 열려있고 삭제된 게시글이면 모달 닫기
+      if (selectedPost && selectedPost.id === postToDelete) {
+        handleCloseModal();
+      }
+    } catch (error) {
+      console.error("Failed to delete post:", error);
+      // TODO: 사용자에게 오류 알림 (예: toast)
+    } finally {
+      setPostToDelete(null);
+      setDeleteConfirmOpen(false);
     }
-    setPostToDelete(null);
-    setDeleteConfirmOpen(false);
   };
 
   const cancelDeletePost = () => {
@@ -193,6 +240,10 @@ export function CommunityTab() {
               post={post}
               onOpenModal={() => handleOpenModal(post)}
               onToggleLike={() => handleToggleLike(post.id, post.is_liked)}
+              onEdit={handleEditPost}
+              onDelete={handleDeletePost}
+              canEdit={canEditPost(post)}
+              canDelete={canDeletePost(post)}
             />
           ))
         )}
@@ -225,21 +276,49 @@ export function CommunityTab() {
         </div>
       )}
 
-      {/* 게시글 작성 다이얼로그 */}
-      <Dialog open={isPostEditorOpen} onOpenChange={setIsPostEditorOpen}>
+      {/* 게시글 작성/수정 다이얼로그 */}
+      <Dialog
+        open={isPostEditorOpen}
+        onOpenChange={(open) => {
+          setIsPostEditorOpen(open);
+          if (!open) {
+            setIsEditMode(false);
+            setEditingPost(null);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
-            <DialogTitle>새 게시글 작성</DialogTitle>
+            <DialogTitle>
+              {isEditMode ? "게시글 수정" : "새 게시글 작성"}
+            </DialogTitle>
             <DialogDescription>
-              커뮤니티에 공유할 내용을 작성해주세요.
+              {isEditMode
+                ? "게시글 내용을 수정해주세요."
+                : "커뮤니티에 공유할 내용을 작성해주세요."}
             </DialogDescription>
           </DialogHeader>
           <PostEditor
             categories={categories}
             tags={tags}
             onSubmit={handlePostSubmit}
-            onCancel={() => setIsPostEditorOpen(false)}
+            onCancel={() => {
+              setIsPostEditorOpen(false);
+              setIsEditMode(false);
+              setEditingPost(null);
+            }}
             isLoading={isSubmitting}
+            initialData={
+              editingPost
+                ? {
+                    title: editingPost.title,
+                    content: editingPost.content,
+                    categoryId: editingPost.category_id.toString(),
+                    tagIds: editingPost.tags?.map((tag) => tag.id) || [],
+                  }
+                : undefined
+            }
+            submitButtonText={isEditMode ? "수정하기" : "게시하기"}
           />
         </DialogContent>
       </Dialog>
@@ -261,17 +340,32 @@ export function CommunityTab() {
                       <div className="font-medium">
                         {selectedPost.author_name}
                       </div>
-                      {/* 수정/삭제 버튼 (인증 로직 추가 필요) */}
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 px-2 text-xs text-red-500"
-                          onClick={() => handleDeletePost(selectedPost.id)}
-                        >
-                          삭제
-                        </Button>
-                      </div>
+                      {/* 수정/삭제 버튼 */}
+                      {(canEditPost(selectedPost) ||
+                        canDeletePost(selectedPost)) && (
+                        <div className="flex gap-2">
+                          {canEditPost(selectedPost) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs text-blue-600"
+                              onClick={() => handleEditPost(selectedPost)}
+                            >
+                              수정
+                            </Button>
+                          )}
+                          {canDeletePost(selectedPost) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs text-red-500"
+                              onClick={() => handleDeletePost(selectedPost.id)}
+                            >
+                              삭제
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {new Date(selectedPost.created_at).toLocaleString()} •

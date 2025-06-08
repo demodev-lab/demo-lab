@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, Loader2 } from "lucide-react";
-import { Category, Tag } from "@/utils/lib/communityService";
+import type { Category, Tag } from "../types";
 
 interface PostEditorProps {
   categories: Category[];
