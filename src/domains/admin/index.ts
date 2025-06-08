@@ -21,7 +21,8 @@ export {
 export { usePermission } from "@/hooks/use-permission";
 
 // Actions
-export { createCategory, createTag } from "./actions";
+export { createCategory } from "./actions/category";
+export { createTag } from "./actions/tag";
 
 // Middleware
 export { checkAdminAccess } from "./middleware";
