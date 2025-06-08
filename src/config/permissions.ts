@@ -1,86 +1,65 @@
 import { Role } from "@/types/auth";
 
-// 권한 설정 타입
-export interface PermissionConfig {
-  label: string;
-  minRole: Role;
-  apiEndpoint?: string;
-  description?: string;
-}
-
-// 중앙 집중식 권한 설정
+/**
+ * 🎯 모든 권한의 단일 진실 공급원 (Single Source of Truth)
+ * API와 클라이언트가 모두 이 설정을 사용합니다.
+ *
+ * 권한 레벨:
+ * - GUEST: 로그인하지 않은 사용자 (레벨 0)
+ * - USER: 일반 사용자 (레벨 1)
+ * - MANAGER: 관리자 (레벨 2)
+ * - ADMIN: 최고 관리자 (레벨 3)
+ */
 export const PERMISSIONS = {
-  // Admin 기능들
-  DASHBOARD: {
-    label: "대시보드",
-    minRole: Role.MANAGER,
-    description: "시스템 통계 및 개요 조회",
-  },
+  // 기본 접근 권한
+  VIEW_PUBLIC_CONTENT: Role.GUEST, // 공개 게시글 조회 등
+  VIEW_MEMBER_CONTENT: Role.USER, // 회원 전용 콘텐츠
+  VIEW_MANAGER_CONTENT: Role.MANAGER, // 관리자 전용 콘텐츠
 
-  // 회원 관리 세분화
-  USER_LIST_VIEW: {
-    label: "회원 목록 조회",
-    minRole: Role.MANAGER,
-    apiEndpoint: "/api/users",
-    description: "사용자 목록 조회",
-  },
-  USER_ROLE_MANAGEMENT: {
-    label: "회원 권한 관리",
-    minRole: Role.ADMIN,
-    description: "사용자 권한 변경",
-  },
-  USER_MANAGEMENT: {
-    label: "회원 관리",
-    minRole: Role.MANAGER, // 탭 접근은 Manager도 가능
-    description: "사용자 목록 조회 및 권한 관리",
-  },
+  // 관리자 기능들
+  VIEW_DASHBOARD: Role.MANAGER,
 
-  COURSE_MANAGEMENT: {
-    label: "코스 관리",
-    minRole: Role.MANAGER,
-    description: "강의 코스 생성 및 관리",
-  },
-  COMMUNITY_MANAGEMENT: {
-    label: "커뮤니티 관리",
-    minRole: Role.MANAGER,
-    description: "게시글, 댓글, 카테고리 관리",
-  },
-  SYSTEM_SETTINGS: {
-    label: "시스템 설정",
-    minRole: Role.ADMIN,
-    description: "시스템 전체 설정 관리",
-  },
+  // 사용자 관리
+  VIEW_USERS: Role.MANAGER, // API와 클라이언트 모두 사용
+  UPDATE_USER_ROLE: Role.ADMIN,
 
-  // API별 권한 (확장 가능)
-  API_CATEGORIES: {
-    label: "카테고리 관리 API",
-    minRole: Role.MANAGER,
-    apiEndpoint: "/api/categories",
-  },
-  API_POSTS: {
-    label: "게시글 관리 API",
-    minRole: Role.MANAGER,
-    apiEndpoint: "/api/posts",
-  },
+  // 컨텐츠 관리
+  MANAGE_COURSES: Role.MANAGER,
+  MANAGE_COMMUNITY: Role.MANAGER,
+
+  // 시스템 관리
+  MANAGE_PAYMENTS: Role.ADMIN,
 } as const;
 
-// Admin 메뉴 설정 (PERMISSIONS에서 자동 생성)
+export type Permission = keyof typeof PERMISSIONS;
+
+/**
+ * Admin 메뉴 구성 - 권한과 연결된 실제 데이터
+ */
 export const ADMIN_MENU = [
-  { key: "dashboard", ...PERMISSIONS.DASHBOARD },
-  { key: "user", ...PERMISSIONS.USER_MANAGEMENT },
-  { key: "lecture", ...PERMISSIONS.COURSE_MANAGEMENT },
-  { key: "community", ...PERMISSIONS.COMMUNITY_MANAGEMENT },
-  { key: "settings", ...PERMISSIONS.SYSTEM_SETTINGS },
+  {
+    key: "dashboard",
+    label: "📊 대시보드",
+    permission: "VIEW_DASHBOARD" as Permission,
+  },
+  {
+    key: "user",
+    label: "👥 사용자 관리",
+    permission: "VIEW_USERS" as Permission,
+  },
+  {
+    key: "lecture",
+    label: "📚 코스 관리",
+    permission: "MANAGE_COURSES" as Permission,
+  },
+  {
+    key: "community",
+    label: "💬 커뮤니티 관리",
+    permission: "MANAGE_COMMUNITY" as Permission,
+  },
+  {
+    key: "settings",
+    label: "⚙️ 시스템 설정",
+    permission: "MANAGE_PAYMENTS" as Permission, // 시스템 설정은 가장 높은 권한 필요
+  },
 ] as const;
-
-// 권한 체크 헬퍼 함수
-export function getRequiredRole(feature: keyof typeof PERMISSIONS): Role {
-  return PERMISSIONS[feature].minRole;
-}
-
-// API 엔드포인트별 권한 맵
-export const API_PERMISSIONS = Object.fromEntries(
-  Object.entries(PERMISSIONS)
-    .filter(([_, config]) => "apiEndpoint" in config && config.apiEndpoint)
-    .map(([_, config]) => [(config as any).apiEndpoint, config.minRole]),
-);

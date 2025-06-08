@@ -55,12 +55,14 @@ export type SignupFormInput = z.infer<typeof signupSchema>;
 export type MagicLinkFormInput = z.infer<typeof magicLinkSchema>;
 
 export enum Role {
+  GUEST = "guest",
   USER = "user",
   MANAGER = "manager",
   ADMIN = "admin",
 }
 
 export const ROLE_LEVELS = {
+  [Role.GUEST]: 0,
   [Role.USER]: 1,
   [Role.MANAGER]: 2,
   [Role.ADMIN]: 3,

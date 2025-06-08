@@ -21,9 +21,19 @@
 
 import { type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
+import { checkAdminAccess } from "@/domains/admin";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  // 1. Supabase 세션 업데이트
+  const response = await updateSession(request);
+
+  // 2. Admin 페이지 권한 체크
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    const adminCheck = await checkAdminAccess(request);
+    if (adminCheck) return adminCheck; // 리다이렉트 필요시
+  }
+
+  return response;
 }
 
 export const config = {
