@@ -2,22 +2,44 @@
 import CommunityManager from "@/app/admin/CommunityManager";
 import CourseManager from "@/app/admin/CourseManager";
 import DashboardCards from "@/app/admin/DashboardCards";
-import UserManagement from "@/components/admin/UserManagement";
-import { usePermission } from "@/hooks/use-permission";
-import { ADMIN_MENU } from "@/config/permissions";
-import { Role } from "@/types/auth";
+import { UserManagement } from "@/domains/admin/components/UserManagement";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { ADMIN_MENU } from "@/config/permissions";
+import {
+  canViewDashboard,
+  canViewUsers,
+  canManageCourses,
+  canManageCommunity,
+  canManagePayments,
+} from "@/utils/permissions/permissions";
 
 export default function AdminPage() {
   const [tab, setTab] = useState("dashboard");
   const [error, setError] = useState<string | null>(null);
-  const { hasRole } = usePermission();
+  const [menuPermissions, setMenuPermissions] = useState<
+    Record<string, boolean>
+  >({});
   const router = useRouter();
 
-  const handleTabClick = (menuKey: string, minRole: Role) => {
-    if (!hasRole(minRole)) {
-      setError(`${minRole} 이상의 권한이 필요합니다.`);
+  // 메뉴별 권한 체크
+  useEffect(() => {
+    const loadPermissions = async () => {
+      setMenuPermissions({
+        dashboard: await canViewDashboard(),
+        user: await canViewUsers(),
+        lecture: await canManageCourses(),
+        community: await canManageCommunity(),
+        settings: await canManagePayments(),
+      });
+    };
+
+    loadPermissions();
+  }, []);
+
+  const handleTabClick = (menuKey: string) => {
+    if (!menuPermissions[menuKey]) {
+      setError(`이 기능을 사용할 권한이 없습니다.`);
       return;
     }
     setError(null);
@@ -33,22 +55,29 @@ export default function AdminPage() {
           <div className="text-xs text-gray-400 mt-1">관리자 백오피스</div>
         </div>
         <nav className="flex-1 space-y-1">
-          {ADMIN_MENU.map((item) => (
-            <button
-              key={item.key}
-              className={`w-full text-left px-3 py-2 rounded font-medium transition-colors ${
-                tab === item.key
-                  ? "bg-[#f3f2fd] text-[#5046E4]"
-                  : "hover:bg-gray-100 text-gray-700"
-              }`}
-              onClick={() => handleTabClick(item.key, item.minRole)}
-            >
-              {item.label}
-              {!hasRole(item.minRole) && (
-                <span className="ml-2 text-xs text-red-500">🔒</span>
-              )}
-            </button>
-          ))}
+          {ADMIN_MENU.map((item) => {
+            const hasPermission = menuPermissions[item.key] ?? false;
+
+            return (
+              <button
+                key={item.key}
+                className={`w-full text-left px-3 py-2 rounded font-medium transition-colors ${
+                  tab === item.key
+                    ? "bg-[#f3f2fd] text-[#5046E4]"
+                    : hasPermission
+                      ? "hover:bg-gray-100 text-gray-700"
+                      : "text-gray-400 cursor-not-allowed"
+                }`}
+                onClick={() => hasPermission && handleTabClick(item.key)}
+                disabled={!hasPermission}
+              >
+                {item.label}
+                {!hasPermission && (
+                  <span className="ml-2 text-xs text-red-500">🔒</span>
+                )}
+              </button>
+            );
+          })}
         </nav>
 
         <button

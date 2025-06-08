@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -23,8 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createCategory, createTag } from "@/app/actions/admin";
-import { Category, Tag } from "@/utils/lib/communityService";
+import { createCategory, createTag } from "@/domains/admin";
+import { Category, Tag } from "@/domains/community/types";
 
 export default function CommunityManager() {
   const [categories, setCategories] = useState<Category[]>([]);

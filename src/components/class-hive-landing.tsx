@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Header } from "@/components/header";
 import { TabNavigation } from "@/components/tab-navigation";
-import { CommunityTab } from "@/components/tabs/community-tab";
+import { CommunityTab } from "@/domains/community/components/CommunityTab";
 import { ClassroomTab } from "@/components/tabs/classroom-tab";
 import { CalendarTab } from "@/components/tabs/calendar-tab";
 import { MembersTab } from "@/components/tabs/members-tab";
