@@ -2,7 +2,7 @@
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import type { FormState } from "../types";
+import type { FormState } from "@/types/admin";
 
 // 카테고리 생성
 export async function createCategory(

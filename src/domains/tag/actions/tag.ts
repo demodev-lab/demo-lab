@@ -2,7 +2,7 @@
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import type { FormState } from "../types";
+import type { FormState } from "@/types/admin";
 
 export async function createTag(
   prevState: FormState,
