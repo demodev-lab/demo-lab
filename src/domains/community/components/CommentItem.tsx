@@ -3,13 +3,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { User, Heart } from "lucide-react";
-import { Comment } from "@/domains/community/types";
-
-// Comment 확장 인터페이스
-interface ExtendedComment extends Comment {
-  depth?: number;
-  isLiked?: boolean;
-}
+import { canEditComment, canDeleteComment } from "../permissions";
+import type { ExtendedComment } from "../types/index";
 
 interface CommentItemProps {
   comment: ExtendedComment;
@@ -36,6 +31,9 @@ export function CommentItem({
   onDeleteComment,
   onToggleLike,
 }: CommentItemProps) {
+  const canEdit = canEditComment(comment.authorUsername, currentUser);
+  const canDelete = canDeleteComment(comment.authorUsername, currentUser);
+
   return (
     <div className={comment.depth && comment.depth >= 1 ? "pl-6" : ""}>
       <div className="flex gap-2 mt-4">
@@ -53,25 +51,25 @@ export function CommentItem({
             <span className="text-xs text-muted-foreground">
               {comment.date}
             </span>
-            {comment.authorUsername === currentUser && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2 text-xs"
-                  onClick={() => onEditClick(comment)}
-                >
-                  수정
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2 text-xs text-red-500"
-                  onClick={() => onDeleteComment(comment.id)}
-                >
-                  삭제
-                </Button>
-              </>
+            {canEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={() => onEditClick(comment)}
+              >
+                수정
+              </Button>
+            )}
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs text-red-500"
+                onClick={() => onDeleteComment(comment.id)}
+              >
+                삭제
+              </Button>
             )}
           </div>
           {editCommentId === comment.id ? (
