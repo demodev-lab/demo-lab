@@ -3,7 +3,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { User, Heart } from "lucide-react";
-import { Comment } from "@/utils/lib/communityService";
+import { Comment } from "@/domains/community/types";
 
 // Comment 확장 인터페이스
 interface ExtendedComment extends Comment {

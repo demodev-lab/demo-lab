@@ -1,45 +1,11 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import {
   addPost as addPostAction,
   updatePost as updatePostAction,
   deletePost as deletePostAction,
   toggleLikePost as toggleLikePostAction,
-} from "@/app/actions/community";
-
-import type { Post, Category, Tag } from "./types";
-
-export interface Comment {
-  id: number;
-  author: string;
-  authorUsername?: string;
-  email?: string;
-  date: string;
-  content: string;
-  status: "visible" | "hidden";
-  isSpam?: boolean;
-  likes?: number;
-  replies?: Comment[];
-}
-
-interface CommunityState {
-  posts: Post[];
-  categories: Category[];
-  tags: Tag[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-  };
-  loading: boolean;
-  fetchPosts: (page?: number, limit?: number) => Promise<void>;
-  fetchCategories: () => Promise<void>;
-  fetchTags: () => Promise<void>;
-  addPost: (formData: FormData) => Promise<void>;
-  updatePost: (postId: number, formData: FormData) => Promise<void>;
-  deletePost: (postId: number) => Promise<void>;
-  toggleLikePost: (postId: number, isLiked: boolean) => void;
-}
+} from "@/domains/community/actions/community";
+import type { CommunityState } from "./types";
 
 export const useCommunityStore = create<CommunityState>((set, get) => ({
   posts: [],

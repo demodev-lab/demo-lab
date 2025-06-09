@@ -1,5 +1,7 @@
-// 커뮤니티 도메인 타입들
+import { Category } from "../category/types";
+import { Tag } from "../tag/types";
 
+// 커뮤니티 도메인 타입들
 export interface Post {
   id: number;
   author_id: string;
@@ -18,17 +20,34 @@ export interface Post {
   created_at: string;
 }
 
-export interface Tag {
+export interface Comment {
   id: number;
-  name: string;
-  color: string;
-  description?: string;
+  author: string;
+  authorUsername?: string;
+  email?: string;
+  date: string;
+  content: string;
+  status: "visible" | "hidden";
+  isSpam?: boolean;
+  likes?: number;
+  replies?: Comment[];
 }
 
-export interface Category {
-  id: number;
-  name: string;
-  description: string;
-  color: string;
-  postCount: number;
+export interface CommunityState {
+  posts: Post[];
+  categories: Category[];
+  tags: Tag[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+  };
+  loading: boolean;
+  fetchPosts: (page?: number, limit?: number) => Promise<void>;
+  fetchCategories: () => Promise<void>;
+  fetchTags: () => Promise<void>;
+  addPost: (formData: FormData) => Promise<void>;
+  updatePost: (postId: number, formData: FormData) => Promise<void>;
+  deletePost: (postId: number) => Promise<void>;
+  toggleLikePost: (postId: number, isLiked: boolean) => void;
 }

@@ -22,7 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createCategory, createTag } from "@/domains/admin";
+import { createCategory } from "@/domains/category/actions/category";
+import { createTag } from "@/domains/tag/actions/tag";
 import { Category, Tag } from "@/domains/community/types";
 
 export default function CommunityManager() {
