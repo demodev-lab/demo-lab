@@ -22,7 +22,7 @@ export function useUserRoleUpdate(canUpdate: boolean, onSuccess?: () => void) {
       setRoleUpdateLoading(userId);
 
       const { updateUserRole: updateUserRoleAction } = await import(
-        "@/domains/admin/actions/user"
+        "@/domains/user/actions/user"
       );
       const result = await updateUserRoleAction(userId, newRole);
 
@@ -35,7 +35,7 @@ export function useUserRoleUpdate(canUpdate: boolean, onSuccess?: () => void) {
     } catch (error: any) {
       console.error("사용자 역할 업데이트 실패:", error);
 
-      let errorMessage = error?.message || "역할 업데이트에 실패했습니다.";
+      const errorMessage = error?.message || "역할 업데이트에 실패했습니다.";
 
       if (errorMessage.includes("권한") || errorMessage.includes("Admin")) {
         toast.error("권한 변경 권한이 없습니다. Admin 권한이 필요합니다.");
