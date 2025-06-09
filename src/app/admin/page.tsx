@@ -2,7 +2,7 @@
 import CommunityManager from "@/app/admin/CommunityManager";
 import CourseManager from "@/app/admin/CourseManager";
 import DashboardCards from "@/app/admin/DashboardCards";
-import { UserManagement } from "@/domains/admin/components/UserManagement";
+import { UserManagement } from "@/domains/user/components/UserManagement";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { ADMIN_MENU } from "@/config/permissions";

@@ -67,3 +67,17 @@ export const ROLE_LEVELS = {
   [Role.MANAGER]: 2,
   [Role.ADMIN]: 3,
 } as const;
+
+export const ROLE_BADGE_VARIANTS = {
+  [Role.GUEST]: "outline",
+  [Role.USER]: "secondary",
+  [Role.MANAGER]: "default",
+  [Role.ADMIN]: "destructive",
+} as const;
+
+export const ROLE_ICONS = {
+  [Role.GUEST]: "⚪",
+  [Role.USER]: "🟢",
+  [Role.MANAGER]: "🟡",
+  [Role.ADMIN]: "🔴",
+} as const;
