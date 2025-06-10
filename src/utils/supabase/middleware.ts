@@ -85,7 +85,7 @@ export async function updateSession(request: NextRequest) {
 
   // 사용자가 수정할 수 있는 보호된 라우트 목록
   // 예: const protectedRoutes = ['/profile', '/settings', '/dashboard'];
-  const protectedRoutes = ["/profile"];
+  const protectedRoutes = ["/profile", "/admin"];
 
   // 현재 경로가 보호된 라우트인지 확인
   const isProtectedRoute = protectedRoutes.some((route) =>

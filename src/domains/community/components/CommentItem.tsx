@@ -5,10 +5,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { User, Heart } from "lucide-react";
 import { canEditComment, canDeleteComment } from "../permissions";
 import type { ExtendedComment } from "../types/index";
+import type { Role } from "@/types/auth";
 
 interface CommentItemProps {
   comment: ExtendedComment;
-  currentUser: string; // 현재 사용자 식별자
+  userRole: Role | null;
+  authUserId: string | null;
   editCommentId: number | null;
   editCommentText: string;
   onEditClick: (comment: ExtendedComment) => void;
@@ -17,11 +19,13 @@ interface CommentItemProps {
   onEditTextChange: (text: string) => void;
   onDeleteComment: (commentId: number) => void;
   onToggleLike: (commentId: number) => void;
+  onReplyClick?: (commentId: number) => void;
 }
 
 export function CommentItem({
   comment,
-  currentUser,
+  userRole,
+  authUserId,
   editCommentId,
   editCommentText,
   onEditClick,
@@ -30,13 +34,15 @@ export function CommentItem({
   onEditTextChange,
   onDeleteComment,
   onToggleLike,
+  onReplyClick,
 }: CommentItemProps) {
-  const canEdit = canEditComment(comment.authorUsername, currentUser);
-  const canDelete = canDeleteComment(comment.authorUsername, currentUser);
+  const isSoftDeleted = comment.status === "soft_deleted";
+  const canEdit = canEditComment(comment, userRole, authUserId);
+  const canDelete = canDeleteComment(comment, userRole, authUserId);
 
   return (
     <div className={comment.depth && comment.depth >= 1 ? "pl-6" : ""}>
-      <div className="flex gap-2 mt-4">
+      <div className={`flex gap-2 mt-4 ${isSoftDeleted ? "opacity-60" : ""}`}>
         <Avatar className="h-8 w-8">
           <AvatarImage
             src={`/placeholder.svg?text=${comment.author.charAt(0)}`}
@@ -72,7 +78,7 @@ export function CommentItem({
               </Button>
             )}
           </div>
-          {editCommentId === comment.id ? (
+          {editCommentId === comment.id && !isSoftDeleted ? (
             <div className="flex flex-col gap-2 mt-2">
               <Textarea
                 value={editCommentText}
@@ -96,20 +102,37 @@ export function CommentItem({
             </div>
           ) : (
             <>
-              <p className="text-sm mt-1">{comment.content}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2 text-xs"
-                  onClick={() => onToggleLike(comment.id)}
-                >
-                  <Heart
-                    className={`h-3 w-3 mr-1 ${comment.isLiked ? "text-red-500 fill-red-500" : "text-gray-400"}`}
-                  />
-                  <span>{comment.likes || 0}</span>
-                </Button>
-              </div>
+              <p
+                className={`text-sm mt-1 ${isSoftDeleted ? "text-gray-500 italic" : ""}`}
+              >
+                {comment.content}
+              </p>
+              {!isSoftDeleted && (
+                <div className="flex items-center gap-2 mt-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={() => onToggleLike(comment.id)}
+                  >
+                    <Heart
+                      className={`h-3 w-3 mr-1 ${comment.isLiked ? "text-red-500 fill-red-500" : "text-gray-400"}`}
+                    />
+                    <span>{comment.likes || 0}</span>
+                  </Button>
+                  {/* 대댓글 버튼 (최상위 댓글에만 표시) */}
+                  {!comment.depth && onReplyClick && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => onReplyClick(comment.id)}
+                    >
+                      답글
+                    </Button>
+                  )}
+                </div>
+              )}
             </>
           )}
           {comment.replies && comment.replies.length > 0 && (
@@ -118,7 +141,8 @@ export function CommentItem({
                 <CommentItem
                   key={reply.id}
                   comment={{ ...reply, depth: 1 }}
-                  currentUser={currentUser}
+                  userRole={userRole}
+                  authUserId={authUserId}
                   editCommentId={editCommentId}
                   editCommentText={editCommentText}
                   onEditClick={onEditClick}
@@ -127,6 +151,7 @@ export function CommentItem({
                   onEditTextChange={onEditTextChange}
                   onDeleteComment={onDeleteComment}
                   onToggleLike={onToggleLike}
+                  onReplyClick={onReplyClick}
                 />
               ))}
             </div>

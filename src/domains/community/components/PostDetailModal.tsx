@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { MessageSquare, Heart, User } from "lucide-react";
 import type { Post } from "../types";
+import { CommentList } from "./CommentList";
 
 interface PostDetailModalProps {
   isOpen: boolean;
@@ -135,9 +136,9 @@ export function PostDetailModal({
 
         <Separator className="my-4" />
 
-        {/* 댓글 기능은 추후 구현 */}
-        <div className="text-center text-muted-foreground py-8">
-          댓글 기능은 준비 중입니다.
+        {/* 댓글 시스템 */}
+        <div className="max-h-[40vh] overflow-y-auto">
+          <CommentList postId={post.id} />
         </div>
       </DialogContent>
     </Dialog>

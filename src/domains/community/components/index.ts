@@ -11,3 +11,5 @@ export { PostEditorModal } from "./PostEditorModal";
 export { PostItem } from "./PostItem";
 export { PostEditor } from "./PostEditor";
 export { CommentItem } from "./CommentItem";
+export { CommentList } from "./CommentList";
+export { CommentForm } from "./CommentForm";
