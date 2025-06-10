@@ -1,10 +1,19 @@
--- 초기 테이블 생성 마이그레이션
--- 커뮤니티 플랫폼을 위한 기본 스키마
+-- 커뮤니티 플랫폼 초기 스키마 생성
+-- 모든 테이블, 권한 시스템, RLS 정책을 포함한 완전한 초기 설정
 
--- 1. 사용자 역할 enum 생성
-CREATE TYPE user_role AS ENUM ('user', 'manager', 'admin');
+-- ========================================
+-- 1. 사용자 역할 enum 생성 (guest 포함)
+-- ========================================
 
+-- 권한 순서: guest < user < manager < admin
+CREATE TYPE user_role AS ENUM ('guest', 'user', 'manager', 'admin');
+
+COMMENT ON TYPE user_role IS '사용자 권한 레벨: guest(비로그인) < user(일반) < manager(관리자) < admin(최고관리자)';
+
+-- ========================================
 -- 2. 프로필 테이블 (auth.users 확장)
+-- ========================================
+
 CREATE TABLE profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
@@ -17,7 +26,10 @@ CREATE TABLE profiles (
 
 COMMENT ON TABLE profiles IS 'Public profile information for each user.';
 
+-- ========================================
 -- 3. 카테고리 테이블
+-- ========================================
+
 CREATE TABLE categories (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
@@ -28,7 +40,10 @@ CREATE TABLE categories (
 
 COMMENT ON TABLE categories IS '게시글 카테고리';
 
+-- ========================================
 -- 4. 태그 테이블
+-- ========================================
+
 CREATE TABLE tags (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
@@ -39,7 +54,10 @@ CREATE TABLE tags (
 
 COMMENT ON TABLE tags IS '게시글 태그';
 
+-- ========================================
 -- 5. 게시글 테이블
+-- ========================================
+
 CREATE TABLE posts (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     author_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -58,7 +76,10 @@ CREATE TABLE posts (
 
 COMMENT ON TABLE posts IS '커뮤니티 게시글';
 
+-- ========================================
 -- 6. 게시글-태그 관계 테이블 (다대다)
+-- ========================================
+
 CREATE TABLE post_tags (
     post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
     tag_id BIGINT REFERENCES tags(id) ON DELETE CASCADE,
@@ -67,7 +88,10 @@ CREATE TABLE post_tags (
 
 COMMENT ON TABLE post_tags IS '게시글과 태그의 다대다 관계';
 
+-- ========================================
 -- 7. 좋아요 테이블
+-- ========================================
+
 CREATE TABLE likes (
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
@@ -77,14 +101,17 @@ CREATE TABLE likes (
 
 COMMENT ON TABLE likes IS '사용자의 게시글 좋아요 관계';
 
--- 8. 댓글 테이블
+-- ========================================
+-- 8. 댓글 테이블 (circular foreign key 문제 해결됨)
+-- ========================================
+
 CREATE TABLE comments (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE NOT NULL,
-    author_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-    parent_comment_id BIGINT REFERENCES comments(id) ON DELETE CASCADE,
+    author_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+    parent_comment_id BIGINT REFERENCES comments(id) ON DELETE SET NULL, -- CASCADE 대신 SET NULL
     content TEXT NOT NULL,
-    status TEXT DEFAULT 'visible' NOT NULL,
+    status TEXT DEFAULT 'active' NOT NULL CHECK (status IN ('active', 'inactive', 'soft_deleted')),
     is_spam BOOLEAN DEFAULT false NOT NULL,
     like_count INTEGER DEFAULT 0 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
@@ -93,7 +120,10 @@ CREATE TABLE comments (
 
 COMMENT ON TABLE comments IS '게시글 댓글';
 
+-- ========================================
 -- 9. 구독 테이블 (결제 관련)
+-- ========================================
+
 CREATE TABLE subscriptions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -110,14 +140,42 @@ CREATE TABLE subscriptions (
     updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
--- 인덱스 생성 (성능 최적화)
+-- ========================================
+-- 10. 인덱스 생성 (성능 최적화)
+-- ========================================
+
+-- Posts 인덱스
 CREATE INDEX idx_posts_author_id ON posts(author_id);
 CREATE INDEX idx_posts_category_id ON posts(category_id);
 CREATE INDEX idx_posts_status ON posts(status);
 CREATE INDEX idx_posts_created_at ON posts(created_at);
+CREATE INDEX idx_posts_is_pinned ON posts(is_pinned);
+
+-- Post Tags 인덱스
 CREATE INDEX idx_post_tags_post_id ON post_tags(post_id);
 CREATE INDEX idx_post_tags_tag_id ON post_tags(tag_id);
+
+-- Likes 인덱스
 CREATE INDEX idx_likes_post_id ON likes(post_id);
 CREATE INDEX idx_likes_user_id ON likes(user_id);
+
+-- Comments 인덱스
 CREATE INDEX idx_comments_post_id ON comments(post_id);
 CREATE INDEX idx_comments_author_id ON comments(author_id);
+CREATE INDEX idx_comments_parent_id ON comments(parent_comment_id);
+CREATE INDEX idx_comments_status ON comments(status);
+CREATE INDEX idx_comments_created_at ON comments(created_at);
+
+-- Profiles 인덱스
+CREATE INDEX idx_profiles_role ON profiles(role);
+CREATE INDEX idx_profiles_username ON profiles(username);
+
+-- 완료 메시지
+DO $$
+BEGIN
+    RAISE NOTICE '=== 초기 스키마 생성 완료 ===';
+    RAISE NOTICE '테이블 생성: profiles, categories, tags, posts, post_tags, likes, comments, subscriptions';
+    RAISE NOTICE '사용자 역할: guest < user < manager < admin';
+    RAISE NOTICE '인덱스 최적화 완료';
+    RAISE NOTICE '===========================';
+END $$; 

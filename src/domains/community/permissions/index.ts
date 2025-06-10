@@ -1,5 +1,6 @@
 import { Role } from "@/types/auth";
 import type { Post } from "../types";
+import type { ExtendedComment } from "../types/index";
 
 /**
  * 게시글 수정 권한 체크
@@ -37,18 +38,32 @@ export const canDeletePost = (
  * 댓글 수정 권한 체크
  */
 export const canEditComment = (
-  commentAuthor: string,
-  currentUser: string,
+  comment: ExtendedComment,
+  userRole: Role | null,
+  authUserId: string | null,
 ): boolean => {
-  return commentAuthor === currentUser;
+  if (!userRole || !authUserId) return false;
+  if (comment.status !== "active") return false;
+  return (
+    userRole === Role.ADMIN ||
+    userRole === Role.MANAGER ||
+    comment.author_id === authUserId
+  );
 };
 
 /**
  * 댓글 삭제 권한 체크
  */
 export const canDeleteComment = (
-  commentAuthor: string,
-  currentUser: string,
+  comment: ExtendedComment,
+  userRole: Role | null,
+  authUserId: string | null,
 ): boolean => {
-  return commentAuthor === currentUser;
+  if (!userRole || !authUserId) return false;
+  if (comment.status !== "active") return false;
+  return (
+    userRole === Role.ADMIN ||
+    userRole === Role.MANAGER ||
+    comment.author_id === authUserId
+  );
 };
