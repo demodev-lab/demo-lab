@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { CommentItem } from "./CommentItem";
 import { CommentForm } from "./CommentForm";
-import { useComments } from "../hooks/useComments";
-import { useCommunityPermissions } from "../hooks/useCommunityPermissions";
-import type { ExtendedComment } from "../types/index";
+import { useComment } from "../hooks/useComment";
+import type { ExtendedComment } from "../types";
 import { toast } from "sonner";
 
 interface CommentListProps {
@@ -12,18 +11,20 @@ interface CommentListProps {
 }
 
 export function CommentList({ postId, className = "" }: CommentListProps) {
-  const {
-    comments,
-    isLoading,
-    createComment,
-    updateComment,
-    deleteComment,
-    toggleLike,
-    refreshComments,
-    error,
-  } = useComments(postId);
+  const { list, create, update, remove, toggleLike, userProfile } =
+    useComment();
 
-  const { userRole, authUser } = useCommunityPermissions();
+  // 댓글 목록 조회
+  const { data: comments = [], isLoading, error } = list(postId);
+
+  // 댓글 생성 mutation
+  const { mutateAsync: createComment } = create();
+  // 댓글 수정 mutation
+  const { mutateAsync: updateComment } = update();
+  // 댓글 삭제 mutation
+  const { mutateAsync: deleteComment } = remove();
+  // 댓글 좋아요 mutation
+  const { mutateAsync: toggleLikeComment } = toggleLike();
 
   // 댓글 수정 상태
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
@@ -32,15 +33,10 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
   // 대댓글 작성 상태
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
 
-  // 초기 댓글 로드
-  useEffect(() => {
-    refreshComments();
-  }, [refreshComments]);
-
   // 에러 토스트 처리
-  useEffect(() => {
+  React.useEffect(() => {
     if (error) {
-      toast.error(error);
+      toast.error(error.message);
     }
   }, [error]);
 
@@ -49,10 +45,11 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
    */
   const handleCreateComment = async (content: string, parentId?: number) => {
     try {
-      await createComment(content, parentId);
+      await createComment({ postId, content, parentId });
       toast.success(
         parentId ? "답글이 작성되었습니다." : "댓글이 작성되었습니다.",
       );
+      setReplyToCommentId(null);
     } catch (error) {
       // 에러는 훅에서 반환되어 useEffect에서 토스트로 처리됨
     }
@@ -73,7 +70,10 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
     if (editCommentId === null) return;
 
     try {
-      await updateComment(editCommentId, editCommentText);
+      await updateComment({
+        commentId: editCommentId,
+        content: editCommentText,
+      });
       setEditCommentId(null);
       setEditCommentText("");
       toast.success("댓글이 수정되었습니다.");
@@ -109,7 +109,7 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
    */
   const handleToggleLike = async (commentId: number) => {
     try {
-      await toggleLike(commentId);
+      await toggleLikeComment(commentId);
     } catch (error) {
       // 에러는 훅에서 반환되어 useEffect에서 토스트로 처리됨
     }
@@ -154,7 +154,6 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
     <div className={`space-y-6 ${className}`}>
       {/* 댓글 작성 폼 */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">댓글 {comments.length}개</h3>
         <CommentForm
           onSubmit={handleCreateComment}
           placeholder="댓글을 작성해주세요..."
@@ -172,8 +171,8 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
             <div key={comment.id}>
               <CommentItem
                 comment={comment}
-                userRole={userRole}
-                authUserId={authUser?.id}
+                userRole={userProfile?.role}
+                authUserId={userProfile?.id}
                 editCommentId={editCommentId}
                 editCommentText={editCommentText}
                 onEditClick={handleEditClick}
