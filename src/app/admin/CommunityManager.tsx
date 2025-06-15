@@ -22,9 +22,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createCategory } from "@/domains/category/actions/category";
-import { createTag } from "@/domains/tag/actions/tag";
-import { Category, Tag } from "@/domains/community/types";
+import { createCategory } from "@/domains/category/actions/categoryAction";
+import { createTag } from "@/domains/tag/actions/tagAction";
+import { Category } from "@/domains/category/types";
+import { Tag } from "@/domains/tag/types";
 
 export default function CommunityManager() {
   const [categories, setCategories] = useState<Category[]>([]);

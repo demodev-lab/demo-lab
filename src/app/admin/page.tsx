@@ -1,4 +1,5 @@
 "use client";
+
 import CommunityManager from "@/app/admin/CommunityManager";
 import CourseManager from "@/app/admin/CourseManager";
 import DashboardCards from "@/app/admin/DashboardCards";
@@ -6,13 +7,8 @@ import { UserManagement } from "@/domains/user/components/UserManagement";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { ADMIN_MENU } from "@/config/permissions";
-import {
-  canViewDashboard,
-  canViewUsers,
-  canManageCourses,
-  canManageCommunity,
-  canManagePayments,
-} from "@/utils/permissions/permissions";
+import { adminPermissions } from "@/domains/admin/permissions";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export default function AdminPage() {
   const [tab, setTab] = useState("dashboard");
@@ -21,16 +17,17 @@ export default function AdminPage() {
     Record<string, boolean>
   >({});
   const router = useRouter();
+  const { data: userProfile } = useUserProfile();
 
   // 메뉴별 권한 체크
   useEffect(() => {
     const loadPermissions = async () => {
       setMenuPermissions({
-        dashboard: await canViewDashboard(),
-        user: await canViewUsers(),
-        lecture: await canManageCourses(),
-        community: await canManageCommunity(),
-        settings: await canManagePayments(),
+        dashboard: adminPermissions.canViewDashboard(userProfile?.role),
+        user: adminPermissions.canViewUsers(userProfile?.role),
+        lecture: adminPermissions.canManageCourses(userProfile?.role),
+        community: adminPermissions.canManageCommunity(userProfile?.role),
+        settings: adminPermissions.canManageSettings(userProfile?.role),
       });
     };
 
