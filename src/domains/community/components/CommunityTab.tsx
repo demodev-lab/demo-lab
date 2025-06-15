@@ -1,194 +1,142 @@
 "use client";
 
-import React from "react";
-import { toast } from "sonner";
-
-// 분리된 훅들
+import React, { useState } from "react";
+import { useCommunity } from "../hooks/useCommunity";
+import { usePost } from "@/domains/post/hooks/usePost";
+import { useCategory } from "@/domains/category/hooks/useCategories";
+import { useTag } from "@/domains/tag/hooks/useTags";
 import {
-  useCommunityPosts,
-  useCommunityPermissions,
-  useCommunityFilters,
-  useCommunityModals,
-} from "../hooks";
-
-// 분리된 컴포넌트들
-import {
-  PostCreateButton,
-  PostFilters,
   PostList,
   PostPagination,
+  PostCreateButton,
+  PostFilters,
   PostDetailModal,
-  PostDeleteConfirmModal,
+  PostRemoveConfirmModal,
   PostEditorModal,
-} from "./";
+} from "@/domains/post/components";
 
 export function CommunityTab() {
-  // 훅들로부터 필요한 상태와 함수들을 가져오기
-  const {
-    posts,
-    pagination,
-    loading,
-    categories,
-    tags,
-    handleAddPost,
-    handleUpdatePost,
-    handleDeletePost,
-    handleToggleLike,
-    loadPage,
-  } = useCommunityPosts();
+  // id 기반 모달 상태 관리
+  const [detailModalPostId, setDetailModalPostId] = useState<number | null>(
+    null,
+  );
+  const [editorModal, setEditorModal] = useState<
+    null | { mode: "create" } | { mode: "edit"; postId: number }
+  >(null);
+  const [removeModalPostId, setRemoveModalPostId] = useState<number | null>(
+    null,
+  );
 
-  const { canEditPost, canDeletePost } = useCommunityPermissions();
-
+  // 클라이언트 상태 및 액션
   const {
+    selectedCategoryId,
+    setSelectedCategoryId,
+    selectedTagIds,
+    setSelectedTagIds,
     sortOption,
-    selectedCategory,
-    showAllCategories,
-    visibleCategories,
     setSortOption,
-    setSelectedCategory,
-    toggleCategories,
-  } = useCommunityFilters(categories);
+    searchQuery,
+    setSearchQuery,
+    setCurrentPage,
+    createPost,
+    updatePost,
+    removePost,
+  } = useCommunity();
 
-  const {
-    // 포스트 에디터 모달
-    isPostEditorOpen,
-    isEditMode,
-    editingPost,
-    isSubmitting,
-    setIsSubmitting,
-    openPostEditor,
-    closePostEditor,
-    openEditMode,
-    // 상세 모달
-    selectedPost,
-    isModalOpen,
-    openPostDetail,
-    closePostDetail,
-    // 삭제 확인 모달
-    deleteConfirmOpen,
-    postToDelete,
-    openDeleteConfirm,
-    closeDeleteConfirm,
-  } = useCommunityModals();
-
-  // 비즈니스 로직 핸들러들
-  const handlePostSubmit = async (formData: FormData) => {
-    setIsSubmitting(true);
-    try {
-      let result;
-      if (isEditMode && editingPost) {
-        result = await handleUpdatePost(editingPost.id, formData);
-      } else {
-        result = await handleAddPost(formData);
-      }
-
-      if (result.success) {
-        closePostEditor();
-        toast.success(
-          isEditMode ? "게시글이 수정되었습니다." : "게시글이 작성되었습니다.",
-        );
-      } else {
-        toast.error(
-          isEditMode
-            ? "게시글 수정에 실패했습니다."
-            : "게시글 작성에 실패했습니다.",
-        );
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleEditPost = (post: (typeof posts)[0]) => {
-    openEditMode(post);
-  };
-
-  const handleDeletePostClick = (postId: number) => {
-    openDeleteConfirm(postId);
-  };
-
-  const confirmDeletePost = async () => {
-    if (!postToDelete) return;
-
-    const result = await handleDeletePost(postToDelete);
-
-    if (result.success) {
-      // 상세보기 모달이 열려있고 삭제된 게시글이면 모달 닫기
-      if (selectedPost && selectedPost.id === postToDelete) {
-        closePostDetail();
-      }
-      toast.success("게시글이 삭제되었습니다.");
-    } else {
-      toast.error("게시글 삭제에 실패했습니다.");
-    }
-
-    closeDeleteConfirm();
-  };
-
-  const handleToggleLikeClick = async (postId: number, isLiked: boolean) => {
-    const result = await handleToggleLike(postId, isLiked);
-    if (!result.success) {
-      toast.error("좋아요 처리에 실패했습니다.");
-    }
-  };
+  // 서버 데이터
+  const { list } = usePost();
+  const { data, isLoading: isPostsLoading } = list(1, 10, {
+    categoryId: selectedCategoryId,
+    tagIds: selectedTagIds,
+    sortOption,
+    searchQuery,
+  });
+  const posts = data?.posts ?? [];
+  const pagination = data?.pagination;
+  const { data: categories, isLoading: isCategoriesLoading } =
+    useCategory.list();
+  const { data: tags, isLoading: isTagsLoading } = useTag.list();
 
   return (
-    <div className="space-y-6">
-      {/* 글쓰기 버튼 */}
-      <PostCreateButton onCreateClick={openPostEditor} />
+    <div className="space-y-4">
+      {/* 게시글 작성 버튼 */}
+      <PostCreateButton
+        onCreateClick={() => setEditorModal({ mode: "create" })}
+      />
 
-      {/* 필터 및 정렬 */}
-      <PostFilters />
+      {/* 필터 */}
+      <PostFilters
+        categories={categories ?? []}
+        tags={tags ?? []}
+        selectedCategoryId={selectedCategoryId}
+        selectedTagIds={selectedTagIds}
+        sortOption={sortOption}
+        searchQuery={searchQuery}
+        onCategoryChange={setSelectedCategoryId}
+        onTagChange={setSelectedTagIds}
+        onSortChange={setSortOption}
+        onSearchChange={setSearchQuery}
+      />
 
       {/* 게시글 목록 */}
       <PostList
         posts={posts}
-        loading={loading}
-        onOpenModal={openPostDetail}
-        onToggleLike={handleToggleLikeClick}
-        onEdit={handleEditPost}
-        onDelete={handleDeletePostClick}
-        canEdit={canEditPost}
-        canDelete={canDeletePost}
+        loading={isPostsLoading}
+        onOpenModal={setDetailModalPostId}
+        onEdit={(postId) => setEditorModal({ mode: "edit", postId })}
+        onDelete={setRemoveModalPostId}
       />
 
       {/* 페이지네이션 */}
-      <PostPagination
-        pagination={pagination}
-        loading={loading}
-        onPageChange={loadPage}
-      />
+      {pagination && (
+        <PostPagination
+          pagination={pagination}
+          loading={isPostsLoading}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
-      {/* 게시글 작성/수정 모달 */}
-      <PostEditorModal
-        isOpen={isPostEditorOpen}
-        isEditMode={isEditMode}
-        editingPost={editingPost}
-        categories={categories}
-        tags={tags}
-        onClose={closePostEditor}
-        onSubmit={handlePostSubmit}
-        isSubmitting={isSubmitting}
-      />
+      {/* 모달들 */}
+      {detailModalPostId !== null && (
+        <PostDetailModal
+          isOpen={!!detailModalPostId}
+          postId={detailModalPostId}
+          onClose={() => setDetailModalPostId(null)}
+          onEdit={(id) => setEditorModal({ mode: "edit", postId: id })}
+          onDelete={(id) => setRemoveModalPostId(id)}
+        />
+      )}
 
-      {/* 게시글 상세보기 모달 */}
-      <PostDetailModal
-        isOpen={isModalOpen}
-        post={selectedPost}
-        onClose={closePostDetail}
-        onToggleLike={handleToggleLikeClick}
-        onEdit={handleEditPost}
-        onDelete={handleDeletePostClick}
-        canEdit={selectedPost ? canEditPost(selectedPost) : false}
-        canDelete={selectedPost ? canDeletePost(selectedPost) : false}
-      />
+      {removeModalPostId !== null && (
+        <PostRemoveConfirmModal
+          isOpen={!!removeModalPostId}
+          postId={removeModalPostId}
+          onClose={() => setRemoveModalPostId(null)}
+          onConfirm={async () => {
+            await removePost(removeModalPostId);
+            setRemoveModalPostId(null);
+          }}
+        />
+      )}
 
-      {/* 삭제 확인 모달 */}
-      <PostDeleteConfirmModal
-        isOpen={deleteConfirmOpen}
-        onClose={closeDeleteConfirm}
-        onConfirm={confirmDeletePost}
-      />
+      {editorModal && (
+        <PostEditorModal
+          isOpen={!!editorModal}
+          mode={editorModal.mode}
+          postId={editorModal.mode === "edit" ? editorModal.postId : undefined}
+          categories={categories}
+          tags={tags}
+          onClose={() => setEditorModal(null)}
+          onSubmit={async (formData) => {
+            if (editorModal.mode === "edit" && editorModal.postId) {
+              await updatePost({ postId: editorModal.postId, data: formData });
+            } else {
+              await createPost(formData);
+            }
+            setEditorModal(null);
+          }}
+        />
+      )}
     </div>
   );
 }

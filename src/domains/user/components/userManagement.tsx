@@ -4,37 +4,40 @@ import { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { NoPermission } from "@/components/ui/no-permission";
-import { useUserPermissions } from "../hooks/useUserPermissions";
+import { useAdminPermissions } from "../hooks/useUserPermissions";
 import { useUserManagement } from "../hooks/useUserManagement";
 import { useUserRoleUpdate } from "../hooks/useUserRoleUpdate";
 import { UserManagementHeader } from "./userManagementHeader";
 import { UserTable } from "./userTable";
 import { User } from "../types";
 import { toast } from "sonner";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export function UserManagement() {
+  const { data: userProfile } = useUserProfile();
+
   // 권한 체크
   const {
-    canView,
-    canUpdate,
+    canViewUsers,
+    canManageUsers,
     isLoading: permissionsLoading,
-  } = useUserPermissions();
+  } = useAdminPermissions(userProfile?.role);
 
   // 사용자 목록 관리
   const { users, loading, error, fetchUsers, clearError } = useUserManagement();
 
   // 역할 업데이트
   const { updateUserRole, roleUpdateLoading } = useUserRoleUpdate(
-    canUpdate,
+    canManageUsers,
     fetchUsers,
   );
 
   // 권한이 확인되면 데이터 가져오기
   useEffect(() => {
-    if (!permissionsLoading && canView) {
+    if (!permissionsLoading && canViewUsers) {
       fetchUsers();
     }
-  }, [permissionsLoading, canView, fetchUsers]);
+  }, [permissionsLoading, canViewUsers, fetchUsers]);
 
   // 에러 처리
   useEffect(() => {
@@ -72,7 +75,7 @@ export function UserManagement() {
   }
 
   // 권한 없음
-  if (!canView) {
+  if (!canViewUsers) {
     return (
       <Card>
         <UserManagementHeader
@@ -91,7 +94,7 @@ export function UserManagement() {
   return (
     <Card>
       <UserManagementHeader
-        canUpdate={canUpdate}
+        canUpdate={canManageUsers}
         loading={loading}
         onRefresh={fetchUsers}
       />
@@ -101,9 +104,11 @@ export function UserManagement() {
         ) : (
           <UserTable
             users={users as User[]}
-            canUpdate={canUpdate}
+            canUpdate={canManageUsers}
             roleUpdateLoading={roleUpdateLoading}
-            onRoleUpdate={updateUserRole}
+            onRoleUpdate={(userId, newRole) =>
+              updateUserRole(userId, newRole, userProfile?.role)
+            }
           />
         )}
       </CardContent>

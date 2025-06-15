@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  canViewUsers,
-  canUpdateUserRole,
-} from "@/utils/permissions/permissions";
+import { adminPermissions } from "@/domains/admin/permissions";
+import { Role } from "@/types/auth";
 
 /**
  * 사용자 관리 페이지 관련 권한 체크 훅
  */
-export function useUserPermissions() {
-  const [canView, setCanView] = useState(false);
-  const [canUpdate, setCanUpdate] = useState(false);
+export function useAdminPermissions(userRole: Role | Role.GUEST) {
+  const [canViewUsers, setCanViewUsers] = useState(false);
+  const [canManageUsers, setCanManageUsers] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -19,15 +17,15 @@ export function useUserPermissions() {
       try {
         setIsLoading(true);
         const [viewPermission, updatePermission] = await Promise.all([
-          canViewUsers(),
-          canUpdateUserRole(),
+          adminPermissions.canViewUsers(userRole),
+          adminPermissions.canManageUsers(userRole),
         ]);
-        setCanView(viewPermission);
-        setCanUpdate(updatePermission);
+        setCanViewUsers(viewPermission);
+        setCanManageUsers(updatePermission);
       } catch (error) {
         console.error("권한 체크 실패:", error);
-        setCanView(false);
-        setCanUpdate(false);
+        setCanViewUsers(false);
+        setCanManageUsers(false);
       } finally {
         setIsLoading(false);
       }
@@ -37,8 +35,8 @@ export function useUserPermissions() {
   }, []);
 
   return {
-    canView,
-    canUpdate,
+    canViewUsers,
+    canManageUsers,
     isLoading,
   };
 }

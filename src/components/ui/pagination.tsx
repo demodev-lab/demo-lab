@@ -1,117 +1,95 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
-
 import { cn } from "@/utils/lib/utils";
-import { ButtonProps, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { usePagination } from "@/hooks/use-pagination";
+import type { PaginationProps } from "@/types/pagination";
 
-const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
-  <nav
-    role="navigation"
-    aria-label="pagination"
-    className={cn("mx-auto flex w-full justify-center", className)}
-    {...props}
-  />
-);
-Pagination.displayName = "Pagination";
-
-const PaginationContent = React.forwardRef<
-  HTMLUListElement,
-  React.ComponentProps<"ul">
->(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn("flex flex-row items-center gap-1", className)}
-    {...props}
-  />
-));
-PaginationContent.displayName = "PaginationContent";
-
-const PaginationItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentProps<"li">
->(({ className, ...props }, ref) => (
-  <li ref={ref} className={cn("", className)} {...props} />
-));
-PaginationItem.displayName = "PaginationItem";
-
-type PaginationLinkProps = {
-  isActive?: boolean;
-} & Pick<ButtonProps, "size"> &
-  React.ComponentProps<"a">;
-
-const PaginationLink = ({
+export function Pagination({
+  currentPage,
+  totalPages,
+  totalCount,
+  onPageChange,
+  loading = false,
   className,
-  isActive,
-  size = "icon",
-  ...props
-}: PaginationLinkProps) => (
-  <a
-    aria-current={isActive ? "page" : undefined}
-    className={cn(
-      buttonVariants({
-        variant: isActive ? "outline" : "ghost",
-        size,
-      }),
-      className,
-    )}
-    {...props}
-  />
-);
-PaginationLink.displayName = "PaginationLink";
+}: PaginationProps) {
+  const items = usePagination({ currentPage, totalPages, totalCount });
 
-const PaginationPrevious = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink
-    aria-label="Go to previous page"
-    size="default"
-    className={cn("gap-1 pl-2.5", className)}
-    {...props}
-  >
-    <ChevronLeft className="h-4 w-4" />
-    <span>Previous</span>
-  </PaginationLink>
-);
-PaginationPrevious.displayName = "PaginationPrevious";
+  if (totalPages <= 1) return null;
 
-const PaginationNext = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink
-    aria-label="Go to next page"
-    size="default"
-    className={cn("gap-1 pr-2.5", className)}
-    {...props}
-  >
-    <span>Next</span>
-    <ChevronRight className="h-4 w-4" />
-  </PaginationLink>
-);
-PaginationNext.displayName = "PaginationNext";
+  return (
+    <nav
+      role="navigation"
+      aria-label="페이지네이션"
+      className={cn("mx-auto flex w-full justify-center", className)}
+    >
+      <ul className="flex flex-row items-center gap-1">
+        <li>
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage <= 1 || loading}
+            className={cn(
+              buttonVariants({
+                variant: "ghost",
+                size: "default",
+              }),
+              "gap-1 pl-2.5",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+            )}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span>이전</span>
+          </button>
+        </li>
 
-const PaginationEllipsis = ({
-  className,
-  ...props
-}: React.ComponentProps<"span">) => (
-  <span
-    aria-hidden
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
-    {...props}
-  >
-    <MoreHorizontal className="h-4 w-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-);
-PaginationEllipsis.displayName = "PaginationEllipsis";
+        {items.map((item, index) => (
+          <li key={index}>
+            {item.isEllipsis ? (
+              <span
+                aria-hidden
+                className="flex h-9 w-9 items-center justify-center"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">더 많은 페이지</span>
+              </span>
+            ) : (
+              <button
+                onClick={() => onPageChange(item.page)}
+                disabled={loading}
+                className={cn(
+                  buttonVariants({
+                    variant: item.isCurrent ? "outline" : "ghost",
+                    size: "icon",
+                  }),
+                  "h-9 w-9",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                )}
+                aria-current={item.isCurrent ? "page" : undefined}
+              >
+                {item.page}
+              </button>
+            )}
+          </li>
+        ))}
 
-export {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-};
+        <li>
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages || loading}
+            className={cn(
+              buttonVariants({
+                variant: "ghost",
+                size: "default",
+              }),
+              "gap-1 pr-2.5",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+            )}
+          >
+            <span>다음</span>
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </li>
+      </ul>
+    </nav>
+  );
+}

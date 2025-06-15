@@ -1,4 +1,6 @@
 import { Role } from "@/types/auth";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { createServerSupabaseClient } from "./server";
 
 // ===== 타입 정의 =====
 export interface UserProfile {
@@ -10,29 +12,16 @@ export interface UserProfile {
   created_at?: string;
 }
 
-// ===== 환경별 Supabase Client 생성 =====
-async function getSupabaseClient() {
-  // 서버 환경인지 확인 (Next.js에서 서버 컴포넌트나 API 라우트)
-  if (typeof window === "undefined") {
-    // 서버 환경
-    const { createServerSupabaseClient } = await import(
-      "@/utils/supabase/server"
-    );
-    return await createServerSupabaseClient();
-  } else {
-    // 클라이언트 환경
-    const { createBrowserSupabaseClient } = await import(
-      "@/utils/supabase/client"
-    );
-    return createBrowserSupabaseClient();
-  }
+export async function getServerUserProfile(
+): Promise<UserProfile> {
+  const supabase = await createServerSupabaseClient();
+  return getUserProfile(supabase);
 }
 
-// ===== 프로필 조회 함수들 =====
-export async function getUserProfile(): Promise<UserProfile> {
+export async function getUserProfile(
+  supabaseClient: SupabaseClient,
+): Promise<UserProfile> {
   try {
-    const supabaseClient = await getSupabaseClient();
-
     const {
       data: { user },
     } = await supabaseClient.auth.getUser();
@@ -67,16 +56,5 @@ export async function getUserProfile(): Promise<UserProfile> {
   } catch (error) {
     // 에러를 다시 throw하여 호출자가 처리하도록
     throw error;
-  }
-}
-
-export async function getUserRole(): Promise<Role> {
-  try {
-    const profile = await getUserProfile();
-    return profile.role;
-  } catch (error) {
-    // 에러 발생 시 GUEST 권한 반환 (로그인하지 않은 사용자로 취급)
-    console.warn(`사용자 권한 조회 실패, GUEST 권한으로 처리: ${error}`);
-    return Role.GUEST;
   }
 }
