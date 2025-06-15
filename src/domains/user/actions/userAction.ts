@@ -2,7 +2,7 @@
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { canUpdateUserRole } from "@/utils/permissions/permissions";
+import { adminPermissions } from "@/domains/admin/permissions";
 import { Role } from "@/types/auth";
 
 type FormState = {
@@ -13,8 +13,9 @@ type FormState = {
 export async function updateUserRole(
   userId: string,
   newRole: Role,
+  userRole: Role
 ): Promise<FormState> {
-  if (!(await canUpdateUserRole())) {
+  if (!(await adminPermissions.canManageUsers(userRole))) {
     return {
       message: "권한 변경 권한이 없습니다.",
       error: true,
