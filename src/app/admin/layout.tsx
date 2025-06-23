@@ -4,10 +4,30 @@
 // Admin 권한 체크는 middleware에서 처리됩니다.
 export const dynamic = "force-dynamic";
 
-export default function AdminLayout({
+import { redirect } from "next/navigation";
+import { checkAdminAccess, getUserRole } from "@/domains/admin/actions/adminAction";
+import { AdminLayoutClient } from "@/domains/admin/components/AdminLayoutClient";
+
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const hasAccess = await checkAdminAccess();
+
+  if (!hasAccess) {
+    redirect("/");
+  }
+
+  const userRole = await getUserRole();
+  
+  if (!userRole) {
+    redirect("/");
+  }
+
+  return (
+    <AdminLayoutClient userRole={userRole}>
+      {children}
+    </AdminLayoutClient>
+  );
 }
