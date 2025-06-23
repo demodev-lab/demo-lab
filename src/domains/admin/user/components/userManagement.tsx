@@ -11,10 +11,10 @@ import { UserManagementHeader } from "./userManagementHeader";
 import { UserTable } from "./userTable";
 import { User } from "../types";
 import { toast } from "sonner";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useProfile } from "@/hooks/use-profile";
 
-export function UserManagement() {
-  const { data: userProfile } = useUserProfile();
+export function UserManagement({ initialData }: { initialData: User[] }) {
+  const { data: userProfile } = useProfile();
 
   // 권한 체크
   const {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Role } from "@/types/auth";
 import { toast } from "sonner";
-import { updateUserRole as updateUserRoleAction } from "@/domains/user/actions/userAction";
+import { updateUserRole as updateUserRoleAction } from "@/domains/admin/user/actions/updateUserRole";
 
 /**
  * 사용자 역할 업데이트 훅
@@ -13,7 +13,11 @@ export function useUserRoleUpdate(canUpdate: boolean, onSuccess?: () => void) {
     null,
   );
 
-  const updateUserRole = async (userId: string, newRole: Role, userRole: Role) => {
+  const updateUserRole = async (
+    userId: string,
+    newRole: Role,
+    userRole: Role,
+  ) => {
     if (!canUpdate) {
       toast.error("권한이 없습니다.");
       return;
