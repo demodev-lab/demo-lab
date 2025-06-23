@@ -10,10 +10,10 @@ export interface UserProfile {
   username?: string;
   avatar_url?: string;
   created_at?: string;
+  updated_at?: string;
 }
 
-export async function getServerUserProfile(
-): Promise<UserProfile> {
+export async function getServerUserProfile(): Promise<UserProfile> {
   const supabase = await createServerSupabaseClient();
   return getUserProfile(supabase);
 }
@@ -33,7 +33,7 @@ export async function getUserProfile(
 
     const { data: profile, error } = await supabaseClient
       .from("profiles")
-      .select("id, role, full_name, username, avatar_url, created_at")
+      .select("id, role, full_name, username, avatar_url, created_at, updated_at")
       .eq("id", userId)
       .single();
 
@@ -52,6 +52,7 @@ export async function getUserProfile(
       username: profile.username,
       avatar_url: profile.avatar_url,
       created_at: profile.created_at,
+      updated_at: profile.updated_at,
     };
   } catch (error) {
     // 에러를 다시 throw하여 호출자가 처리하도록
