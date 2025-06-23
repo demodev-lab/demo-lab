@@ -4,6 +4,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import Providers from "./providers";
+import { Header } from "@/components/header";
+import { TabNavigation } from "@/components/tab-navigation";
+import { ConditionalSidebar } from "@/components/conditional-sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +23,24 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex flex-col min-h-screen bg-[#F2F2F2]">
+            {/* 상단 헤더 */}
+            <Header />
+
+            {/* 탭 네비게이션 */}
+            <TabNavigation />
+
+            {/* 메인 콘텐츠 영역 */}
+            <div className="flex flex-1 w-full">
+              {/* 각 페이지별 탭 콘텐츠 */}
+              <main className="flex-1 w-full">{children}</main>
+
+              {/* 조건부 사이드바 렌더링 */}
+              <ConditionalSidebar />
+            </div>
+          </div>
+        </Providers>
         <Script
           src="https://assets.lemonsqueezy.com/lemon.js"
           strategy="afterInteractive"

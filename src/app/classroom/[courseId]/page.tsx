@@ -1,4 +1,4 @@
-import { CourseDetail } from "@/components/course-detail";
+import { CourseDetail } from "@/domains/course/components/course-detail";
 
 interface Props {
   params: { courseId: string };
