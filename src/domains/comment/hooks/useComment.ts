@@ -7,13 +7,13 @@ import {
   toggleCommentLike,
   updateComment,
 } from "../actions/commentAction";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useProfile } from "@/hooks/use-profile";
 
 /**
  * 댓글 관련 상태와 액션을 관리하는 훅
  */
 export const useComment = () => {
-  const { data: userProfile } = useUserProfile();
+  const { data: userProfile } = useProfile();
 
   // 댓글 목록 조회 훅
   const list = (postId: number) => {

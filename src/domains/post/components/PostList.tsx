@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Loader2 } from "lucide-react";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useProfile } from "@/hooks/use-profile";
 import { postPermissions } from "../permissions";
 import { PostItem } from "./PostItem";
 import type { Post } from "../types";
@@ -24,7 +24,7 @@ export function PostList({
   onDelete,
   className,
 }: PostListProps) {
-  const { data: profile } = useUserProfile();
+  const { data: profile } = useProfile();
 
   if (loading && posts.length === 0) {
     return (

@@ -1,5 +1,5 @@
 import React from "react";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useProfile } from "@/hooks/use-profile";
 import { postPermissions } from "../permissions";
 import {
   Dialog,
@@ -31,7 +31,7 @@ export function PostDetailModal({
   onEdit,
   onDelete,
 }: PostDetailModalProps) {
-  const { data: profile } = useUserProfile();
+  const { data: profile } = useProfile();
   const { get, toggleLike } = usePost();
   const toggleLikeMutation = toggleLike();
   const { data: post, isLoading } = get(postId);
