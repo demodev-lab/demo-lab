@@ -38,6 +38,10 @@ export function Sidebar() {
             <Link href="/payment">코스 결제하기</Link>
           </Button>
 
+          <Button asChild className="w-full" variant="outline">
+            <Link href="/course/apply">코스 등록하기</Link>
+          </Button>
+
           <div className="space-y-2 pt-2">
             <h3 className="font-medium">About ClassHive</h3>
             <p className="text-sm text-muted-foreground">

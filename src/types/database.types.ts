@@ -319,6 +319,14 @@ export type Database = {
           difficulty: Database["public"]["Enums"]["difficulty_level"];
           total_lecture_count: number;
           total_duration_secs: number;
+          status: Database["public"]["Enums"]["course_status"];
+          applicant_id: string | null;
+          applicant_email: string | null;
+          applicant_phone: string | null;
+          applied_at: string | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          rejection_reason: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -331,6 +339,14 @@ export type Database = {
           difficulty: Database["public"]["Enums"]["difficulty_level"];
           total_lecture_count?: number;
           total_duration_secs?: number;
+          status?: Database["public"]["Enums"]["course_status"];
+          applicant_id?: string | null;
+          applicant_email?: string | null;
+          applicant_phone?: string | null;
+          applied_at?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          rejection_reason?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -343,10 +359,33 @@ export type Database = {
           difficulty?: Database["public"]["Enums"]["difficulty_level"];
           total_lecture_count?: number;
           total_duration_secs?: number;
+          status?: Database["public"]["Enums"]["course_status"];
+          applicant_id?: string | null;
+          applicant_email?: string | null;
+          applicant_phone?: string | null;
+          applied_at?: string | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          rejection_reason?: string | null;
           created_at?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "Course_applicant_id_fkey";
+            columns: ["applicant_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "Course_approved_by_fkey";
+            columns: ["approved_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       Module: {
         Row: {
@@ -741,6 +780,7 @@ export type Database = {
       user_role: "user" | "manager" | "admin";
       difficulty_level: "입문" | "초급" | "중급" | "고급";
       enrollment_status: "수강전" | "수강중" | "완강";
+      course_status: "pending" | "active" | "closed";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -859,6 +899,7 @@ export const Constants = {
       user_role: ["user", "manager", "admin"],
       difficulty_level: ["입문", "초급", "중급", "고급"],
       enrollment_status: ["수강전", "수강중", "완강"],
+      course_status: ["pending", "active", "closed"],
     },
   },
 } as const;

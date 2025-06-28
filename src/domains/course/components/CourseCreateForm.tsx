@@ -30,7 +30,11 @@ const formSchema = z.object({
   thumbnail_url: z.string().optional(),
 });
 
-export function CourseCreateForm() {
+interface CourseCreateFormProps {
+  isAdmin?: boolean;
+}
+
+export function CourseCreateForm({ isAdmin = false }: CourseCreateFormProps) {
   const { createCourse, isCreating } = useCourseAdmin();
   const form = useForm<CreateCourseInput>({
     resolver: zodResolver(formSchema),
@@ -45,7 +49,10 @@ export function CourseCreateForm() {
   });
 
   const onSubmit = (data: CreateCourseInput) => {
-    createCourse(data);
+    createCourse({
+      ...data,
+      status: isAdmin ? "active" : "pending",
+    });
     form.reset();
   };
 

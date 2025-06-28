@@ -16,6 +16,19 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, showProgress = false }: CourseCardProps) {
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Badge variant="secondary">승인 대기</Badge>;
+      case "active":
+        return null;
+      case "closed":
+        return <Badge variant="destructive">마감</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Card className="overflow-hidden h-full hover:shadow-md transition-shadow">
       <div className="aspect-video relative">
@@ -28,6 +41,11 @@ export function CourseCard({ course, showProgress = false }: CourseCardProps) {
         ) : (
           <div className="w-full h-full bg-muted flex items-center justify-center">
             <span className="text-muted-foreground">No thumbnail</span>
+          </div>
+        )}
+        {course.status && course.status !== "active" && (
+          <div className="absolute top-2 right-2">
+            {getStatusBadge(course.status)}
           </div>
         )}
       </div>

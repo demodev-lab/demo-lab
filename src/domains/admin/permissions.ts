@@ -17,9 +17,9 @@ export const ADMIN_MENU: AdminMenuItem[] = [
   },
   {
     key: "lecture",
-    label: "강좌 관리",
+    label: "코스 관리",
     requiredRole: Role.MANAGER, // MANAGER 이상 접근 가능
-    description: "강좌를 생성하고 관리합니다.",
+    description: "코스를 생성하고 관리합니다.",
   },
   {
     key: "community",
