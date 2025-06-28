@@ -39,6 +39,8 @@ export function CourseCreateForm() {
       subtitle: "",
       description: "",
       difficulty: "입문",
+      thumbnail_url:
+        "https://velog.velcdn.com/images/tjdtna01/post/579043a8-d9c3-467f-9ced-6e4a89a77fc1/image.png",
     },
   });
 
@@ -55,9 +57,9 @@ export function CourseCreateForm() {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>강좌명</FormLabel>
+              <FormLabel>코스명</FormLabel>
               <FormControl>
-                <Input placeholder="강좌의 제목을 입력하세요" {...field} />
+                <Input placeholder="코스의 제목을 입력하세요" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -71,7 +73,7 @@ export function CourseCreateForm() {
             <FormItem>
               <FormLabel>부제목</FormLabel>
               <FormControl>
-                <Input placeholder="강좌의 부제목을 입력하세요" {...field} />
+                <Input placeholder="코스의 부제목을 입력하세요" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,7 +88,7 @@ export function CourseCreateForm() {
               <FormLabel>설명</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="강좌에 대한 상세 설명을 입력하세요"
+                  placeholder="코스에 대한 상세 설명을 입력하세요"
                   className="resize-none"
                   {...field}
                 />
@@ -138,7 +140,7 @@ export function CourseCreateForm() {
         />
 
         <Button type="submit" disabled={isCreating}>
-          {isCreating ? "생성 중..." : "강좌 생성"}
+          {isCreating ? "생성 중..." : "코스 생성"}
         </Button>
       </form>
     </Form>

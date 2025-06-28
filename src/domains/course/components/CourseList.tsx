@@ -46,7 +46,7 @@ export function CourseList({ onCourseClick }: CourseListProps) {
   if (error) {
     return (
       <div className="text-center text-destructive">
-        강좌 목록을 불러오는데 실패했습니다.
+        코스 목록을 불러오는데 실패했습니다.
       </div>
     );
   }
@@ -64,7 +64,7 @@ export function CourseList({ onCourseClick }: CourseListProps) {
   if (courses.length === 0) {
     return (
       <div className="text-center text-muted-foreground">
-        등록된 강좌가 없습니다.
+        등록된 코스가 없습니다.
       </div>
     );
   }

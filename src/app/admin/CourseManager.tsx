@@ -22,18 +22,18 @@ export function CourseManager() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">강좌 관리</h2>
+        <h2 className="text-2xl font-bold tracking-tight">코스 관리</h2>
         <p className="text-muted-foreground">
-          새로운 강좌를 생성하고 관리합니다. 강좌를 클릭하면 모듈과 강의를
+          새로운 코스를 생성하고 관리합니다. 코스를 클릭하면 모듈과 강의를
           관리할 수 있습니다.
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>새 강좌 생성</CardTitle>
+          <CardTitle>새 코스 생성</CardTitle>
           <CardDescription>
-            새로운 강좌를 생성합니다. 모든 필수 정보를 입력해주세요.
+            새로운 코스를 생성합니다. 모든 필수 정보를 입력해주세요.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -43,9 +43,9 @@ export function CourseManager() {
 
       <Card>
         <CardHeader>
-          <CardTitle>강좌 목록</CardTitle>
+          <CardTitle>코스 목록</CardTitle>
           <CardDescription>
-            현재 등록된 모든 강좌 목록입니다. 강좌를 클릭하여 상세 관리 페이지로
+            현재 등록된 모든 코스 목록입니다. 코스를 클릭하여 상세 관리 페이지로
             이동하세요.
           </CardDescription>
         </CardHeader>

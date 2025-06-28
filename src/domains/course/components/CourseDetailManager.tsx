@@ -46,11 +46,11 @@ export function CourseDetailManager({ course }: CourseDetailManagerProps) {
   const handleUpdateCourse = async () => {
     try {
       await updateCourse(course.id, courseForm);
-      toast.success("강좌 정보가 업데이트되었습니다.");
+      toast.success("코스 정보가 업데이트되었습니다.");
       setIsEditingCourse(false);
       router.refresh();
     } catch (error) {
-      toast.error("강좌 업데이트에 실패했습니다.");
+      toast.error("코스 업데이트에 실패했습니다.");
       console.error(error);
     }
   };
@@ -68,9 +68,9 @@ export function CourseDetailManager({ course }: CourseDetailManagerProps) {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h2 className="text-2xl font-bold">강좌 상세 관리</h2>
+            <h2 className="text-2xl font-bold">코스 상세 관리</h2>
             <p className="text-muted-foreground">
-              강좌, 모듈, 강의를 관리합니다.
+              코스, 모듈, 강의를 관리합니다.
             </p>
           </div>
         </div>
@@ -81,9 +81,9 @@ export function CourseDetailManager({ course }: CourseDetailManagerProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>강좌 정보</CardTitle>
+              <CardTitle>코스 정보</CardTitle>
               <CardDescription>
-                강좌의 기본 정보를 수정할 수 있습니다.
+                코스의 기본 정보를 수정할 수 있습니다.
               </CardDescription>
             </div>
             {!isEditingCourse ? (
