@@ -16,24 +16,34 @@ export function useCourseAdmin() {
     mutationFn: (input: CreateCourseInput) => createCourse(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("강좌가 생성되었습니다.");
+      toast.success("코스가 생성되었습니다.");
     },
     onError: (error) => {
-      toast.error("강좌 생성 중 오류가 발생했습니다.");
-      return error;
+      console.error("Create course error:", error);
+      if (error instanceof Error) {
+        toast.error(error.message || "코스 생성 중 오류가 발생했습니다.");
+      } else {
+        toast.error("코스 생성 중 오류가 발생했습니다.");
+      }
     },
   });
 
   const updateCourseMutation = useMutation({
-    mutationFn: ({ id, ...input }: UpdateCourseInput) =>
-      updateCourse(id, input),
+    mutationFn: ({
+      id,
+      ...input
+    }: UpdateCourseInput & { id: string | number }) => updateCourse(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("강좌가 수정되었습니다.");
+      toast.success("코스가 수정되었습니다.");
     },
     onError: (error) => {
-      toast.error("강좌 수정 중 오류가 발생했습니다.");
-      return error;
+      console.error("Update course error:", error);
+      if (error instanceof Error) {
+        toast.error(error.message || "코스 수정 중 오류가 발생했습니다.");
+      } else {
+        toast.error("코스 수정 중 오류가 발생했습니다.");
+      }
     },
   });
 
@@ -41,11 +51,15 @@ export function useCourseAdmin() {
     mutationFn: (id: string) => deleteCourse(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("강좌가 삭제되었습니다.");
+      toast.success("코스가 삭제되었습니다.");
     },
     onError: (error) => {
-      toast.error("강좌 삭제 중 오류가 발생했습니다.");
-      return error;
+      console.error("Delete course error:", error);
+      if (error instanceof Error) {
+        toast.error(error.message || "코스 삭제 중 오류가 발생했습니다.");
+      } else {
+        toast.error("코스 삭제 중 오류가 발생했습니다.");
+      }
     },
   });
 

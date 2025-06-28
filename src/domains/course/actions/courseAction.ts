@@ -10,20 +10,31 @@ import {
 import { revalidatePath } from "next/cache";
 
 export async function createCourse(input: CreateCourseInput) {
-  const supabase = await createServerSupabaseClient();
+  try {
+    const supabase = await createServerSupabaseClient();
 
-  const { data, error } = await supabase
-    .from("Course")
-    .insert(input)
-    .select()
-    .single();
+    const { data, error } = await supabase
+      .from("Course")
+      .insert(input)
+      .select()
+      .single();
 
-  if (error) throw error;
+    if (error) {
+      console.error("Course creation error:", error);
+      throw new Error(error.message || "코스 생성에 실패했습니다.");
+    }
 
-  // Course 생성 후 관련 경로들 revalidate
-  revalidatePath("/admin");
-  revalidatePath("/classroom");
-  return data;
+    // Course 생성 후 관련 경로들 revalidate
+    revalidatePath("/admin");
+    revalidatePath("/classroom");
+    return data;
+  } catch (error) {
+    console.error("createCourse error:", error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("코스 생성 중 알 수 없는 오류가 발생했습니다.");
+  }
 }
 
 export async function getCourseList() {
@@ -172,22 +183,33 @@ export async function updateCourse(
 
 // 코스 신청 (사용자가 신청)
 export async function applyCourse(input: CreateCourseApplicationInput) {
-  const supabase = await createServerSupabaseClient();
+  try {
+    const supabase = await createServerSupabaseClient();
 
-  const { data, error } = await supabase
-    .from("CourseApplication")
-    .insert({
-      ...input,
-      status: "pending",
-      applied_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
+    const { data, error } = await supabase
+      .from("CourseApplication")
+      .insert({
+        ...input,
+        status: "pending",
+        applied_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
 
-  if (error) throw error;
+    if (error) {
+      console.error("Course application error:", error);
+      throw new Error(error.message || "코스 신청에 실패했습니다.");
+    }
 
-  revalidatePath("/");
-  return data;
+    revalidatePath("/");
+    return data;
+  } catch (error) {
+    console.error("applyCourse error:", error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("코스 신청 중 알 수 없는 오류가 발생했습니다.");
+  }
 }
 
 // 코스 승인 (관리자가 승인)

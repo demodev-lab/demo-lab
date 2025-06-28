@@ -24,8 +24,8 @@ import type { CreateCourseInput } from "../types";
 
 const formSchema = z.object({
   title: z.string().min(1, "제목을 입력해주세요"),
-  subtitle: z.string().min(1, "부제목을 입력해주세요"),
-  description: z.string().min(1, "설명을 입력해주세요"),
+  subtitle: z.string().optional(),
+  description: z.string().optional(),
   difficulty: z.enum(["입문", "초급", "중급", "고급"]),
   thumbnail_url: z.string().optional(),
 });
@@ -45,8 +45,8 @@ export function CourseCreateForm() {
   });
 
   const onSubmit = (data: CreateCourseInput) => {
+    console.log("Submitting course data:", data);
     createCourse(data);
-    form.reset();
   };
 
   return (
