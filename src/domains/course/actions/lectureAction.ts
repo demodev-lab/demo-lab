@@ -75,7 +75,8 @@ export async function getLectureById(id: number) {
       Module (
         id,
         title,
-        course_id
+        course_id,
+        sequence
       ),
       LectureKeypoint (
         id,
@@ -93,6 +94,66 @@ export async function getLectureById(id: number) {
 
   if (error) throw error;
   return data;
+}
+
+// 코스의 모든 강의를 모듈별로 정렬하여 가져오기 (진도 정보 포함)
+export async function getCourseLecturesWithProgress(
+  courseId: number,
+  userId?: string,
+) {
+  const supabase = await createServerSupabaseClient();
+
+  // 모듈과 강의 가져오기
+  const { data: modules, error } = await supabase
+    .from("Module")
+    .select(
+      `
+      *,
+      Lecture (
+        id,
+        title,
+        description,
+        sequence,
+        duration_secs,
+        video_url
+      )
+    `,
+    )
+    .eq("course_id", courseId)
+    .order("sequence", { ascending: true });
+
+  if (error) throw error;
+
+  // 사용자가 있으면 진도 정보도 가져오기
+  if (userId && modules) {
+    const lectureIds = modules.flatMap((m) => m.Lecture.map((l: any) => l.id));
+
+    const { data: progressData } = await supabase
+      .from("LectureProgress")
+      .select("lecture_id, progress_secs, is_completed")
+      .eq("user_id", userId)
+      .in("lecture_id", lectureIds);
+
+    // 진도 정보를 맵으로 변환
+    const progressMap = new Map(
+      progressData?.map((p) => [p.lecture_id, p]) || [],
+    );
+
+    // 각 강의에 진도 정보 추가
+    return modules.map((module) => ({
+      ...module,
+      Lecture: module.Lecture.map((lecture: any) => ({
+        ...lecture,
+        progress: progressMap.get(lecture.id) || null,
+      })).sort((a: any, b: any) => a.sequence - b.sequence),
+    }));
+  }
+
+  // 강의 정렬
+  return modules.map((module) => ({
+    ...module,
+    Lecture: module.Lecture.sort((a: any, b: any) => a.sequence - b.sequence),
+  }));
 }
 
 export async function updateLecture(
