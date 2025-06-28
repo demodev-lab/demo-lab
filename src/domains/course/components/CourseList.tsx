@@ -1,10 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCourses } from "../hooks/useCourses";
 import { CourseCard } from "./course-card";
+import { usePathname } from "next/navigation";
 
 function CourseCardSkeleton() {
   return (
@@ -28,8 +34,14 @@ function CourseCardSkeleton() {
   );
 }
 
-export function CourseList() {
+interface CourseListProps {
+  onCourseClick?: (courseId: string) => void;
+}
+
+export function CourseList({ onCourseClick }: CourseListProps) {
   const { courses, isLoading, error } = useCourses();
+  const pathname = usePathname();
+  const isAdminPage = pathname?.includes("/admin");
 
   if (error) {
     return (
@@ -59,11 +71,25 @@ export function CourseList() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {courses.map((course) => (
-        <Link key={course.id} href={`/classroom/${course.id}`}>
-          <CourseCard course={course} />
-        </Link>
-      ))}
+      {courses.map((course) => {
+        if (isAdminPage && onCourseClick) {
+          return (
+            <div
+              key={course.id}
+              onClick={() => onCourseClick(course.id.toString())}
+              className="cursor-pointer"
+            >
+              <CourseCard course={course} />
+            </div>
+          );
+        }
+
+        return (
+          <Link key={course.id} href={`/classroom/${course.id}`}>
+            <CourseCard course={course} />
+          </Link>
+        );
+      })}
     </div>
   );
 }

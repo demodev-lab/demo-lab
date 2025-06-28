@@ -10,7 +10,8 @@
       "Bash(HUSKY=0 git commit -m \"feat: course 도메인 구조 추가\" -m \"- 코스 관련 기능을 위한 도메인 구조 생성\n- actions, components, hooks, types 디렉토리 구성\n- 추후 코스 관리 기능 구현을 위한 기반 마련\")",
       "Bash(HUSKY=0 git commit -m \"refactor: Post와 Comment 도메인 컴포넌트 개선\" -m \"- PostDetailModal, PostEditorModal, PostList 컴포넌트 구조 개선\n- useComment hook 업데이트\n- 타입 안정성 및 코드 품질 향상\")",
       "Bash(HUSKY=0 git commit -m \"refactor: CourseManager 컴포넌트 import 경로 수정\" -m \"- 새로운 도메인 구조에 맞게 import 경로 업데이트\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }
