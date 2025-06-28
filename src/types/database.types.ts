@@ -7,73 +7,167 @@ export type Json =
   | Json[];
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+          extensions?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
+      background_knowledge: {
+        Row: {
+          content: string;
+          course_id: number | null;
+          created_at: string | null;
+          id: number;
+          sequence: number | null;
+        };
+        Insert: {
+          content: string;
+          course_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          sequence?: number | null;
+        };
+        Update: {
+          content?: string;
+          course_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          sequence?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "background_knowledge_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "course";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       categories: {
         Row: {
-          color: string;
-          created_at: string;
+          color: string | null;
+          created_at: string | null;
           description: string | null;
           id: number;
           name: string;
         };
         Insert: {
-          color?: string;
-          created_at?: string;
+          color?: string | null;
+          created_at?: string | null;
           description?: string | null;
-          id?: never;
+          id?: number;
           name: string;
         };
         Update: {
-          color?: string;
-          created_at?: string;
+          color?: string | null;
+          created_at?: string | null;
           description?: string | null;
-          id?: never;
+          id?: number;
           name?: string;
         };
         Relationships: [];
       };
-      comments: {
+      comment_likes: {
         Row: {
-          author_id: string;
-          content: string;
-          created_at: string;
+          comment_id: number | null;
+          created_at: string | null;
           id: number;
-          is_spam: boolean;
-          like_count: number;
-          parent_comment_id: number | null;
-          post_id: number;
-          status: string;
-          updated_at: string | null;
+          user_id: string;
         };
         Insert: {
-          author_id: string;
-          content: string;
-          created_at?: string;
-          id?: never;
-          is_spam?: boolean;
-          like_count?: number;
-          parent_comment_id?: number | null;
-          post_id: number;
-          status?: string;
-          updated_at?: string | null;
+          comment_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          user_id: string;
         };
         Update: {
-          author_id?: string;
-          content?: string;
-          created_at?: string;
-          id?: never;
-          is_spam?: boolean;
-          like_count?: number;
-          parent_comment_id?: number | null;
-          post_id?: number;
-          status?: string;
-          updated_at?: string | null;
+          comment_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          user_id?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "comments_parent_comment_id_fkey";
-            columns: ["parent_comment_id"];
+            foreignKeyName: "comment_likes_comment_id_fkey";
+            columns: ["comment_id"];
+            isOneToOne: false;
+            referencedRelation: "comments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comment_likes_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      comments: {
+        Row: {
+          author_id: string;
+          children_count: number | null;
+          content: string;
+          created_at: string | null;
+          id: number;
+          like_count: number | null;
+          parent_id: number | null;
+          post_id: number | null;
+        };
+        Insert: {
+          author_id: string;
+          children_count?: number | null;
+          content: string;
+          created_at?: string | null;
+          id?: number;
+          like_count?: number | null;
+          parent_id?: number | null;
+          post_id?: number | null;
+        };
+        Update: {
+          author_id?: string;
+          children_count?: number | null;
+          content?: string;
+          created_at?: string | null;
+          id?: number;
+          like_count?: number | null;
+          parent_id?: number | null;
+          post_id?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comments_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey";
+            columns: ["parent_id"];
             isOneToOne: false;
             referencedRelation: "comments";
             referencedColumns: ["id"];
@@ -87,28 +181,476 @@ export type Database = {
           },
         ];
       };
-      likes: {
+      course: {
         Row: {
+          created_at: string | null;
+          description: string | null;
+          difficulty: Database["public"]["Enums"]["difficulty_level"];
+          id: number;
+          subtitle: string | null;
+          thumbnail_url: string | null;
+          title: string;
+          total_duration_secs: number | null;
+          total_lecture_count: number | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          description?: string | null;
+          difficulty?: Database["public"]["Enums"]["difficulty_level"];
+          id?: number;
+          subtitle?: string | null;
+          thumbnail_url?: string | null;
+          title: string;
+          total_duration_secs?: number | null;
+          total_lecture_count?: number | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          description?: string | null;
+          difficulty?: Database["public"]["Enums"]["difficulty_level"];
+          id?: number;
+          subtitle?: string | null;
+          thumbnail_url?: string | null;
+          title?: string;
+          total_duration_secs?: number | null;
+          total_lecture_count?: number | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
+      course_application: {
+        Row: {
+          applicant_email: string | null;
+          applicant_id: string;
+          applicant_phone: string | null;
+          applied_at: string;
+          approved_at: string | null;
+          approved_by: string | null;
+          approved_course_id: number | null;
           created_at: string;
-          post_id: number;
+          description: string | null;
+          difficulty: Database["public"]["Enums"]["difficulty_level"];
+          id: number;
+          rejected_at: string | null;
+          rejected_by: string | null;
+          rejection_reason: string | null;
+          status: string;
+          subtitle: string | null;
+          thumbnail_url: string | null;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          applicant_email?: string | null;
+          applicant_id: string;
+          applicant_phone?: string | null;
+          applied_at?: string;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          approved_course_id?: number | null;
+          created_at?: string;
+          description?: string | null;
+          difficulty?: Database["public"]["Enums"]["difficulty_level"];
+          id?: number;
+          rejected_at?: string | null;
+          rejected_by?: string | null;
+          rejection_reason?: string | null;
+          status?: string;
+          subtitle?: string | null;
+          thumbnail_url?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          applicant_email?: string | null;
+          applicant_id?: string;
+          applicant_phone?: string | null;
+          applied_at?: string;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          approved_course_id?: number | null;
+          created_at?: string;
+          description?: string | null;
+          difficulty?: Database["public"]["Enums"]["difficulty_level"];
+          id?: number;
+          rejected_at?: string | null;
+          rejected_by?: string | null;
+          rejection_reason?: string | null;
+          status?: string;
+          subtitle?: string | null;
+          thumbnail_url?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "course_application_applicant_id_fkey";
+            columns: ["applicant_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "course_application_approved_course_id_fkey";
+            columns: ["approved_course_id"];
+            isOneToOne: false;
+            referencedRelation: "course";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      course_instructor: {
+        Row: {
+          course_id: number | null;
+          created_at: string | null;
+          id: number;
+          instructor_id: string | null;
+          intro_message: string | null;
+          role_title: string | null;
+        };
+        Insert: {
+          course_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          instructor_id?: string | null;
+          intro_message?: string | null;
+          role_title?: string | null;
+        };
+        Update: {
+          course_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          instructor_id?: string | null;
+          intro_message?: string | null;
+          role_title?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "course_instructor_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "course";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "course_instructor_instructor_id_fkey";
+            columns: ["instructor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      course_learning_goal: {
+        Row: {
+          content: string;
+          course_id: number | null;
+          created_at: string | null;
+          id: number;
+          sequence: number | null;
+        };
+        Insert: {
+          content: string;
+          course_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          sequence?: number | null;
+        };
+        Update: {
+          content?: string;
+          course_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          sequence?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "course_learning_goal_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "course";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      enrollment: {
+        Row: {
+          completed_lecture_count: number | null;
+          course_id: number | null;
+          created_at: string | null;
+          id: number;
+          last_viewed_lecture_id: number | null;
+          status: Database["public"]["Enums"]["enrollment_status"] | null;
+          updated_at: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          completed_lecture_count?: number | null;
+          course_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          last_viewed_lecture_id?: number | null;
+          status?: Database["public"]["Enums"]["enrollment_status"] | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          completed_lecture_count?: number | null;
+          course_id?: number | null;
+          created_at?: string | null;
+          id?: number;
+          last_viewed_lecture_id?: number | null;
+          status?: Database["public"]["Enums"]["enrollment_status"] | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "enrollment_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "course";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "enrollment_last_viewed_lecture_id_fkey";
+            columns: ["last_viewed_lecture_id"];
+            isOneToOne: false;
+            referencedRelation: "lecture";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "enrollment_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lecture: {
+        Row: {
+          course_id: number | null;
+          created_at: string | null;
+          description: string | null;
+          duration_secs: number | null;
+          id: number;
+          module_id: number | null;
+          sequence: number;
+          title: string;
+          updated_at: string | null;
+          video_url: string | null;
+        };
+        Insert: {
+          course_id?: number | null;
+          created_at?: string | null;
+          description?: string | null;
+          duration_secs?: number | null;
+          id?: number;
+          module_id?: number | null;
+          sequence: number;
+          title: string;
+          updated_at?: string | null;
+          video_url?: string | null;
+        };
+        Update: {
+          course_id?: number | null;
+          created_at?: string | null;
+          description?: string | null;
+          duration_secs?: number | null;
+          id?: number;
+          module_id?: number | null;
+          sequence?: number;
+          title?: string;
+          updated_at?: string | null;
+          video_url?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lecture_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "course";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lecture_module_id_fkey";
+            columns: ["module_id"];
+            isOneToOne: false;
+            referencedRelation: "module";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lecture_keypoint: {
+        Row: {
+          content: string;
+          created_at: string | null;
+          id: number;
+          lecture_id: number | null;
+          sequence: number | null;
+        };
+        Insert: {
+          content: string;
+          created_at?: string | null;
+          id?: number;
+          lecture_id?: number | null;
+          sequence?: number | null;
+        };
+        Update: {
+          content?: string;
+          created_at?: string | null;
+          id?: number;
+          lecture_id?: number | null;
+          sequence?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lecture_keypoint_lecture_id_fkey";
+            columns: ["lecture_id"];
+            isOneToOne: false;
+            referencedRelation: "lecture";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lecture_material: {
+        Row: {
+          created_at: string | null;
+          file_url: string;
+          id: number;
+          lecture_id: number | null;
+          title: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          file_url: string;
+          id?: number;
+          lecture_id?: number | null;
+          title: string;
+        };
+        Update: {
+          created_at?: string | null;
+          file_url?: string;
+          id?: number;
+          lecture_id?: number | null;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lecture_material_lecture_id_fkey";
+            columns: ["lecture_id"];
+            isOneToOne: false;
+            referencedRelation: "lecture";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lecture_progress: {
+        Row: {
+          id: number;
+          is_completed: boolean | null;
+          lecture_id: number | null;
+          progress_secs: number | null;
+          updated_at: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          id?: number;
+          is_completed?: boolean | null;
+          lecture_id?: number | null;
+          progress_secs?: number | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          id?: number;
+          is_completed?: boolean | null;
+          lecture_id?: number | null;
+          progress_secs?: number | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lecture_progress_lecture_id_fkey";
+            columns: ["lecture_id"];
+            isOneToOne: false;
+            referencedRelation: "lecture";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lecture_progress_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      module: {
+        Row: {
+          course_id: number | null;
+          id: number;
+          sequence: number;
+          title: string;
+        };
+        Insert: {
+          course_id?: number | null;
+          id?: number;
+          sequence: number;
+          title: string;
+        };
+        Update: {
+          course_id?: number | null;
+          id?: number;
+          sequence?: number;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "module_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "course";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      post_likes: {
+        Row: {
+          created_at: string | null;
+          id: number;
+          post_id: number | null;
           user_id: string;
         };
         Insert: {
-          created_at?: string;
-          post_id: number;
+          created_at?: string | null;
+          id?: number;
+          post_id?: number | null;
           user_id: string;
         };
         Update: {
-          created_at?: string;
-          post_id?: number;
+          created_at?: string | null;
+          id?: number;
+          post_id?: number | null;
           user_id?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "likes_post_id_fkey";
+            foreignKeyName: "post_likes_post_id_fkey";
             columns: ["post_id"];
             isOneToOne: false;
             referencedRelation: "posts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "post_likes_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -146,50 +688,48 @@ export type Database = {
       posts: {
         Row: {
           author_id: string;
-          category_id: number | null;
-          comment_count: number;
+          category_id: number;
+          comment_count: number | null;
           content: string | null;
-          created_at: string;
+          created_at: string | null;
           id: number;
-          is_pinned: boolean;
-          is_spam: boolean;
-          like_count: number;
-          status: string;
+          is_pinned: boolean | null;
+          like_count: number | null;
           title: string;
-          updated_at: string | null;
-          view_count: number;
+          view_count: number | null;
         };
         Insert: {
           author_id: string;
-          category_id?: number | null;
-          comment_count?: number;
+          category_id: number;
+          comment_count?: number | null;
           content?: string | null;
-          created_at?: string;
-          id?: never;
-          is_pinned?: boolean;
-          is_spam?: boolean;
-          like_count?: number;
-          status?: string;
+          created_at?: string | null;
+          id?: number;
+          is_pinned?: boolean | null;
+          like_count?: number | null;
           title: string;
-          updated_at?: string | null;
-          view_count?: number;
+          view_count?: number | null;
         };
         Update: {
           author_id?: string;
-          category_id?: number | null;
-          comment_count?: number;
+          category_id?: number;
+          comment_count?: number | null;
           content?: string | null;
-          created_at?: string;
-          id?: never;
-          is_pinned?: boolean;
-          is_spam?: boolean;
-          like_count?: number;
-          status?: string;
+          created_at?: string | null;
+          id?: number;
+          is_pinned?: boolean | null;
+          like_count?: number | null;
           title?: string;
-          updated_at?: string | null;
-          view_count?: number;
+          view_count?: number | null;
         };
         Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "posts_category_id_fkey";
             columns: ["category_id"];
@@ -202,616 +742,107 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null;
-          created_at: string;
+          created_at: string | null;
           full_name: string | null;
           id: string;
           role: Database["public"]["Enums"]["user_role"];
-          updated_at: string;
+          updated_at: string | null;
           username: string | null;
         };
         Insert: {
           avatar_url?: string | null;
-          created_at?: string;
+          created_at?: string | null;
           full_name?: string | null;
           id: string;
           role?: Database["public"]["Enums"]["user_role"];
-          updated_at?: string;
+          updated_at?: string | null;
           username?: string | null;
         };
         Update: {
           avatar_url?: string | null;
-          created_at?: string;
+          created_at?: string | null;
           full_name?: string | null;
           id?: string;
           role?: Database["public"]["Enums"]["user_role"];
-          updated_at?: string;
+          updated_at?: string | null;
           username?: string | null;
         };
         Relationships: [];
       };
-      subscriptions: {
+      related_course: {
         Row: {
-          created_at: string;
-          current_period_end: string | null;
-          id: string;
-          lemon_squeezy_customer_id: number | null;
-          lemon_squeezy_order_id: number | null;
-          lemonsqueezy_subscription_id: number;
-          price_id: number | null;
-          product_id: number | null;
-          status: string;
-          test_mode: boolean | null;
-          updated_at: string;
-          user_id: string | null;
-          variant_id: number | null;
+          course_a_id: number | null;
+          course_b_id: number | null;
+          created_at: string | null;
+          id: number;
         };
         Insert: {
-          created_at?: string;
-          current_period_end?: string | null;
-          id?: string;
-          lemon_squeezy_customer_id?: number | null;
-          lemon_squeezy_order_id?: number | null;
-          lemonsqueezy_subscription_id: number;
-          price_id?: number | null;
-          product_id?: number | null;
-          status: string;
-          test_mode?: boolean | null;
-          updated_at?: string;
-          user_id?: string | null;
-          variant_id?: number | null;
+          course_a_id?: number | null;
+          course_b_id?: number | null;
+          created_at?: string | null;
+          id?: number;
         };
         Update: {
-          created_at?: string;
-          current_period_end?: string | null;
-          id?: string;
-          lemon_squeezy_customer_id?: number | null;
-          lemon_squeezy_order_id?: number | null;
-          lemonsqueezy_subscription_id?: number;
-          price_id?: number | null;
-          product_id?: number | null;
-          status?: string;
-          test_mode?: boolean | null;
-          updated_at?: string;
-          user_id?: string | null;
-          variant_id?: number | null;
+          course_a_id?: number | null;
+          course_b_id?: number | null;
+          created_at?: string | null;
+          id?: number;
         };
         Relationships: [
           {
-            foreignKeyName: "subscriptions_user_id_fkey";
-            columns: ["user_id"];
+            foreignKeyName: "related_course_course_a_id_fkey";
+            columns: ["course_a_id"];
             isOneToOne: false;
-            referencedRelation: "profiles";
+            referencedRelation: "course";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "related_course_course_b_id_fkey";
+            columns: ["course_b_id"];
+            isOneToOne: false;
+            referencedRelation: "course";
             referencedColumns: ["id"];
           },
         ];
       };
       tags: {
         Row: {
-          color: string;
-          created_at: string;
+          color: string | null;
+          created_at: string | null;
           description: string | null;
           id: number;
           name: string;
         };
         Insert: {
-          color?: string;
-          created_at?: string;
+          color?: string | null;
+          created_at?: string | null;
           description?: string | null;
-          id?: never;
+          id?: number;
           name: string;
         };
         Update: {
-          color?: string;
-          created_at?: string;
+          color?: string | null;
+          created_at?: string | null;
           description?: string | null;
-          id?: never;
+          id?: number;
           name?: string;
         };
         Relationships: [];
-      };
-      Course: {
-        Row: {
-          id: number;
-          title: string;
-          subtitle: string | null;
-          description: string | null;
-          thumbnail_url: string | null;
-          difficulty: Database["public"]["Enums"]["difficulty_level"];
-          total_lecture_count: number;
-          total_duration_secs: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: never;
-          title: string;
-          subtitle?: string | null;
-          description?: string | null;
-          thumbnail_url?: string | null;
-          difficulty: Database["public"]["Enums"]["difficulty_level"];
-          total_lecture_count?: number;
-          total_duration_secs?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: never;
-          title?: string;
-          subtitle?: string | null;
-          description?: string | null;
-          thumbnail_url?: string | null;
-          difficulty?: Database["public"]["Enums"]["difficulty_level"];
-          total_lecture_count?: number;
-          total_duration_secs?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      Module: {
-        Row: {
-          id: number;
-          course_id: number;
-          title: string;
-          sequence: number;
-        };
-        Insert: {
-          id?: never;
-          course_id: number;
-          title: string;
-          sequence: number;
-        };
-        Update: {
-          id?: never;
-          course_id?: number;
-          title?: string;
-          sequence?: number;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "Module_course_id_fkey";
-            columns: ["course_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      Lecture: {
-        Row: {
-          id: number;
-          course_id: number;
-          module_id: number;
-          title: string;
-          description: string | null;
-          sequence: number;
-          video_url: string | null;
-          duration_secs: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: never;
-          course_id: number;
-          module_id: number;
-          title: string;
-          description?: string | null;
-          sequence: number;
-          video_url?: string | null;
-          duration_secs?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: never;
-          course_id?: number;
-          module_id?: number;
-          title?: string;
-          description?: string | null;
-          sequence?: number;
-          video_url?: string | null;
-          duration_secs?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "Lecture_course_id_fkey";
-            columns: ["course_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "Lecture_module_id_fkey";
-            columns: ["module_id"];
-            isOneToOne: false;
-            referencedRelation: "Module";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      Enrollment: {
-        Row: {
-          id: number;
-          user_id: string;
-          course_id: number;
-          status: Database["public"]["Enums"]["enrollment_status"];
-          completed_lecture_count: number;
-          last_viewed_lecture_id: number | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: never;
-          user_id: string;
-          course_id: number;
-          status?: Database["public"]["Enums"]["enrollment_status"];
-          completed_lecture_count?: number;
-          last_viewed_lecture_id?: number | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: never;
-          user_id?: string;
-          course_id?: number;
-          status?: Database["public"]["Enums"]["enrollment_status"];
-          completed_lecture_count?: number;
-          last_viewed_lecture_id?: number | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "Enrollment_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "Enrollment_course_id_fkey";
-            columns: ["course_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "Enrollment_last_viewed_lecture_id_fkey";
-            columns: ["last_viewed_lecture_id"];
-            isOneToOne: false;
-            referencedRelation: "Lecture";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      LectureProgress: {
-        Row: {
-          id: number;
-          user_id: string;
-          lecture_id: number;
-          progress_secs: number;
-          is_completed: boolean;
-          updated_at: string;
-        };
-        Insert: {
-          id?: never;
-          user_id: string;
-          lecture_id: number;
-          progress_secs?: number;
-          is_completed?: boolean;
-          updated_at?: string;
-        };
-        Update: {
-          id?: never;
-          user_id?: string;
-          lecture_id?: number;
-          progress_secs?: number;
-          is_completed?: boolean;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "LectureProgress_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "LectureProgress_lecture_id_fkey";
-            columns: ["lecture_id"];
-            isOneToOne: false;
-            referencedRelation: "Lecture";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      CourseInstructor: {
-        Row: {
-          id: number;
-          course_id: number;
-          instructor_id: string;
-          role_title: string | null;
-          intro_message: string | null;
-        };
-        Insert: {
-          id?: never;
-          course_id: number;
-          instructor_id: string;
-          role_title?: string | null;
-          intro_message?: string | null;
-        };
-        Update: {
-          id?: never;
-          course_id?: number;
-          instructor_id?: string;
-          role_title?: string | null;
-          intro_message?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "CourseInstructor_course_id_fkey";
-            columns: ["course_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "CourseInstructor_instructor_id_fkey";
-            columns: ["instructor_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      CourseLearningGoal: {
-        Row: {
-          id: number;
-          course_id: number;
-          content: string;
-        };
-        Insert: {
-          id?: never;
-          course_id: number;
-          content: string;
-        };
-        Update: {
-          id?: never;
-          course_id?: number;
-          content?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "CourseLearningGoal_course_id_fkey";
-            columns: ["course_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      BackgroundKnowledge: {
-        Row: {
-          id: number;
-          course_id: number;
-          content: string;
-        };
-        Insert: {
-          id?: never;
-          course_id: number;
-          content: string;
-        };
-        Update: {
-          id?: never;
-          course_id?: number;
-          content?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "BackgroundKnowledge_course_id_fkey";
-            columns: ["course_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      LectureKeypoint: {
-        Row: {
-          id: number;
-          lecture_id: number;
-          content: string;
-        };
-        Insert: {
-          id?: never;
-          lecture_id: number;
-          content: string;
-        };
-        Update: {
-          id?: never;
-          lecture_id?: number;
-          content?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "LectureKeypoint_lecture_id_fkey";
-            columns: ["lecture_id"];
-            isOneToOne: false;
-            referencedRelation: "Lecture";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      LectureMaterial: {
-        Row: {
-          id: number;
-          lecture_id: number;
-          title: string;
-          file_url: string;
-        };
-        Insert: {
-          id?: never;
-          lecture_id: number;
-          title: string;
-          file_url: string;
-        };
-        Update: {
-          id?: never;
-          lecture_id?: number;
-          title?: string;
-          file_url?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "LectureMaterial_lecture_id_fkey";
-            columns: ["lecture_id"];
-            isOneToOne: false;
-            referencedRelation: "Lecture";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      RelatedCourse: {
-        Row: {
-          id: number;
-          course_a_id: number;
-          course_b_id: number;
-        };
-        Insert: {
-          id?: never;
-          course_a_id: number;
-          course_b_id: number;
-        };
-        Update: {
-          id?: never;
-          course_a_id?: number;
-          course_b_id?: number;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "RelatedCourse_course_a_id_fkey";
-            columns: ["course_a_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "RelatedCourse_course_b_id_fkey";
-            columns: ["course_b_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      CourseApplication: {
-        Row: {
-          id: number;
-          title: string;
-          subtitle: string | null;
-          description: string | null;
-          thumbnail_url: string | null;
-          difficulty: Database["public"]["Enums"]["difficulty_level"];
-          applicant_id: string;
-          applicant_email: string | null;
-          applicant_phone: string | null;
-          status: string;
-          applied_at: string;
-          approved_at: string | null;
-          approved_by: string | null;
-          approved_course_id: number | null;
-          rejected_at: string | null;
-          rejected_by: string | null;
-          rejection_reason: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: never;
-          title: string;
-          subtitle?: string | null;
-          description?: string | null;
-          thumbnail_url?: string | null;
-          difficulty: Database["public"]["Enums"]["difficulty_level"];
-          applicant_id: string;
-          applicant_email?: string | null;
-          applicant_phone?: string | null;
-          status?: string;
-          applied_at?: string;
-          approved_at?: string | null;
-          approved_by?: string | null;
-          approved_course_id?: number | null;
-          rejected_at?: string | null;
-          rejected_by?: string | null;
-          rejection_reason?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: never;
-          title?: string;
-          subtitle?: string | null;
-          description?: string | null;
-          thumbnail_url?: string | null;
-          difficulty?: Database["public"]["Enums"]["difficulty_level"];
-          applicant_id?: string;
-          applicant_email?: string | null;
-          applicant_phone?: string | null;
-          status?: string;
-          applied_at?: string;
-          approved_at?: string | null;
-          approved_by?: string | null;
-          approved_course_id?: number | null;
-          rejected_at?: string | null;
-          rejected_by?: string | null;
-          rejection_reason?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "CourseApplication_applicant_id_fkey";
-            columns: ["applicant_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "CourseApplication_approved_by_fkey";
-            columns: ["approved_by"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "CourseApplication_rejected_by_fkey";
-            columns: ["rejected_by"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "CourseApplication_approved_course_id_fkey";
-            columns: ["approved_course_id"];
-            isOneToOne: false;
-            referencedRelation: "Course";
-            referencedColumns: ["id"];
-          },
-        ];
       };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      delete_comment_rpc: {
+        Args: { comment_id: number };
+        Returns: boolean;
+      };
       get_posts_with_details: {
         Args: {
           request_user_id: string;
-          page_limit: number;
-          page_offset: number;
+          page_limit?: number;
+          page_offset?: number;
         };
         Returns: {
           id: number;
@@ -831,11 +862,38 @@ export type Database = {
           is_liked: boolean;
         }[];
       };
+      get_user_role: {
+        Args: { user_id?: string };
+        Returns: Database["public"]["Enums"]["user_role"];
+      };
+      has_minimum_role: {
+        Args: {
+          required_role: Database["public"]["Enums"]["user_role"];
+          user_id?: string;
+        };
+        Returns: boolean;
+      };
+      is_admin: {
+        Args: { user_id?: string };
+        Returns: boolean;
+      };
+      is_own_resource: {
+        Args: { resource_user_id: string; user_id?: string };
+        Returns: boolean;
+      };
+      toggle_comment_like_rpc: {
+        Args: { comment_id_param: number };
+        Returns: boolean;
+      };
+      toggle_post_like_rpc: {
+        Args: { post_id_param: number };
+        Returns: boolean;
+      };
     };
     Enums: {
-      user_role: "user" | "manager" | "admin";
       difficulty_level: "입문" | "초급" | "중급" | "고급";
       enrollment_status: "수강전" | "수강중" | "완강";
+      user_role: "user" | "manager" | "admin";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -949,11 +1007,14 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
-      user_role: ["user", "manager", "admin"],
       difficulty_level: ["입문", "초급", "중급", "고급"],
       enrollment_status: ["수강전", "수강중", "완강"],
+      user_role: ["user", "manager", "admin"],
     },
   },
 } as const;

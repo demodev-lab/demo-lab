@@ -9,6 +9,21 @@
 CREATE TYPE user_role AS ENUM ('user', 'manager', 'admin');
 
 -- =============================================
+-- 테이블 생성
+-- =============================================
+
+-- 사용자 프로필
+CREATE TABLE profiles (
+    id UUID REFERENCES auth.users NOT NULL PRIMARY KEY,
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    username TEXT UNIQUE,
+    full_name TEXT,
+    avatar_url TEXT,
+    role user_role DEFAULT 'user' NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =============================================
 -- 함수 정의
 -- =============================================
 
@@ -81,21 +96,6 @@ SECURITY DEFINER
 AS $$
   SELECT resource_user_id = user_id;
 $$;
-
--- =============================================
--- 테이블 생성
--- =============================================
-
--- 사용자 프로필
-CREATE TABLE profiles (
-    id UUID REFERENCES auth.users NOT NULL PRIMARY KEY,
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    username TEXT UNIQUE,
-    full_name TEXT,
-    avatar_url TEXT,
-    role user_role DEFAULT 'user' NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
 
 -- =============================================
 -- 트리거 생성
