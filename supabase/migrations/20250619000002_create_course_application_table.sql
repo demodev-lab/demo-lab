@@ -1,3 +1,12 @@
+-- updated_at 자동 업데이트 함수 생성 (없을 경우를 대비)
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- CourseApplication 테이블 생성
 CREATE TABLE "CourseApplication" (
   id SERIAL PRIMARY KEY,
