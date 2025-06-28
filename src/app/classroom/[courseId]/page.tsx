@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { getCourseWithDetails } from "@/domains/course/actions/courseAction";
 import { getEnrollmentByUserAndCourse } from "@/domains/course/actions/enrollmentAction";
 import { getUserCourseProgress } from "@/domains/course/actions/progressAction";
-import { CourseDetail } from "@/domains/course/components/course-detail";
+// import { CourseDetail } from "@/domains/course/components/course-detail";
+import { CourseDetailNew } from "@/domains/course/components/CourseDetailNew";
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 
 interface Props {
@@ -35,7 +36,7 @@ export default async function CourseDetailPage({ params }: Props) {
     }
 
     return (
-      <CourseDetail
+      <CourseDetailNew
         course={course}
         enrollment={enrollment}
         progress={progress}
