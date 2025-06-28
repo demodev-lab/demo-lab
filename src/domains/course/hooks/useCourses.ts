@@ -1,20 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-  getCourseList,
-  getAllCourses,
-  getCourseById,
-} from "../actions/courseAction";
+import { getCourseList, getCourseById } from "../actions/courseAction";
 
-export function useCourses(includeAll = false) {
+export function useCourses() {
   const {
     data: courses = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["courses", includeAll ? "all" : "active"],
-    queryFn: () => (includeAll ? getAllCourses() : getCourseList()),
+    queryKey: ["courses"],
+    queryFn: () => getCourseList(),
   });
 
   return {

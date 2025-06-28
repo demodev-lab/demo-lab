@@ -41,7 +41,7 @@ interface CourseListProps {
 export function CourseList({ onCourseClick }: CourseListProps) {
   const pathname = usePathname();
   const isAdminPage = pathname?.includes("/admin");
-  const { courses, isLoading, error } = useCourses(isAdminPage);
+  const { courses, isLoading, error } = useCourses();
 
   if (error) {
     return (

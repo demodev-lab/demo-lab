@@ -17,6 +17,8 @@ export type LectureMaterial =
 export type Enrollment = Database["public"]["Tables"]["Enrollment"]["Row"];
 export type LectureProgress =
   Database["public"]["Tables"]["LectureProgress"]["Row"];
+export type CourseApplication =
+  Database["public"]["Tables"]["CourseApplication"]["Row"];
 
 // 입력 타입 정의
 export type CreateCourseInput =
@@ -31,6 +33,10 @@ export type CreateLectureInput =
   Database["public"]["Tables"]["Lecture"]["Insert"];
 export type UpdateLectureInput =
   Database["public"]["Tables"]["Lecture"]["Update"];
+export type CreateCourseApplicationInput =
+  Database["public"]["Tables"]["CourseApplication"]["Insert"];
+export type UpdateCourseApplicationInput =
+  Database["public"]["Tables"]["CourseApplication"]["Update"];
 
 // 확장된 타입 정의 (조인된 데이터 포함)
 export interface CourseWithDetails extends Course {

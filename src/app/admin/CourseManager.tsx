@@ -76,7 +76,7 @@ export function CourseManager() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <CourseCreateForm isAdmin={true} />
+              <CourseCreateForm />
             </CardContent>
           </Card>
         </TabsContent>

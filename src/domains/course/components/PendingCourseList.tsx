@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Course } from "../types";
+import { CourseApplication } from "../types";
 import {
   getPendingCourses,
   approveCourse,
@@ -30,7 +30,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Phone, User } from "lucide-react";
 
-interface CourseWithApplicant extends Course {
+interface CourseApplicationWithApplicant extends CourseApplication {
   applicant?: {
     id: string;
     full_name: string | null;
@@ -40,12 +40,12 @@ interface CourseWithApplicant extends Course {
 }
 
 export function PendingCourseList() {
-  const [courses, setCourses] = useState<CourseWithApplicant[]>([]);
+  const [courses, setCourses] = useState<CourseApplicationWithApplicant[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] =
-    useState<CourseWithApplicant | null>(null);
+    useState<CourseApplicationWithApplicant | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export function PendingCourseList() {
   const fetchPendingCourses = async () => {
     try {
       const data = await getPendingCourses();
-      setCourses(data as CourseWithApplicant[]);
+      setCourses(data as CourseApplicationWithApplicant[]);
     } catch (error) {
       toast.error("대기 중인 코스 목록을 불러오는데 실패했습니다.");
       console.error(error);
@@ -78,7 +78,7 @@ export function PendingCourseList() {
     }
   };
 
-  const handleRejectClick = (course: CourseWithApplicant) => {
+  const handleRejectClick = (course: CourseApplicationWithApplicant) => {
     setSelectedCourse(course);
     setRejectDialogOpen(true);
     setRejectionReason("");

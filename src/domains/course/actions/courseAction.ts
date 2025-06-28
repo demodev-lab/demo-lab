@@ -5,6 +5,7 @@ import {
   CreateCourseInput,
   UpdateCourseInput,
   CourseWithDetails,
+  CreateCourseApplicationInput,
 } from "../types";
 import { revalidatePath } from "next/cache";
 
@@ -26,31 +27,6 @@ export async function createCourse(input: CreateCourseInput) {
 }
 
 export async function getCourseList() {
-  const supabase = await createServerSupabaseClient();
-
-  const { data, error } = await supabase
-    .from("Course")
-    .select(
-      `
-      *,
-      CourseInstructor (
-        instructor:profiles (
-          id,
-          username,
-          avatar_url
-        )
-      )
-    `,
-    )
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
-
-  if (error) throw error;
-  return data;
-}
-
-// 모든 코스 목록 조회 (관리자용, 상태 무관)
-export async function getAllCourses() {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
@@ -195,11 +171,11 @@ export async function updateCourse(
 }
 
 // 코스 신청 (사용자가 신청)
-export async function applyCourse(input: CreateCourseInput) {
+export async function applyCourse(input: CreateCourseApplicationInput) {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Course")
+    .from("CourseApplication")
     .insert({
       ...input,
       status: "pending",
@@ -224,32 +200,65 @@ export async function approveCourse(id: string | number) {
 
   if (!user) throw new Error("로그인이 필요합니다.");
 
-  const { data, error } = await supabase
-    .from("Course")
-    .update({
-      status: "active",
-      approved_at: new Date().toISOString(),
-      approved_by: user.id,
-    })
+  // 1. 신청 정보 가져오기
+  const { data: application, error: appError } = await supabase
+    .from("CourseApplication")
+    .select("*")
     .eq("id", id)
+    .single();
+
+  if (appError || !application)
+    throw new Error("신청 정보를 찾을 수 없습니다.");
+
+  // 2. Course 테이블에 새 코스 생성
+  const { data: newCourse, error: courseError } = await supabase
+    .from("Course")
+    .insert({
+      title: application.title,
+      subtitle: application.subtitle,
+      description: application.description,
+      thumbnail_url: application.thumbnail_url,
+      difficulty: application.difficulty,
+    })
     .select()
     .single();
 
-  if (error) throw error;
+  if (courseError) throw courseError;
+
+  // 3. CourseApplication 상태 업데이트
+  const { error: updateError } = await supabase
+    .from("CourseApplication")
+    .update({
+      status: "approved",
+      approved_at: new Date().toISOString(),
+      approved_by: user.id,
+      approved_course_id: newCourse.id,
+    })
+    .eq("id", id);
+
+  if (updateError) throw updateError;
 
   revalidatePath("/admin");
   revalidatePath("/classroom");
-  return data;
+  return newCourse;
 }
 
 // 코스 거절 (관리자가 거절)
 export async function rejectCourse(id: string | number, reason: string) {
   const supabase = await createServerSupabaseClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("로그인이 필요합니다.");
+
   const { data, error } = await supabase
-    .from("Course")
+    .from("CourseApplication")
     .update({
-      status: "closed",
+      status: "rejected",
+      rejected_at: new Date().toISOString(),
+      rejected_by: user.id,
       rejection_reason: reason,
     })
     .eq("id", id)
@@ -267,7 +276,7 @@ export async function getPendingCourses() {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Course")
+    .from("CourseApplication")
     .select(
       `
       *,

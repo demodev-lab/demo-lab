@@ -68,7 +68,6 @@ export function CourseApplicationForm({
         ...values,
         applicant_id: userId,
         applicant_email: userEmail || null,
-        status: "pending",
       });
 
       toast.success(
