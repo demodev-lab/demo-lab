@@ -37,6 +37,50 @@ export const useCreateComment = () => {
     }) => {
       return createComment(postId, content, parentId);
     },
+    onMutate: async ({ postId }) => {
+      // 낙관적 업데이트 - comment_count 증가
+      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      await queryClient.cancelQueries({ queryKey: ["post", postId] });
+
+      const previousPosts = queryClient.getQueryData(["posts"]);
+      const previousPost = queryClient.getQueryData(["post", postId]);
+
+      // posts 목록 업데이트
+      queryClient.setQueriesData({ queryKey: ["posts"] }, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          posts: old.posts?.map((post: any) =>
+            post.id === postId
+              ? { ...post, comment_count: (post.comment_count || 0) + 1 }
+              : post,
+          ),
+        };
+      });
+
+      // 단일 post 업데이트
+      queryClient.setQueryData(["post", postId], (old: any) => {
+        if (!old) return old;
+        return { ...old, comment_count: (old.comment_count || 0) + 1 };
+      });
+
+      return { previousPosts, previousPost };
+    },
+    onError: (err, variables, context) => {
+      // 에러 시 롤백
+      if (context?.previousPosts) {
+        queryClient.setQueriesData(
+          { queryKey: ["posts"] },
+          context.previousPosts,
+        );
+      }
+      if (context?.previousPost) {
+        queryClient.setQueryData(
+          ["post", variables.postId],
+          context.previousPost,
+        );
+      }
+    },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["comments"] });
       // posts 쿼리도 무효화하여 comment_count 업데이트
@@ -92,7 +136,7 @@ export const useUpdateComment = () => {
 /**
  * 댓글 삭제 훅
  */
-export const useRemoveComment = () => {
+export const useRemoveComment = (postId: number) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (commentId: number) => {
@@ -100,29 +144,66 @@ export const useRemoveComment = () => {
     },
     onMutate: async (commentId) => {
       await queryClient.cancelQueries({ queryKey: ["comments"] });
-      const previousData = queryClient.getQueriesData({
+      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      await queryClient.cancelQueries({ queryKey: ["post", postId] });
+
+      const previousComments = queryClient.getQueriesData({
         queryKey: ["comments"],
       });
+      const previousPosts = queryClient.getQueryData(["posts"]);
+      const previousPost = queryClient.getQueryData(["post", postId]);
 
       queryClient.setQueriesData<any>({ queryKey: ["comments"] }, (oldData) => {
         if (!oldData) return oldData;
         return deleteCommentOptimistically(oldData, commentId);
       });
 
-      return { previousData };
+      // comment_count 감소
+      queryClient.setQueriesData({ queryKey: ["posts"] }, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          posts: old.posts?.map((post: any) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  comment_count: Math.max(0, (post.comment_count || 0) - 1),
+                }
+              : post,
+          ),
+        };
+      });
+
+      queryClient.setQueryData(["post", postId], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          comment_count: Math.max(0, (old.comment_count || 0) - 1),
+        };
+      });
+
+      return { previousComments, previousPosts, previousPost };
     },
     onError: (err, variables, context) => {
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
+      if (context?.previousComments) {
+        context.previousComments.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
+      }
+      if (context?.previousPosts) {
+        queryClient.setQueriesData(
+          { queryKey: ["posts"] },
+          context.previousPosts,
+        );
+      }
+      if (context?.previousPost) {
+        queryClient.setQueryData(["post", postId], context.previousPost);
       }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["comments"] });
-      // posts 쿼리도 무효화하여 comment_count 업데이트
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post"] });
+      queryClient.invalidateQueries({ queryKey: ["post", postId] });
     },
   });
 };

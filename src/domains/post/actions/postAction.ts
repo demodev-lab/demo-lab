@@ -70,10 +70,22 @@ export async function getPostList(
     query = query.eq("category_id", categoryId);
   }
 
-  // 정렬 및 페이지네이션
-  const { data, error } = await query
-    .order("created_at", { ascending: false })
-    .range(start, end);
+  // 정렬 옵션 적용
+  switch (sortOption) {
+    case "popular":
+      query = query.order("like_count", { ascending: false });
+      break;
+    case "comments":
+      query = query.order("comment_count", { ascending: false });
+      break;
+    case "latest":
+    default:
+      query = query.order("created_at", { ascending: false });
+      break;
+  }
+
+  // 페이지네이션
+  const { data, error } = await query.range(start, end);
 
   console.log("[postAction] Posts query result:", {
     data,

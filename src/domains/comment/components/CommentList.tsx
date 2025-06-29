@@ -28,7 +28,7 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
   // 댓글 수정 mutation
   const updateCommentMutation = useUpdateComment();
   // 댓글 삭제 mutation
-  const deleteCommentMutation = useRemoveComment();
+  const deleteCommentMutation = useRemoveComment(postId);
   // 댓글 좋아요 mutation
   const toggleLikeCommentMutation = useToggleCommentLike();
 
