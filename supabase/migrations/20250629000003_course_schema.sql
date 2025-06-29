@@ -220,13 +220,13 @@ ALTER TABLE related_course ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Courses are viewable by everyone" ON course
     FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can create courses" ON course
-    FOR INSERT WITH CHECK (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can create courses" ON course
+    FOR INSERT WITH CHECK (has_minimum_role('instructor'));
 
-CREATE POLICY "Only admins can update courses" ON course
-    FOR UPDATE USING (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can update courses" ON course
+    FOR UPDATE USING (has_minimum_role('instructor'));
 
-CREATE POLICY "Only admins can delete courses" ON course
+CREATE POLICY "Only managers and above can delete courses" ON course
     FOR DELETE USING (has_minimum_role('manager'));
 
 -- course_application 정책
@@ -265,44 +265,44 @@ CREATE POLICY "Users can manage own progress" ON lecture_progress
 CREATE POLICY "Course details are viewable by everyone" ON course_instructor
     FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can manage course instructors" ON course_instructor
-    FOR ALL USING (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can manage course instructors" ON course_instructor
+    FOR ALL USING (has_minimum_role('instructor'));
 
 CREATE POLICY "Course goals are viewable by everyone" ON course_learning_goal
     FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can manage course goals" ON course_learning_goal
-    FOR ALL USING (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can manage course goals" ON course_learning_goal
+    FOR ALL USING (has_minimum_role('instructor'));
 
 CREATE POLICY "Background knowledge is viewable by everyone" ON background_knowledge
     FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can manage background knowledge" ON background_knowledge
-    FOR ALL USING (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can manage background knowledge" ON background_knowledge
+    FOR ALL USING (has_minimum_role('instructor'));
 
 CREATE POLICY "Modules are viewable by everyone" ON module
     FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can manage modules" ON module
-    FOR ALL USING (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can manage modules" ON module
+    FOR ALL USING (has_minimum_role('instructor'));
 
 CREATE POLICY "Lectures are viewable by everyone" ON lecture
     FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can manage lectures" ON lecture
-    FOR ALL USING (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can manage lectures" ON lecture
+    FOR ALL USING (has_minimum_role('instructor'));
 
 CREATE POLICY "Lecture keypoints are viewable by everyone" ON lecture_keypoint
     FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can manage lecture keypoints" ON lecture_keypoint
-    FOR ALL USING (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can manage lecture keypoints" ON lecture_keypoint
+    FOR ALL USING (has_minimum_role('instructor'));
 
 CREATE POLICY "Lecture materials are viewable by everyone" ON lecture_material
     FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can manage lecture materials" ON lecture_material
-    FOR ALL USING (has_minimum_role('manager'));
+CREATE POLICY "Only instructors and above can manage lecture materials" ON lecture_material
+    FOR ALL USING (has_minimum_role('instructor'));
 
 CREATE POLICY "Related courses are viewable by everyone" ON related_course
     FOR SELECT USING (true);

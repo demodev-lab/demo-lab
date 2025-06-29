@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: This rule defines unified conventions and best practices for building scalable, maintainable, and consistent fullstack applications with Next.js, covering file naming, directory structure, component architecture, and technology stack guidelines based on React 19 and Next.js 15.
 globs: **/*.js,**/*.jsx,**/*.ts,**/*.tsx
 alwaysApply: false

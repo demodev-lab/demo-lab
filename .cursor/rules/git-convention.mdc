@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Git convention defining branch naming, commit message format, and issue labeling based on GitFlow and Conventional Commits.
 globs:
 alwaysApply: false

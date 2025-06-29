@@ -6,7 +6,7 @@
 -- =============================================
 -- ENUM 타입 정의
 -- =============================================
-CREATE TYPE user_role AS ENUM ('user', 'manager', 'admin');
+CREATE TYPE user_role AS ENUM ('user', 'instructor', 'manager', 'admin');
 
 -- =============================================
 -- 테이블 생성
@@ -73,6 +73,7 @@ SECURITY DEFINER
 AS $$
   SELECT CASE 
     WHEN required_role = 'user' THEN true
+    WHEN required_role = 'instructor' THEN get_user_role(user_id) IN ('instructor', 'manager', 'admin')
     WHEN required_role = 'manager' THEN get_user_role(user_id) IN ('manager', 'admin')
     WHEN required_role = 'admin' THEN get_user_role(user_id) = 'admin'
     ELSE false

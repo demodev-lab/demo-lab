@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: This rule defines the Memory Bank structure and documentation conventions for maintaining consistent project knowledge and context across the development lifecycle.
 globs:
 alwaysApply: true

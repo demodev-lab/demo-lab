@@ -893,7 +893,7 @@ export type Database = {
     Enums: {
       difficulty_level: "입문" | "초급" | "중급" | "고급";
       enrollment_status: "수강전" | "수강중" | "완강";
-      user_role: "user" | "manager" | "admin";
+      user_role: "user" | "instructor" | "manager" | "admin";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -1014,7 +1014,7 @@ export const Constants = {
     Enums: {
       difficulty_level: ["입문", "초급", "중급", "고급"],
       enrollment_status: ["수강전", "수강중", "완강"],
-      user_role: ["user", "manager", "admin"],
+      user_role: ["user", "instructor", "manager", "admin"],
     },
   },
 } as const;
