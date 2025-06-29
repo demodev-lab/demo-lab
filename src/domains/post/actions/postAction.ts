@@ -226,6 +226,7 @@ export async function postToggleLike(postId: number) {
 
   const currentCount = await getPostLikeCount(postId, supabase);
   let newCount = currentCount;
+  let isLiked = false;
 
   // 1. 이미 좋아요를 눌렀는지 확인
   const { data: existing, error: findError } = await supabase
@@ -244,6 +245,7 @@ export async function postToggleLike(postId: number) {
 
     if (insertError) throw insertError;
     newCount++;
+    isLiked = true;
   } else {
     // 이미 좋아요를 눌렀다면 좋아요 취소
     const { error: deleteError } = await supabase
@@ -253,11 +255,18 @@ export async function postToggleLike(postId: number) {
 
     if (deleteError) throw deleteError;
     newCount = Math.max(0, newCount - 1);
+    isLiked = false;
   }
 
   await updatePostLikeCount(postId, newCount, supabase);
 
   revalidatePath("/community");
+
+  // 업데이트된 상태 반환
+  return {
+    like_count: newCount,
+    is_liked: isLiked,
+  };
 }
 
 async function getPostLikeCount(

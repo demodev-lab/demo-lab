@@ -155,6 +155,34 @@ export const useTogglePostLike = () => {
       // 롤백을 위한 이전 데이터 반환
       return { previousPosts, previousPost };
     },
+    onSuccess: (data, postId) => {
+      // 서버에서 반환된 실제 데이터로 캐시 업데이트
+      queryClient.setQueriesData({ queryKey: ["posts"] }, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          posts: old.posts?.map((post: Post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  is_liked: data.is_liked,
+                  like_count: data.like_count,
+                }
+              : post,
+          ),
+        };
+      });
+
+      // 단일 post 업데이트
+      queryClient.setQueryData(["post", postId], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          is_liked: data.is_liked,
+          like_count: data.like_count,
+        };
+      });
+    },
     onError: (err, postId, context) => {
       // 에러 시 이전 데이터로 롤백
       if (context?.previousPosts) {
@@ -166,11 +194,6 @@ export const useTogglePostLike = () => {
       if (context?.previousPost) {
         queryClient.setQueryData(["post", postId], context.previousPost);
       }
-    },
-    onSettled: () => {
-      // 성공/실패 여부와 관계없이 최신 데이터 다시 가져오기
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post"] });
     },
   });
 };
