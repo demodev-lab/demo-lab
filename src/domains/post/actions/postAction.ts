@@ -9,7 +9,17 @@ import { SupabaseClient } from "@supabase/supabase-js";
 // DB에서 가져온 raw post 데이터를 클라이언트에서 사용할 수 있는 형태로 변환
 function transformPost(post: any, userId?: string): PostWithDetails {
   return {
-    ...post,
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    author_id: post.author_id,
+    category_id: post.category_id,
+    created_at: post.created_at,
+    updated_at: post.updated_at,
+    like_count: post.like_count || 0,
+    comment_count: post.comment_count || 0,
+    view_count: post.view_count || 0,
+    is_pinned: post.is_pinned || false,
     author_name: post.author.full_name ?? "익명",
     category_name: post.category?.name ?? "Unknown",
     category_color: post.category?.color ?? "#000000",
