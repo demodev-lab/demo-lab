@@ -1,8 +1,12 @@
+"use client";
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlusCircle, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/auth/auth-provider";
 
 interface PostCreateButtonProps {
   onCreateClick: () => void;
@@ -13,6 +17,16 @@ export function PostCreateButton({
   onCreateClick,
   className,
 }: PostCreateButtonProps) {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  const handleCreateClick = () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    onCreateClick();
+  };
   return (
     <Card className={`border shadow-none ${className || ""}`}>
       <CardContent className="p-4 flex items-center justify-between">
@@ -29,7 +43,7 @@ export function PostCreateButton({
         </div>
         <Button
           className="bg-[#5046E4] hover:bg-[#5046E4]/90"
-          onClick={onCreateClick}
+          onClick={handleCreateClick}
         >
           <PlusCircle className="mr-2 h-4 w-4" />
           글쓰기

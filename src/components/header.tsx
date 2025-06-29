@@ -103,16 +103,11 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  로그인
-                </Button>
-              </Link>
-              <Link href="/signup">
-                <Button size="sm">회원가입</Button>
-              </Link>
-            </div>
+            <Link href="/login">
+              <Button variant="ghost" size="sm">
+                로그인
+              </Button>
+            </Link>
           )}
 
           {/* Mobile Menu */}
@@ -159,16 +154,11 @@ export function Header() {
                     <LogoutButton />
                   </>
                 ) : (
-                  <>
-                    <Link href="/login">
-                      <Button variant="ghost" className="justify-start w-full">
-                        로그인
-                      </Button>
-                    </Link>
-                    <Link href="/signup">
-                      <Button className="justify-start w-full">회원가입</Button>
-                    </Link>
-                  </>
+                  <Link href="/login">
+                    <Button variant="ghost" className="justify-start w-full">
+                      로그인
+                    </Button>
+                  </Link>
                 )}
               </div>
             </SheetContent>

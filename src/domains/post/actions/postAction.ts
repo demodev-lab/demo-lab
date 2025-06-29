@@ -42,16 +42,22 @@ export async function getPostList(
   const end = start + limit - 1; // range는 inclusive이므로 -1
   console.log("[postAction] Query range:", { start, end });
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select(
-      `
+  let query = supabase.from("posts").select(
+    `
       *,
       author:profiles(full_name),
       category:categories(name, color),
       tags:post_tags(tag:tags(*))
     `,
-    )
+  );
+
+  // 카테고리 필터링
+  if (categoryId) {
+    query = query.eq("category_id", categoryId);
+  }
+
+  // 정렬 및 페이지네이션
+  const { data, error } = await query
     .order("created_at", { ascending: false })
     .range(start, end);
 
@@ -66,10 +72,16 @@ export async function getPostList(
     throw error;
   }
 
-  // 전체 게시글 수 조회
-  const { count, error: countError } = await supabase
+  // 전체 게시글 수 조회 (필터 적용)
+  let countQuery = supabase
     .from("posts")
     .select("*", { count: "exact", head: true });
+
+  if (categoryId) {
+    countQuery = countQuery.eq("category_id", categoryId);
+  }
+
+  const { count, error: countError } = await countQuery;
 
   console.log("[postAction] Total count query:", { count, countError });
 

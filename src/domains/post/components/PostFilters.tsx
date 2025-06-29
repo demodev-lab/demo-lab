@@ -29,6 +29,7 @@ interface PostFiltersProps {
 
 export function PostFilters({
   categories,
+  selectedCategoryId,
   onCategoryChange,
   onSortChange,
   className,
@@ -38,7 +39,11 @@ export function PostFilters({
       {/* 카테고리 필터 */}
       <div className="flex flex-wrap items-center gap-2">
         <Button
-          variant="outline"
+          variant={
+            selectedCategoryId === undefined || selectedCategoryId === null
+              ? "default"
+              : "outline"
+          }
           size="sm"
           onClick={() => onCategoryChange(null)}
         >
@@ -47,12 +52,17 @@ export function PostFilters({
         {categories.map((category) => (
           <Button
             key={category.id}
-            variant="outline"
+            variant={selectedCategoryId === category.id ? "default" : "outline"}
             size="sm"
             onClick={() => onCategoryChange(category.id)}
             style={{
               borderColor: category.color,
-              color: category.color,
+              backgroundColor:
+                selectedCategoryId === category.id
+                  ? category.color
+                  : "transparent",
+              color:
+                selectedCategoryId === category.id ? "white" : category.color,
             }}
           >
             {category.name}
