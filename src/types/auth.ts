@@ -55,31 +55,31 @@ export type SignupFormInput = z.infer<typeof signupSchema>;
 export type MagicLinkFormInput = z.infer<typeof magicLinkSchema>;
 
 export enum Role {
-  GUEST = "guest",
   USER = "user",
+  INSTRUCTOR = "instructor",
   MANAGER = "manager",
   ADMIN = "admin",
 }
 
-export type UserRole = "guest" | "user" | "manager" | "admin";
+export type UserRole = "user" | "instructor" | "manager" | "admin";
 
 export const ROLE_LEVELS = {
-  [Role.GUEST]: 0,
   [Role.USER]: 1,
-  [Role.MANAGER]: 2,
-  [Role.ADMIN]: 3,
+  [Role.INSTRUCTOR]: 2,
+  [Role.MANAGER]: 3,
+  [Role.ADMIN]: 4,
 } as const;
 
 export const ROLE_BADGE_VARIANTS = {
-  [Role.GUEST]: "outline",
   [Role.USER]: "secondary",
+  [Role.INSTRUCTOR]: "default",
   [Role.MANAGER]: "default",
   [Role.ADMIN]: "destructive",
 } as const;
 
 export const ROLE_ICONS = {
-  [Role.GUEST]: "⚪",
   [Role.USER]: "🟢",
+  [Role.INSTRUCTOR]: "🟦",
   [Role.MANAGER]: "🟡",
   [Role.ADMIN]: "🔴",
 } as const;

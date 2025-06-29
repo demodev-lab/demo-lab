@@ -74,7 +74,8 @@ export const useCreatePost = () => {
   return useMutation({
     mutationFn: (data: PostFormData) => createPost(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      // posts로 시작하는 모든 쿼리를 무효화
+      queryClient.invalidateQueries({ queryKey: ["posts"], exact: false });
     },
   });
 };
