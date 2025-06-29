@@ -8,7 +8,7 @@ export async function getCategoryList() {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("categories")
-    .select("*")
+    .select("*, min_role_required")
     .order("name");
   if (error) throw error;
   return data;

@@ -61,6 +61,8 @@ export enum Role {
   ADMIN = "admin",
 }
 
+export type UserRole = "guest" | "user" | "manager" | "admin";
+
 export const ROLE_LEVELS = {
   [Role.GUEST]: 0,
   [Role.USER]: 1,

@@ -108,51 +108,57 @@ export function PostEditor({
           </div>
           <div className="space-y-2">
             <label className="font-medium">카테고리</label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex w-full justify-start items-center gap-2 text-sm"
-                >
-                  {selectedCategory ? (
-                    <Badge
-                      style={{ backgroundColor: selectedCategory.color }}
-                      className="text-white"
-                    >
-                      {selectedCategory.name}
-                    </Badge>
-                  ) : (
-                    "카테고리 선택"
-                  )}
-                  <ChevronDown className="h-4 w-4 ml-auto" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-[--radix-dropdown-menu-trigger-width]"
-              >
-                <DropdownMenuRadioGroup
-                  value={categoryId?.toString() || ""}
-                  onValueChange={(value) => setCategoryId(Number(value))}
-                >
-                  {categories?.map((category) => (
-                    <DropdownMenuRadioItem
-                      key={category.id}
-                      value={category.id.toString()}
-                    >
+            {categories && categories.length === 0 ? (
+              <div className="text-sm text-muted-foreground p-3 border rounded-md bg-muted/50">
+                작성 가능한 카테고리가 없습니다. 권한이 필요할 수 있습니다.
+              </div>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="flex w-full justify-start items-center gap-2 text-sm"
+                  >
+                    {selectedCategory ? (
                       <Badge
-                        style={{
-                          backgroundColor: category.color,
-                        }}
+                        style={{ backgroundColor: selectedCategory.color }}
                         className="text-white"
                       >
-                        {category.name}
+                        {selectedCategory.name}
                       </Badge>
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    ) : (
+                      "카테고리 선택"
+                    )}
+                    <ChevronDown className="h-4 w-4 ml-auto" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-[--radix-dropdown-menu-trigger-width]"
+                >
+                  <DropdownMenuRadioGroup
+                    value={categoryId?.toString() || ""}
+                    onValueChange={(value) => setCategoryId(Number(value))}
+                  >
+                    {categories?.map((category) => (
+                      <DropdownMenuRadioItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        <Badge
+                          style={{
+                            backgroundColor: category.color,
+                          }}
+                          className="text-white"
+                        >
+                          {category.name}
+                        </Badge>
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
           <div className="space-y-2">
             <label className="font-medium">

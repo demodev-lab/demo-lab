@@ -1,6 +1,7 @@
-import { Role, ROLE_LEVELS } from "@/types/auth";
+import { Role, ROLE_LEVELS, UserRole } from "@/types/auth";
 import { Post } from "@/domains/post/types";
 import { AdminMenuItem } from "@/domains/admin/types";
+import type { Category } from "@/domains/category/types";
 
 /**
  * 🎯 모든 권한의 단일 진실 공급원 (Single Source of Truth)
@@ -180,5 +181,24 @@ export const postPermissions = {
   canView: (userRole: Role | null): boolean => {
     if (!userRole) return false;
     return [Role.ADMIN, Role.MANAGER, Role.USER].includes(userRole);
+  },
+
+  /**
+   * 특정 카테고리에 게시글 작성 권한 체크
+   */
+  canCreateInCategory: (
+    category: Category | null,
+    userRole: UserRole | null,
+  ): boolean => {
+    if (!category || !userRole) return false;
+
+    // 카테고리에 권한 제한이 없는 경우
+    if (!category.min_role_required) return true;
+
+    // 사용자 권한 레벨과 카테고리 요구 권한 레벨 비교
+    const userLevel = ROLE_LEVELS[userRole as Role] ?? 0;
+    const requiredLevel = ROLE_LEVELS[category.min_role_required as Role] ?? 0;
+
+    return userLevel >= requiredLevel;
   },
 };

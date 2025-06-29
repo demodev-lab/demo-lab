@@ -5,6 +5,8 @@ import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
 import { usePostDetail } from "../hooks/usePost";
 import { useProfile } from "@/hooks/use-profile";
+import { postPermissions } from "@/config/permissions";
+import { useMemo } from "react";
 
 interface PostEditorModalProps {
   isOpen: boolean;
@@ -29,6 +31,15 @@ export function PostEditorModal({
     enabled: mode === "edit" && !!postId,
   });
   const { data: userProfile } = useProfile();
+
+  // 사용자가 작성 가능한 카테고리만 필터링
+  const availableCategories = useMemo(() => {
+    if (!categories || !userProfile) return [];
+
+    return categories.filter((category) =>
+      postPermissions.canCreateInCategory(category, userProfile.role),
+    );
+  }, [categories, userProfile]);
 
   if (mode === "edit" && (isLoading || !post)) return null;
 
@@ -81,7 +92,7 @@ export function PostEditorModal({
         </DialogTitle>
         <PostEditor
           initialData={initialData}
-          categories={categories}
+          categories={availableCategories}
           tags={tags}
           onCancel={onClose}
           onSubmit={handleSubmit}

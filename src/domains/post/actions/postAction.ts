@@ -161,6 +161,23 @@ export async function getPost(postId: number) {
 // 게시글 작성
 export async function createPost(data: PostFormData) {
   const supabase = await createServerSupabaseClient();
+  const userProfile = await getServerUserProfile();
+
+  if (!userProfile) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  // 카테고리 권한 체크
+  if (data.categoryId) {
+    const { data: canPost, error: permError } = await supabase.rpc(
+      "can_post_in_category",
+      { category_id_param: data.categoryId },
+    );
+
+    if (permError || !canPost) {
+      throw new Error("해당 카테고리에 게시글을 작성할 권한이 없습니다.");
+    }
+  }
 
   const { data: post, error } = await supabase
     .from("posts")
