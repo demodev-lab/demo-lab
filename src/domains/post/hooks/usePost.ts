@@ -114,7 +114,61 @@ export const useTogglePostLike = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (postId: number) => postToggleLike(postId),
-    onSuccess: () => {
+    onMutate: async (postId: number) => {
+      // 진행 중인 refetch 취소
+      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      await queryClient.cancelQueries({ queryKey: ["post", postId] });
+
+      // 이전 데이터 스냅샷
+      const previousPosts = queryClient.getQueryData(["posts"]);
+      const previousPost = queryClient.getQueryData(["post", postId]);
+
+      // 낙관적 업데이트 - posts 목록
+      queryClient.setQueriesData({ queryKey: ["posts"] }, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          posts: old.posts?.map((post: Post) =>
+            post.id === postId
+              ? {
+                  ...post,
+                  is_liked: !post.is_liked,
+                  like_count: post.is_liked
+                    ? post.like_count - 1
+                    : post.like_count + 1,
+                }
+              : post,
+          ),
+        };
+      });
+
+      // 낙관적 업데이트 - 단일 post
+      queryClient.setQueryData(["post", postId], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          is_liked: !old.is_liked,
+          like_count: old.is_liked ? old.like_count - 1 : old.like_count + 1,
+        };
+      });
+
+      // 롤백을 위한 이전 데이터 반환
+      return { previousPosts, previousPost };
+    },
+    onError: (err, postId, context) => {
+      // 에러 시 이전 데이터로 롤백
+      if (context?.previousPosts) {
+        queryClient.setQueriesData(
+          { queryKey: ["posts"] },
+          context.previousPosts,
+        );
+      }
+      if (context?.previousPost) {
+        queryClient.setQueryData(["post", postId], context.previousPost);
+      }
+    },
+    onSettled: () => {
+      // 성공/실패 여부와 관계없이 최신 데이터 다시 가져오기
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["post"] });
     },

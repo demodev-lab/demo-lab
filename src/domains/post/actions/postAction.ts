@@ -7,13 +7,16 @@ import { getServerUserProfile } from "@/utils/supabase/profiles";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 // DB에서 가져온 raw post 데이터를 클라이언트에서 사용할 수 있는 형태로 변환
-function transformPost(post: any): PostWithDetails {
+function transformPost(post: any, userId?: string): PostWithDetails {
   return {
     ...post,
     author_name: post.author.full_name ?? "익명",
     category_name: post.category?.name ?? "Unknown",
     category_color: post.category?.color ?? "#000000",
     tags: post.tags?.map((t: any) => t.tag) ?? [],
+    is_liked: userId
+      ? post.post_likes?.some((like: any) => like.user_id === userId)
+      : false,
   };
 }
 
@@ -36,6 +39,7 @@ export async function getPostList(
     searchQuery,
   });
   const supabase = await createServerSupabaseClient();
+  const userProfile = await getServerUserProfile();
   console.log("[postAction] Supabase client created");
 
   const start = (page - 1) * limit;
@@ -47,7 +51,8 @@ export async function getPostList(
       *,
       author:profiles(full_name),
       category:categories(name, color),
-      tags:post_tags(tag:tags(*))
+      tags:post_tags(tag:tags(*)),
+      post_likes!left(user_id)
     `,
   );
 
@@ -89,7 +94,8 @@ export async function getPostList(
     console.error("[postAction] Error fetching count:", countError);
   }
 
-  const transformedPosts = data?.map(transformPost) || [];
+  const transformedPosts =
+    data?.map((post) => transformPost(post, userProfile?.id)) || [];
   console.log("[postAction] Transformed posts:", {
     transformedPostsLength: transformedPosts.length,
   });
@@ -110,6 +116,7 @@ export async function getPostList(
 // 단일 게시글 조회
 export async function getPost(postId: number) {
   const supabase = await createServerSupabaseClient();
+  const userProfile = await getServerUserProfile();
 
   const { data, error } = await supabase
     .from("posts")
@@ -118,7 +125,8 @@ export async function getPost(postId: number) {
       *,
       author:profiles(full_name),
       category:categories(name, color),
-      tags:post_tags(tag:tags(*))
+      tags:post_tags(tag:tags(*)),
+      post_likes!left(user_id)
     `,
     )
     .eq("id", postId)
@@ -126,7 +134,7 @@ export async function getPost(postId: number) {
 
   if (error) throw error;
 
-  return transformPost(data);
+  return transformPost(data, userProfile?.id);
 }
 
 // 게시글 작성

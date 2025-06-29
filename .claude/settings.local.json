@@ -12,7 +12,9 @@
       "Bash(HUSKY=0 git commit -m \"refactor: CourseManager 컴포넌트 import 경로 수정\" -m \"- 새로운 도메인 구조에 맞게 import 경로 업데이트\")",
       "Bash(git commit:*)",
       "Bash(mkdir:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(find:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

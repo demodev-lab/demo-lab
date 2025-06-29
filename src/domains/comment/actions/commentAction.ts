@@ -18,12 +18,12 @@ export async function createComment(
   if (parentId) {
     const { data: parentComment, error: parentError } = await supabase
       .from("comments")
-      .select("id, parent_comment_id")
+      .select("id, parent_id")
       .eq("id", parentId)
       .single();
     if (parentError || !parentComment)
       throw new Error("존재하지 않는 댓글입니다.");
-    if (parentComment.parent_comment_id)
+    if (parentComment.parent_id)
       throw new Error("대댓글의 대댓글은 작성할 수 없습니다.");
   }
   const { data, error } = await supabase
@@ -32,8 +32,7 @@ export async function createComment(
       post_id: postId,
       content: content.trim(),
       author_id: profile.id,
-      parent_comment_id: parentId || null,
-      status: "active",
+      parent_id: parentId || null,
     })
     .select()
     .single();
@@ -52,7 +51,7 @@ export async function updateComment(commentId: number, content: string) {
     .from("comments")
     .update({
       content: content.trim(),
-      updated_at: new Date().toISOString(),
+      // updated_at is handled by database trigger
     })
     .eq("id", commentId)
     .eq("author_id", profile.id)
@@ -69,22 +68,15 @@ export async function deleteComment(commentId: number) {
   if (!profile) throw new Error("Unauthorized");
   const { data: comment, error: fetchError } = await supabase
     .from("comments")
-    .select("post_id, children_count")
+    .select("post_id")
     .eq("id", commentId)
     .single();
   if (fetchError || !comment) throw new Error("존재하지 않는 댓글입니다.");
-  const hasChildren = comment.children_count > 0;
-  if (hasChildren) {
-    const { error } = await supabase.rpc("soft_delete_comment", {
-      p_comment_id: commentId,
-    });
-    if (error) throw new Error("댓글 삭제에 실패했습니다.");
-  } else {
-    const { error } = await supabase.rpc("hard_delete_comment", {
-      p_comment_id: commentId,
-    });
-    if (error) throw new Error("댓글 삭제에 실패했습니다.");
-  }
+  // Use the delete_comment_rpc function which handles both soft and hard deletes
+  const { error } = await supabase.rpc("delete_comment_rpc", {
+    comment_id: commentId,
+  });
+  if (error) throw new Error("댓글 삭제에 실패했습니다.");
   await updateCommentCount(comment.post_id);
   revalidatePath("/");
   revalidatePath(`/community/post/${comment.post_id}`);
@@ -92,8 +84,8 @@ export async function deleteComment(commentId: number) {
 
 export async function toggleCommentLike(commentId: number) {
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.rpc("toggle_comment_like", {
-    p_comment_id: commentId,
+  const { error } = await supabase.rpc("toggle_comment_like_rpc", {
+    comment_id_param: commentId,
   });
   if (error) throw new Error("좋아요 처리에 실패했습니다.");
   revalidatePath("/");
@@ -122,14 +114,14 @@ export async function getCommentList(
   const transformedComments = comments.map((comment: any) => ({
     id: comment.id,
     post_id: comment.post_id,
-    parent_comment_id: comment.parent_comment_id,
+    parent_comment_id: comment.parent_id,
     author_id: comment.author_id,
     content: comment.content,
     author: comment.author.full_name,
     authorUsername: comment.author.username || "",
     date: new Date(comment.created_at).toLocaleDateString("ko-KR"),
     likes: comment.like_count || 0,
-    status: comment.status,
+    status: undefined, // Comments don't have status in the database
     isLiked: profile ? comment.is_liked.length > 0 : false,
     replies: [],
   }));
