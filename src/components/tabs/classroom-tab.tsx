@@ -16,32 +16,32 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CourseApplicationForm } from "@/domains/course/components/CourseApplicationForm";
-import { useAuth } from "@/hooks/use-auth";
-
-function CourseCardSkeleton() {
-  return (
-    <Card className="overflow-hidden">
-      <Skeleton className="aspect-video w-full" />
-      <div className="p-4 space-y-3">
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-        <Skeleton className="h-4 w-full" />
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-3 w-12" />
-          </div>
-          <Skeleton className="h-1 w-full" />
-        </div>
-      </div>
-    </Card>
-  );
-}
+import { useProfile } from "@/hooks/use-profile";
 
 export function ClassroomTab() {
+  function CourseCardSkeleton() {
+    return (
+      <Card className="overflow-hidden">
+        <Skeleton className="aspect-video w-full" />
+        <div className="p-4 space-y-3">
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-full" />
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+            <Skeleton className="h-1 w-full" />
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   const router = useRouter();
   const { courses, isLoading, error } = useCourses();
-  const { user } = useAuth();
+  const { data: userProfile } = useProfile();
   const [isApplicationOpen, setIsApplicationOpen] = useState(false);
 
   if (error) {
@@ -73,7 +73,7 @@ export function ClassroomTab() {
           <div className="text-center text-muted-foreground">
             등록된 강좌가 없습니다.
           </div>
-          {user && (
+          {userProfile && (
             <Button onClick={() => setIsApplicationOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               코스 등록 신청하기
@@ -90,8 +90,8 @@ export function ClassroomTab() {
               </DialogDescription>
             </DialogHeader>
             <CourseApplicationForm
-              userId={user?.id || ""}
-              userEmail={user?.email}
+              userId={userProfile?.id || ""}
+              userEmail={userProfile?.email}
               onSuccess={() => setIsApplicationOpen(false)}
               onCancel={() => setIsApplicationOpen(false)}
             />
@@ -105,7 +105,7 @@ export function ClassroomTab() {
     <div className="container py-6">
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-2xl font-bold">코스 목록</h2>
-        {user && (
+        {userProfile && (
           <Button onClick={() => setIsApplicationOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             코스 등록 신청하기
@@ -170,8 +170,8 @@ export function ClassroomTab() {
             </DialogDescription>
           </DialogHeader>
           <CourseApplicationForm
-            userId={user?.id || ""}
-            userEmail={user?.email}
+            userId={userProfile?.id || ""}
+            userEmail={userProfile?.email}
           />
         </DialogContent>
       </Dialog>

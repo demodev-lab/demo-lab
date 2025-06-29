@@ -3,7 +3,7 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
 import { useProfile } from "@/hooks/use-profile";
-import { postPermissions } from "../permissions";
+import { postPermissions } from "@/config/permissions";
 import { PostItem } from "./PostItem";
 import type { Post } from "../types";
 

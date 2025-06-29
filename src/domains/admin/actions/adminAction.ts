@@ -1,34 +1,16 @@
 "use server";
 
-import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { cache } from "react";
 import { AdminTab } from "../types";
 import { Role } from "@/types/auth";
-import { adminPermissions } from "../permissions";
+import { adminPermissions } from "@/config/permissions";
+import { getServerUserProfile } from "@/utils/supabase/profiles";
 
 // 서버 사이드에서 사용자의 role을 가져오는 함수
 export const getUserRole = cache(async (): Promise<Role | null> => {
-  const supabase = await createServerSupabaseClient();
-
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) return null;
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    // DB에서 가져온 role 문자열을 Role enum으로 변환
-    if (profile?.role && Object.values(Role).includes(profile.role as Role)) {
-      return profile.role as Role;
-    }
-    
-    return null;
+    const profile = await getServerUserProfile();
+    return profile?.role || null;
   } catch (error) {
     console.error("Error fetching user role:", error);
     return null;

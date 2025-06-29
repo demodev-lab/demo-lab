@@ -1,5 +1,5 @@
 import type { Tag } from "@/domains/tag/types";
-import type { Category } from "@/domains/category/types";
+
 import type { PaginationState } from "@/types/pagination";
 import type { Role } from "@/types/auth";
 

@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import { createLemonSqueezyCheckoutUrl } from "@/utils/lib/lemonsqueezy";
 import { createServerSupabaseClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   try {

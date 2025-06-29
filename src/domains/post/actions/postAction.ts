@@ -217,7 +217,7 @@ export async function postToggleLike(postId: number) {
 
   if (findError) {
     // 좋아요를 누르지 않았다면 좋아요 추가
-    const { data: newLike, error: insertError } = await supabase
+    const { error: insertError } = await supabase
       .from("post_likes")
       .insert([{ post_id: postId, user_id: userProfile.id }])
       .select();

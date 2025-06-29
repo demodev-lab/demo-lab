@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { adminPermissions } from "@/domains/admin/permissions";
+import { adminPermissions } from "@/config/permissions";
 import { Role } from "@/types/auth";
 
 /**
@@ -32,7 +32,7 @@ export function useAdminPermissions(userRole: Role | Role.GUEST) {
     };
 
     checkPermissions();
-  }, []);
+  }, [userRole]);
 
   return {
     canViewUsers,

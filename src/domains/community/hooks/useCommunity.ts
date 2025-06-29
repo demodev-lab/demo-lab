@@ -1,6 +1,14 @@
 import { useAtom } from "jotai";
-import { usePost } from "@/domains/post/hooks/usePost";
-import { useComment } from "@/domains/comment/hooks/useComment";
+import {
+  useCreatePost,
+  useUpdatePost,
+  useRemovePost,
+} from "@/domains/post/hooks/usePost";
+import {
+  useCreateComment,
+  useUpdateComment,
+  useRemoveComment,
+} from "@/domains/comment/hooks/useComment";
 import {
   selectedCategoryIdAtom,
   selectedTagIdsAtom,
@@ -20,14 +28,14 @@ export function useCommunity() {
   const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
 
   // mutations만 남김
-  const { mutate: createPost } = usePost().create();
-  const { mutate: updatePost } = usePost().update();
-  const { mutate: removePost } = usePost().remove();
+  const { mutate: createPost } = useCreatePost();
+  const { mutate: updatePost } = useUpdatePost();
+  const { mutate: removePost } = useRemovePost();
 
   // 댓글 관련 mutations
-  const { mutate: createComment } = useComment().create();
-  const { mutate: updateComment } = useComment().update();
-  const { mutate: removeComment } = useComment().remove();
+  const { mutate: createComment } = useCreateComment();
+  const { mutate: updateComment } = useUpdateComment();
+  const { mutate: removeComment } = useRemoveComment();
 
   return {
     selectedCategoryId,

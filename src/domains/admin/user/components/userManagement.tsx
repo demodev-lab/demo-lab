@@ -13,7 +13,7 @@ import { User } from "../types";
 import { toast } from "sonner";
 import { useProfile } from "@/hooks/use-profile";
 
-export function UserManagement({ initialData }: { initialData: User[] }) {
+export function UserManagement() {
   const { data: userProfile } = useProfile();
 
   // 권한 체크

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import Image from "next/image";
 import type { Course } from "../types";
 
 interface CourseCardProps {
@@ -20,10 +21,11 @@ export function CourseCard({ course, showProgress = false }: CourseCardProps) {
     <Card className="overflow-hidden h-full hover:shadow-md transition-shadow">
       <div className="aspect-video relative">
         {course.thumbnail_url ? (
-          <img
+          <Image
             src={course.thumbnail_url}
             alt={course.title}
-            className="object-cover w-full h-full"
+            fill
+            className="object-cover"
           />
         ) : (
           <div className="w-full h-full bg-muted flex items-center justify-center">

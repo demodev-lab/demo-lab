@@ -2,7 +2,7 @@
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { adminPermissions } from "@/domains/admin/permissions";
+import { adminPermissions } from "@/config/permissions";
 import { Role } from "@/types/auth";
 
 type FormState = {
@@ -13,7 +13,7 @@ type FormState = {
 export async function updateUserRole(
   userId: string,
   newRole: Role,
-  userRole: Role
+  userRole: Role,
 ): Promise<FormState> {
   if (!(await adminPermissions.canManageUsers(userRole))) {
     return {

@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ADMIN_MENU } from "../permissions";
-import { adminPermissions } from "../permissions";
+import { ADMIN_MENU, adminPermissions } from "@/config/permissions";
 import type { AdminSidebarProps } from "../types";
 
 export function AdminSidebar({

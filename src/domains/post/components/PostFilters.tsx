@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,15 +29,8 @@ interface PostFiltersProps {
 
 export function PostFilters({
   categories,
-  tags,
-  selectedCategoryId,
-  selectedTagIds,
-  sortOption,
-  searchQuery,
   onCategoryChange,
-  onTagChange,
   onSortChange,
-  onSearchChange,
   className,
 }: PostFiltersProps) {
   return (

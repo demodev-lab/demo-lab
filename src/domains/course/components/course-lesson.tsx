@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -215,22 +215,25 @@ export function CourseLesson({
   const overallProgress = calculateOverallProgress();
 
   // Mark a lesson as completed
-  const markLessonAsCompleted = (lessonId: string) => {
-    setCourseData((prevCourse) => {
-      const updatedModules = prevCourse.modules.map((module) => {
-        const updatedLessons = module.lessons.map((lesson) =>
-          lesson.id === lessonId ? { ...lesson, completed: true } : lesson,
-        );
-        return { ...module, lessons: updatedLessons };
+  const markLessonAsCompleted = useCallback(
+    (lessonId: string) => {
+      setCourseData((prevCourse) => {
+        const updatedModules = prevCourse.modules.map((module) => {
+          const updatedLessons = module.lessons.map((lesson) =>
+            lesson.id === lessonId ? { ...lesson, completed: true } : lesson,
+          );
+          return { ...module, lessons: updatedLessons };
+        });
+        return { ...prevCourse, modules: updatedModules };
       });
-      return { ...prevCourse, modules: updatedModules };
-    });
 
-    // Also update activeLesson if it's the current lesson
-    if (activeLesson && activeLesson.id === lessonId) {
-      setActiveLesson({ ...activeLesson, completed: true });
-    }
-  };
+      // Also update activeLesson if it's the current lesson
+      if (activeLesson && activeLesson.id === lessonId) {
+        setActiveLesson({ ...activeLesson, completed: true });
+      }
+    },
+    [activeLesson, setCourseData, setActiveLesson],
+  );
 
   // Find current lesson
   useEffect(() => {
@@ -247,7 +250,7 @@ export function CourseLesson({
       console.warn(`Lesson ${lessonId} not found in course ${courseId}`);
       // Could redirect to the first lesson or show an error message
     }
-  }, [lessonId, allLessons, courseId, courseData.id]);
+  }, [lessonId, allLessons, courseId, courseData.id, activeLesson]);
 
   // Handle video events
   useEffect(() => {
@@ -287,7 +290,7 @@ export function CourseLesson({
       video.removeEventListener("ended", handleEnded);
       video.removeEventListener("error", handleError);
     };
-  }, [activeLesson?.id]); // Only depend on the lesson ID, not the entire object
+  }, [activeLesson, markLessonAsCompleted]);
 
   const togglePlayPause = () => {
     const video = videoRef.current;
@@ -499,7 +502,7 @@ export function CourseLesson({
                 <h2>Lesson Content</h2>
                 <p>
                   This lesson covers how to acquire your first client for your
-                  AI agency. You&rsquoll learn effective strategies for client
+                  AI agency. You&rsquo;ll learn effective strategies for client
                   outreach, positioning your services, and closing deals with
                   confidence.
                 </p>

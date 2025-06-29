@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { usePost } from "../hooks/usePost";
+import { usePostDetail, useTogglePostLike } from "../hooks/usePost";
 
 interface PostItemProps {
   postId: number;
@@ -41,9 +41,8 @@ export function PostItem({
   canEdit = false,
   canDelete = false,
 }: PostItemProps) {
-  const { get, toggleLike } = usePost();
-  const { data: post, isLoading } = get(postId);
-  const toggleLikeMutation = toggleLike();
+  const { data: post, isLoading } = usePostDetail(postId);
+  const toggleLikeMutation = useTogglePostLike();
 
   if (isLoading || !post) return null;
 

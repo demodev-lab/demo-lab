@@ -8,8 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { usePost } from "../hooks/usePost";
-import { DialogTitle } from "@/components/ui/dialog";
+import { usePostDetail } from "../hooks/usePost";
 
 interface PostRemoveConfirmModalProps {
   isOpen: boolean;
@@ -24,20 +23,18 @@ export function PostRemoveConfirmModal({
   onClose,
   onConfirm,
 }: PostRemoveConfirmModalProps) {
-  const { get } = usePost();
-  const { data: post } = get(postId);
+  const { data: post } = usePostDetail(postId);
 
   if (!post) return null;
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
-        <DialogTitle>게시글 삭제</DialogTitle>
         <AlertDialogHeader>
           <AlertDialogTitle>게시글 삭제</AlertDialogTitle>
           <AlertDialogDescription>
-            정말로 "{post.title}" 게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수
-            없습니다.
+            정말로 &quot;{post.title}&quot; 게시글을 삭제하시겠습니까? 이 작업은
+            되돌릴 수 없습니다.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

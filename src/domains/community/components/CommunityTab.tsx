@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { useCommunity } from "../hooks/useCommunity";
-import { usePost } from "@/domains/post/hooks/usePost";
-import { useCategory } from "@/domains/category/hooks/useCategories";
-import { useTag } from "@/domains/tag/hooks/useTags";
+import { usePostList } from "@/domains/post/hooks/usePost";
+import { useCategories } from "@/domains/category/hooks/useCategories";
+import { useTags } from "@/domains/tag/hooks/useTags";
 import {
   PostList,
   PostPagination,
@@ -44,8 +44,7 @@ export function CommunityTab() {
   } = useCommunity();
 
   // 서버 데이터
-  const { list } = usePost();
-  const { data, isLoading: isPostsLoading } = list(1, 10, {
+  const { data, isLoading: isPostsLoading } = usePostList(1, 10, {
     categoryId: selectedCategoryId,
     tagIds: selectedTagIds,
     sortOption,
@@ -53,9 +52,8 @@ export function CommunityTab() {
   });
   const posts = data?.posts ?? [];
   const pagination = data?.pagination;
-  const { data: categories, isLoading: isCategoriesLoading } =
-    useCategory.list();
-  const { data: tags, isLoading: isTagsLoading } = useTag.list();
+  const { data: categories } = useCategories();
+  const { data: tags } = useTags();
 
   return (
     <div className="space-y-4">

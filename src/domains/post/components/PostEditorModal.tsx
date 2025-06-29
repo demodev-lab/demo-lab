@@ -3,7 +3,7 @@ import { PostEditor } from "./PostEditor";
 import type { PostFormData } from "../types";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
-import { usePost } from "../hooks/usePost";
+import { usePostDetail } from "../hooks/usePost";
 import { useProfile } from "@/hooks/use-profile";
 
 interface PostEditorModalProps {
@@ -25,11 +25,9 @@ export function PostEditorModal({
   onClose,
   onSubmit,
 }: PostEditorModalProps) {
-  const { get } = usePost();
-  const { data: post, isLoading } =
-    mode === "edit" && postId
-      ? get(postId)
-      : { data: undefined, isLoading: false };
+  const { data: post, isLoading } = usePostDetail(postId, {
+    enabled: mode === "edit" && !!postId,
+  });
   const { data: userProfile } = useProfile();
 
   if (mode === "edit" && (isLoading || !post)) return null;

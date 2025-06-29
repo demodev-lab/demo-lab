@@ -1,6 +1,6 @@
 import React from "react";
 import { useProfile } from "@/hooks/use-profile";
-import { postPermissions } from "../permissions";
+import { postPermissions } from "@/config/permissions";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Heart, MessageSquare, User } from "lucide-react";
 import { CommentList } from "../../comment/components/CommentList";
-import { usePost } from "../hooks/usePost";
+import { usePostDetail, useTogglePostLike } from "../hooks/usePost";
 
 interface PostDetailModalProps {
   isOpen: boolean;
@@ -32,9 +32,8 @@ export function PostDetailModal({
   onDelete,
 }: PostDetailModalProps) {
   const { data: profile } = useProfile();
-  const { get, toggleLike } = usePost();
-  const toggleLikeMutation = toggleLike();
-  const { data: post, isLoading } = get(postId);
+  const toggleLikeMutation = useTogglePostLike();
+  const { data: post, isLoading } = usePostDetail(postId);
 
   if (isLoading || !post) return null;
 

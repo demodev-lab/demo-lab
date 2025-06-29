@@ -23,8 +23,6 @@ import {
   User,
 } from "lucide-react";
 import { cn } from "@/utils/lib/utils";
-import { Header } from "@/components/header";
-import { TabNavigation } from "@/components/tab-navigation";
 
 interface Instructor {
   id: string;
