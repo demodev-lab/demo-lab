@@ -1,11 +1,22 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { useRouter } from "next/navigation";
 import { CourseCard } from "@/domains/course/components/course-card";
 import { useCourses } from "@/domains/course/hooks/useCourses";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { CourseApplicationForm } from "@/domains/course/components/CourseApplicationForm";
+import { useAuth } from "@/hooks/use-auth";
 
 function CourseCardSkeleton() {
   return (
@@ -30,6 +41,8 @@ function CourseCardSkeleton() {
 export function ClassroomTab() {
   const router = useRouter();
   const { courses, isLoading, error } = useCourses();
+  const { user } = useAuth();
+  const [isApplicationOpen, setIsApplicationOpen] = useState(false);
 
   if (error) {
     return (
@@ -56,15 +69,50 @@ export function ClassroomTab() {
   if (courses.length === 0) {
     return (
       <div className="container py-6">
-        <div className="text-center text-muted-foreground">
-          등록된 강좌가 없습니다.
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="text-center text-muted-foreground">
+            등록된 강좌가 없습니다.
+          </div>
+          {user && (
+            <Button onClick={() => setIsApplicationOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              코스 등록 신청하기
+            </Button>
+          )}
         </div>
+
+        <Dialog open={isApplicationOpen} onOpenChange={setIsApplicationOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>코스 등록 신청</DialogTitle>
+              <DialogDescription>
+                코스 정보를 입력해주세요. 관리자 승인 후 코스가 공개됩니다.
+              </DialogDescription>
+            </DialogHeader>
+            <CourseApplicationForm
+              userId={user?.id || ""}
+              userEmail={user?.email}
+              onSuccess={() => setIsApplicationOpen(false)}
+              onCancel={() => setIsApplicationOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
 
   return (
     <div className="container py-6">
+      <div className="mb-6 flex justify-between items-center">
+        <h2 className="text-2xl font-bold">코스 목록</h2>
+        {user && (
+          <Button onClick={() => setIsApplicationOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            코스 등록 신청하기
+          </Button>
+        )}
+      </div>
+
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {courses.map((course) => (
           <div
@@ -112,6 +160,21 @@ export function ClassroomTab() {
           </Card>
         ))} */}
       </div>
+
+      <Dialog open={isApplicationOpen} onOpenChange={setIsApplicationOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>코스 등록 신청</DialogTitle>
+            <DialogDescription>
+              코스 정보를 입력해주세요. 관리자 승인 후 코스가 공개됩니다.
+            </DialogDescription>
+          </DialogHeader>
+          <CourseApplicationForm
+            userId={user?.id || ""}
+            userEmail={user?.email}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

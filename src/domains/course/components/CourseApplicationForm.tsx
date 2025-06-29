@@ -39,11 +39,15 @@ const formSchema = z.object({
 interface CourseApplicationFormProps {
   userId: string;
   userEmail?: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 export function CourseApplicationForm({
   userId,
   userEmail,
+  onSuccess,
+  onCancel,
 }: CourseApplicationFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -73,7 +77,11 @@ export function CourseApplicationForm({
       toast.success(
         "코스 등록 신청이 완료되었습니다! 관리자 승인 후 코스가 공개됩니다.",
       );
-      router.push("/");
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/");
+      }
     } catch (error) {
       toast.error("코스 등록 신청에 실패했습니다.");
       console.error(error);
@@ -206,7 +214,13 @@ export function CourseApplicationForm({
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.push("/")}
+            onClick={() => {
+              if (onCancel) {
+                onCancel();
+              } else {
+                router.push("/");
+              }
+            }}
           >
             취소
           </Button>
