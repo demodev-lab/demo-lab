@@ -121,7 +121,7 @@ export async function getCommentList(
     authorUsername: comment.author.username || "",
     date: new Date(comment.created_at).toLocaleDateString("ko-KR"),
     likes: comment.like_count || 0,
-    status: undefined, // Comments don't have status in the database
+    status: comment.deleted_at ? "soft_deleted" : "active", // deleted_at 필드로 상태 판단
     isLiked: profile ? comment.is_liked.length > 0 : false,
     replies: [],
   }));
