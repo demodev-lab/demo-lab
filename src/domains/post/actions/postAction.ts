@@ -234,6 +234,8 @@ export async function postToggleLike(postId: number) {
   if (!userProfile) throw new Error("사용자 정보를 찾을 수 없습니다.");
 
   try {
+    console.log("좋아요 토글 시작:", { postId, userId: userProfile.id });
+
     // RPC 함수를 사용하여 좋아요 토글
     const { data: isLiked, error } = await supabase.rpc(
       "toggle_post_like_rpc",
@@ -242,8 +244,15 @@ export async function postToggleLike(postId: number) {
       },
     );
 
+    console.log("RPC 결과:", { isLiked, error });
+
     if (error) {
-      console.error("RPC 에러:", error);
+      console.error("RPC 에러 상세:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
       throw new Error("좋아요 처리에 실패했습니다.");
     }
 

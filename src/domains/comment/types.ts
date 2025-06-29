@@ -8,6 +8,7 @@ export interface Comment {
   parent_id: number | null;
   children_count: number;
   like_count: number;
+  status?: string;
 }
 
 export interface ExtendedComment {

@@ -1,17 +1,18 @@
 import { Role } from "@/types/auth";
-import type { Comment } from "@/domains/comment/types";
+import type { ExtendedComment } from "@/domains/comment/types";
 
 export const commentPermission = {
   /**
    * 댓글 수정 가능 여부 체크
    */
   canUpdate(
-    comment: Comment,
+    comment: ExtendedComment,
     userRole: Role | null,
     userId: string | null,
   ): boolean {
     if (!userRole || !userId) return false;
-    if (comment.status !== "active") return false;
+    // soft_deleted 상태인 댓글은 수정 불가
+    if (comment.status === "soft_deleted") return false;
 
     return (
       userRole === Role.ADMIN ||
@@ -24,12 +25,13 @@ export const commentPermission = {
    * 댓글 삭제 가능 여부 체크
    */
   canDelete(
-    comment: Comment,
+    comment: ExtendedComment,
     userRole: Role | null,
     userId: string | null,
   ): boolean {
     if (!userRole || !userId) return false;
-    if (comment.status !== "active") return false;
+    // soft_deleted 상태인 댓글은 삭제 불가
+    if (comment.status === "soft_deleted") return false;
 
     return (
       userRole === Role.ADMIN ||

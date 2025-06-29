@@ -113,6 +113,8 @@ export function CommunityTab() {
           onConfirm={async () => {
             await removePost(removeModalPostId);
             setRemoveModalPostId(null);
+            // 게시글 상세 모달도 닫기
+            setDetailModalPostId(null);
           }}
         />
       )}

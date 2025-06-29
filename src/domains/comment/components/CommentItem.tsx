@@ -38,6 +38,16 @@ export function CommentItem({
 }: CommentItemProps) {
   const isSoftDeleted = comment.status === "soft_deleted";
   const isReply = comment.parent_comment_id !== null;
+
+  // 디버깅용 로그
+  console.log("댓글 권한 체크:", {
+    commentId: comment.id,
+    commentAuthorId: comment.author_id,
+    authUserId: authUserId,
+    userRole: userRole,
+    isSame: comment.author_id === authUserId,
+  });
+
   const canEdit = commentPermission.canUpdate(comment, userRole, authUserId);
   const canDelete = commentPermission.canDelete(comment, userRole, authUserId);
 

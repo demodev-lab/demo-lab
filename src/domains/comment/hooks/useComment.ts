@@ -37,8 +37,11 @@ export const useCreateComment = () => {
     }) => {
       return createComment(postId, content, parentId);
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["comments"] });
+      // posts 쿼리도 무효화하여 comment_count 업데이트
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post", variables.postId] });
     },
   });
 };
@@ -117,6 +120,9 @@ export const useRemoveComment = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["comments"] });
+      // posts 쿼리도 무효화하여 comment_count 업데이트
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post"] });
     },
   });
 };
