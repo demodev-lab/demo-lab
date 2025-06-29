@@ -22,10 +22,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { usePostDetail, useTogglePostLike } from "../hooks/usePost";
+import { useTogglePostLike } from "../hooks/usePost";
+import type { Post } from "../types";
 
 interface PostItemProps {
-  postId: number;
+  post: Post;
   onOpenModal: (postId: number) => void;
   onEdit?: (postId: number) => void;
   onDelete?: (postId: number) => void;
@@ -34,22 +35,19 @@ interface PostItemProps {
 }
 
 export function PostItem({
-  postId,
+  post,
   onOpenModal,
   onEdit,
   onDelete,
   canEdit = false,
   canDelete = false,
 }: PostItemProps) {
-  const { data: post, isLoading } = usePostDetail(postId);
   const toggleLikeMutation = useTogglePostLike();
-
-  if (isLoading || !post) return null;
 
   return (
     <Card
       className={`${post.is_pinned ? "border-[#5046E4]" : ""} cursor-pointer hover:shadow-md transition-shadow`}
-      onClick={() => onOpenModal(postId)}
+      onClick={() => onOpenModal(post.id)}
     >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
@@ -99,7 +97,7 @@ export function PostItem({
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();
-                      onEdit(postId);
+                      onEdit(post.id);
                     }}
                   >
                     <Edit className="mr-2 h-4 w-4" />
@@ -110,7 +108,7 @@ export function PostItem({
                   <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDelete(postId);
+                      onDelete(post.id);
                     }}
                     className="text-red-600"
                   >
@@ -152,7 +150,7 @@ export function PostItem({
             className="gap-1"
             onClick={(e) => {
               e.stopPropagation();
-              toggleLikeMutation.mutate(postId);
+              toggleLikeMutation.mutate(post.id);
             }}
             disabled={toggleLikeMutation.isPending}
           >

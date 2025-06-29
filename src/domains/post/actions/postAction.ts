@@ -4,7 +4,6 @@ import { createServerSupabaseClient } from "@/utils/supabase/server";
 import type { PostFormData, PostWithDetails } from "../types";
 import { revalidatePath } from "next/cache";
 import { getServerUserProfile } from "@/utils/supabase/profiles";
-import { SupabaseClient } from "@supabase/supabase-js";
 
 // DB에서 가져온 raw post 데이터를 클라이언트에서 사용할 수 있는 형태로 변환
 function transformPost(post: any, userId?: string): PostWithDetails {
@@ -234,77 +233,43 @@ export async function postToggleLike(postId: number) {
   const userProfile = await getServerUserProfile();
   if (!userProfile) throw new Error("사용자 정보를 찾을 수 없습니다.");
 
-  const currentCount = await getPostLikeCount(postId, supabase);
-  let newCount = currentCount;
-  let isLiked = false;
+  try {
+    // RPC 함수를 사용하여 좋아요 토글
+    const { data: isLiked, error } = await supabase.rpc(
+      "toggle_post_like_rpc",
+      {
+        post_id_param: postId,
+      },
+    );
 
-  // 1. 이미 좋아요를 눌렀는지 확인
-  const { data: existing, error: findError } = await supabase
-    .from("post_likes")
-    .select("id")
-    .eq("post_id", postId)
-    .eq("user_id", userProfile.id)
-    .single();
+    if (error) {
+      console.error("RPC 에러:", error);
+      throw new Error("좋아요 처리에 실패했습니다.");
+    }
 
-  if (findError) {
-    // 좋아요를 누르지 않았다면 좋아요 추가
-    const { error: insertError } = await supabase
-      .from("post_likes")
-      .insert([{ post_id: postId, user_id: userProfile.id }])
-      .select();
+    // 업데이트된 게시글 정보 가져오기
+    const { data: post, error: postError } = await supabase
+      .from("posts")
+      .select("like_count")
+      .eq("id", postId)
+      .single();
 
-    if (insertError) throw insertError;
-    newCount++;
-    isLiked = true;
-  } else {
-    // 이미 좋아요를 눌렀다면 좋아요 취소
-    const { error: deleteError } = await supabase
-      .from("post_likes")
-      .delete()
-      .eq("id", existing.id);
+    if (postError) {
+      console.error("게시글 조회 에러:", postError);
+      throw new Error("게시글 정보를 가져올 수 없습니다.");
+    }
 
-    if (deleteError) throw deleteError;
-    newCount = Math.max(0, newCount - 1);
-    isLiked = false;
+    revalidatePath("/community");
+
+    // 업데이트된 상태 반환
+    return {
+      like_count: post.like_count || 0,
+      is_liked: isLiked,
+    };
+  } catch (error) {
+    console.error("좋아요 토글 전체 에러:", error);
+    throw error;
   }
-
-  await updatePostLikeCount(postId, newCount, supabase);
-
-  revalidatePath("/community");
-
-  // 업데이트된 상태 반환
-  return {
-    like_count: newCount,
-    is_liked: isLiked,
-  };
-}
-
-async function getPostLikeCount(
-  postId: number,
-  supabase: SupabaseClient,
-): Promise<number> {
-  const { data, error } = await supabase
-    .from("posts")
-    .select("like_count")
-    .eq("id", postId)
-    .single();
-
-  if (error) throw error;
-
-  return data?.like_count || 0;
-}
-
-async function updatePostLikeCount(
-  postId: number,
-  newCount: number,
-  supabase: SupabaseClient,
-) {
-  const { error } = await supabase
-    .from("posts")
-    .update({ like_count: newCount })
-    .eq("id", postId);
-
-  if (error) throw error;
 }
 
 // 댓글 수 조회

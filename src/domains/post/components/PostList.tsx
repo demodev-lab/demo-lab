@@ -51,7 +51,7 @@ export function PostList({
       {posts.map((post) => (
         <PostItem
           key={post.id}
-          postId={post.id}
+          post={post}
           onOpenModal={onOpenModal}
           onEdit={onEdit}
           onDelete={onDelete}
