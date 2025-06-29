@@ -10,7 +10,7 @@ export async function createModule(input: CreateModuleInput) {
 
   // 동일한 course_id에서 최대 sequence 값 조회
   const { data: maxSeqData } = await supabase
-    .from("Module")
+    .from("module")
     .select("sequence")
     .eq("course_id", input.course_id)
     .order("sequence", { ascending: false })
@@ -20,7 +20,7 @@ export async function createModule(input: CreateModuleInput) {
   const newSequence = maxSeqData ? maxSeqData.sequence + 1 : 1;
 
   const { data, error } = await supabase
-    .from("Module")
+    .from("module")
     .insert({
       ...input,
       sequence: input.sequence ?? newSequence,
@@ -39,11 +39,11 @@ export async function getModulesByCourseId(courseId: number) {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Module")
+    .from("module")
     .select(
       `
       *,
-      Lecture (
+      lecture (
         id,
         title,
         description,
@@ -63,7 +63,7 @@ export async function getModulesByCourseId(courseId: number) {
   // 각 모듈 내의 강의들도 순서대로 정렬
   return data.map((module) => ({
     ...module,
-    Lecture: module.Lecture.sort((a: any, b: any) => a.sequence - b.sequence),
+    lecture: module.lecture.sort((a: any, b: any) => a.sequence - b.sequence),
   }));
 }
 
@@ -74,7 +74,7 @@ export async function updateModule(
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Module")
+    .from("module")
     .update(input)
     .eq("id", id)
     .select()
@@ -107,7 +107,7 @@ export async function reorderModules(courseId: number) {
 
   // 해당 코스의 모든 모듈을 sequence 순으로 가져오기
   const { data: modules, error: fetchError } = await supabase
-    .from("Module")
+    .from("module")
     .select("id")
     .eq("course_id", courseId)
     .order("sequence", { ascending: true });
@@ -117,7 +117,7 @@ export async function reorderModules(courseId: number) {
   // sequence를 1부터 순차적으로 재할당
   for (let i = 0; i < modules.length; i++) {
     await supabase
-      .from("Module")
+      .from("module")
       .update({ sequence: i + 1 })
       .eq("id", modules[i].id);
   }

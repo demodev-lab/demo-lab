@@ -12,7 +12,7 @@ export async function getEnrollmentByUserAndCourse(
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Enrollment")
+    .from("enrollment")
     .select("*")
     .eq("user_id", userId)
     .eq("course_id", courseId)
@@ -50,7 +50,7 @@ export async function enrollCourse(courseId: number) {
 
   // 수강 신청
   const { data, error } = await supabase
-    .from("Enrollment")
+    .from("enrollment")
     .insert({
       user_id: user.id,
       course_id: courseId,
@@ -73,7 +73,7 @@ export async function updateEnrollmentStatus(
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Enrollment")
+    .from("enrollment")
     .update({ status })
     .eq("id", enrollmentId)
     .select()
@@ -88,11 +88,11 @@ export async function getUserEnrollments(userId: string) {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Enrollment")
+    .from("enrollment")
     .select(
       `
       *,
-      Course (
+      course (
         id,
         title,
         subtitle,
@@ -115,7 +115,7 @@ export async function getCourseEnrollmentCount(courseId: number) {
   const supabase = await createServerSupabaseClient();
 
   const { count, error } = await supabase
-    .from("Enrollment")
+    .from("enrollment")
     .select("id", { count: "exact", head: true })
     .eq("course_id", courseId);
 

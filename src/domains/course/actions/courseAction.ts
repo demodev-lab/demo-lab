@@ -14,7 +14,7 @@ export async function createCourse(input: CreateCourseInput) {
     const supabase = await createServerSupabaseClient();
 
     const { data, error } = await supabase
-      .from("Course")
+      .from("course")
       .insert(input)
       .select()
       .single();
@@ -41,11 +41,11 @@ export async function getCourseList() {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Course")
+    .from("course")
     .select(
       `
       *,
-      CourseInstructor (
+      course_instructor (
         instructor:profiles (
           id,
           username,
@@ -64,11 +64,11 @@ export async function getCourseById(id: string | number) {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Course")
+    .from("course")
     .select(
       `
       *,
-      CourseInstructor (
+      course_instructor (
         instructor:profiles (
           id,
           username,
@@ -90,15 +90,15 @@ export async function getCourseWithDetails(
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Course")
+    .from("course")
     .select(
       `
       *,
-      Module (
+      module (
         id,
         title,
         sequence,
-        Lecture (
+        lecture (
           id,
           title,
           description,
@@ -107,18 +107,18 @@ export async function getCourseWithDetails(
           duration_secs,
           created_at,
           updated_at,
-          LectureKeypoint (
+          lecture_keypoint (
             id,
             content
           ),
-          LectureMaterial (
+          lecture_material (
             id,
             title,
             file_url
           )
         )
       ),
-      CourseInstructor (
+      course_instructor (
         id,
         role_title,
         intro_message,
@@ -129,11 +129,11 @@ export async function getCourseWithDetails(
           username
         )
       ),
-      CourseLearningGoal (
+      course_learning_goal (
         id,
         content
       ),
-      BackgroundKnowledge (
+      background_knowledge (
         id,
         content
       )
@@ -145,17 +145,21 @@ export async function getCourseWithDetails(
   if (error) throw error;
 
   // Module 내 Lecture 정렬
-  const sortedModules = data.Module.map((module: any) => ({
-    ...module,
-    lectures: module.Lecture.sort((a: any, b: any) => a.sequence - b.sequence),
-  })).sort((a: any, b: any) => a.sequence - b.sequence);
+  const sortedModules = data.module
+    .map((module: any) => ({
+      ...module,
+      lectures: module.lecture.sort(
+        (a: any, b: any) => a.sequence - b.sequence,
+      ),
+    }))
+    .sort((a: any, b: any) => a.sequence - b.sequence);
 
   return {
     ...data,
     modules: sortedModules,
-    instructors: data.CourseInstructor,
-    learning_goals: data.CourseLearningGoal,
-    background_knowledge: data.BackgroundKnowledge,
+    instructors: data.course_instructor,
+    learning_goals: data.course_learning_goal,
+    background_knowledge: data.background_knowledge,
   };
 }
 
@@ -166,7 +170,7 @@ export async function updateCourse(
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("Course")
+    .from("course")
     .update(input)
     .eq("id", id)
     .select()
@@ -187,7 +191,7 @@ export async function applyCourse(input: CreateCourseApplicationInput) {
     const supabase = await createServerSupabaseClient();
 
     const { data, error } = await supabase
-      .from("CourseApplication")
+      .from("course_application")
       .insert({
         ...input,
         status: "pending",
@@ -224,7 +228,7 @@ export async function approveCourse(id: string | number) {
 
   // 1. 신청 정보 가져오기
   const { data: application, error: appError } = await supabase
-    .from("CourseApplication")
+    .from("course_application")
     .select("*")
     .eq("id", id)
     .single();
@@ -234,7 +238,7 @@ export async function approveCourse(id: string | number) {
 
   // 2. Course 테이블에 새 코스 생성
   const { data: newCourse, error: courseError } = await supabase
-    .from("Course")
+    .from("course")
     .insert({
       title: application.title,
       subtitle: application.subtitle,
@@ -249,7 +253,7 @@ export async function approveCourse(id: string | number) {
 
   // 3. CourseApplication 상태 업데이트
   const { error: updateError } = await supabase
-    .from("CourseApplication")
+    .from("course_application")
     .update({
       status: "approved",
       approved_at: new Date().toISOString(),
@@ -276,7 +280,7 @@ export async function rejectCourse(id: string | number, reason: string) {
   if (!user) throw new Error("로그인이 필요합니다.");
 
   const { data, error } = await supabase
-    .from("CourseApplication")
+    .from("course_application")
     .update({
       status: "rejected",
       rejected_at: new Date().toISOString(),
@@ -298,7 +302,7 @@ export async function getPendingCourses() {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("CourseApplication")
+    .from("course_application")
     .select(
       `
       *,
@@ -320,7 +324,7 @@ export async function getPendingCourses() {
 export async function deleteCourse(id: string | number) {
   const supabase = await createServerSupabaseClient();
 
-  const { error } = await supabase.from("Course").delete().eq("id", id);
+  const { error } = await supabase.from("course").delete().eq("id", id);
 
   if (error) throw error;
 
@@ -334,7 +338,7 @@ export async function addCourseLearningGoal(courseId: number, content: string) {
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("CourseLearningGoal")
+    .from("course_learning_goal")
     .insert({
       course_id: courseId,
       content,
@@ -351,7 +355,7 @@ export async function deleteCourseLearningGoal(id: number) {
   const supabase = await createServerSupabaseClient();
 
   const { error } = await supabase
-    .from("CourseLearningGoal")
+    .from("course_learning_goal")
     .delete()
     .eq("id", id);
 
@@ -366,7 +370,7 @@ export async function addBackgroundKnowledge(
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("BackgroundKnowledge")
+    .from("background_knowledge")
     .insert({
       course_id: courseId,
       content,
@@ -383,7 +387,7 @@ export async function deleteBackgroundKnowledge(id: number) {
   const supabase = await createServerSupabaseClient();
 
   const { error } = await supabase
-    .from("BackgroundKnowledge")
+    .from("background_knowledge")
     .delete()
     .eq("id", id);
 
@@ -400,7 +404,7 @@ export async function addCourseInstructor(
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("CourseInstructor")
+    .from("course_instructor")
     .insert({
       course_id: courseId,
       instructor_id: instructorId,
@@ -422,7 +426,7 @@ export async function removeCourseInstructor(
   const supabase = await createServerSupabaseClient();
 
   const { error } = await supabase
-    .from("CourseInstructor")
+    .from("course_instructor")
     .delete()
     .eq("course_id", courseId)
     .eq("instructor_id", instructorId);
@@ -437,10 +441,10 @@ export async function getCourseStats() {
 
   const [coursesResult, modulesResult, lecturesResult, enrollmentsResult] =
     await Promise.all([
-      supabase.from("Course").select("id", { count: "exact" }),
-      supabase.from("Module").select("id", { count: "exact" }),
-      supabase.from("Lecture").select("id", { count: "exact" }),
-      supabase.from("Enrollment").select("id", { count: "exact" }),
+      supabase.from("course").select("id", { count: "exact" }),
+      supabase.from("module").select("id", { count: "exact" }),
+      supabase.from("lecture").select("id", { count: "exact" }),
+      supabase.from("enrollment").select("id", { count: "exact" }),
     ]);
 
   return {

@@ -12,7 +12,7 @@ export async function getLectureProgress(
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase
-    .from("LectureProgress")
+    .from("lecture_progress")
     .select("*")
     .eq("user_id", userId)
     .eq("lecture_id", lectureId)
@@ -46,7 +46,7 @@ export async function updateLectureProgress(
 
   // upsert를 사용하여 없으면 생성, 있으면 업데이트
   const { data, error } = await supabase
-    .from("LectureProgress")
+    .from("lecture_progress")
     .upsert({
       user_id: user.id,
       lecture_id: lectureId,
@@ -80,7 +80,7 @@ export async function completeLecture(lectureId: number) {
 
   // 강의 정보 가져오기
   const { data: lecture } = await supabase
-    .from("Lecture")
+    .from("lecture")
     .select("duration_secs")
     .eq("id", lectureId)
     .single();
@@ -98,7 +98,7 @@ export async function getUserCourseProgress(userId: string, courseId: number) {
 
   // 코스의 모든 강의 ID 가져오기
   const { data: lectures } = await supabase
-    .from("Lecture")
+    .from("lecture")
     .select("id")
     .eq("course_id", courseId);
 
@@ -114,7 +114,7 @@ export async function getUserCourseProgress(userId: string, courseId: number) {
 
   // 사용자의 진도 정보 가져오기
   const { data: progress } = await supabase
-    .from("LectureProgress")
+    .from("lecture_progress")
     .select("lecture_id, is_completed")
     .eq("user_id", userId)
     .in("lecture_id", lectureIds);
@@ -134,7 +134,7 @@ async function updateEnrollmentProgress(userId: string, lectureId: number) {
 
   // 강의가 속한 코스 ID 찾기
   const { data: lecture } = await supabase
-    .from("Lecture")
+    .from("lecture")
     .select("course_id")
     .eq("id", lectureId)
     .single();
@@ -143,7 +143,7 @@ async function updateEnrollmentProgress(userId: string, lectureId: number) {
 
   // 해당 코스의 완료된 강의 수 계산
   const { data: completedLectures } = await supabase
-    .from("LectureProgress")
+    .from("lecture_progress")
     .select("lecture_id")
     .eq("user_id", userId)
     .eq("is_completed", true)
@@ -151,7 +151,7 @@ async function updateEnrollmentProgress(userId: string, lectureId: number) {
       "lecture_id",
       (
         await supabase
-          .from("Lecture")
+          .from("lecture")
           .select("id")
           .eq("course_id", lecture.course_id)
       ).data?.map((l) => l.id) || [],
@@ -161,7 +161,7 @@ async function updateEnrollmentProgress(userId: string, lectureId: number) {
 
   // Enrollment 업데이트
   await supabase
-    .from("Enrollment")
+    .from("enrollment")
     .update({
       completed_lecture_count: completedCount,
       last_viewed_lecture_id: lectureId,
@@ -178,7 +178,7 @@ export async function getModuleProgress(userId: string, moduleId: number) {
 
   // 모듈의 모든 강의 가져오기
   const { data: lectures } = await supabase
-    .from("Lecture")
+    .from("lecture")
     .select("id")
     .eq("module_id", moduleId);
 
@@ -194,7 +194,7 @@ export async function getModuleProgress(userId: string, moduleId: number) {
 
   // 진도 정보 가져오기
   const { data: progress } = await supabase
-    .from("LectureProgress")
+    .from("lecture_progress")
     .select("is_completed")
     .eq("user_id", userId)
     .in("lecture_id", lectureIds)
