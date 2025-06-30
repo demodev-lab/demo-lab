@@ -56,87 +56,94 @@ export function CommunityTab() {
   const { data: tags } = useTags();
 
   return (
-    <div className="space-y-4">
-      {/* 게시글 작성 버튼 */}
-      <PostCreateButton
-        onCreateClick={() => setEditorModal({ mode: "create" })}
-      />
+    <div className="container py-6">
+      <div className="space-y-4">
+        {/* 게시글 작성 버튼 */}
+        <PostCreateButton
+          onCreateClick={() => setEditorModal({ mode: "create" })}
+        />
 
-      {/* 필터 */}
-      <PostFilters
-        categories={categories ?? []}
-        tags={tags ?? []}
-        selectedCategoryId={selectedCategoryId}
-        selectedTagIds={selectedTagIds}
-        sortOption={sortOption}
-        searchQuery={searchQuery}
-        onCategoryChange={setSelectedCategoryId}
-        onTagChange={setSelectedTagIds}
-        onSortChange={setSortOption}
-        onSearchChange={setSearchQuery}
-      />
+        {/* 필터 */}
+        <PostFilters
+          categories={categories ?? []}
+          tags={tags ?? []}
+          selectedCategoryId={selectedCategoryId}
+          selectedTagIds={selectedTagIds}
+          sortOption={sortOption}
+          searchQuery={searchQuery}
+          onCategoryChange={setSelectedCategoryId}
+          onTagChange={setSelectedTagIds}
+          onSortChange={setSortOption}
+          onSearchChange={setSearchQuery}
+        />
 
-      {/* 게시글 목록 */}
-      <PostList
-        posts={posts}
-        loading={isPostsLoading}
-        onOpenModal={setDetailModalPostId}
-        onEdit={(postId) => setEditorModal({ mode: "edit", postId })}
-        onDelete={setRemoveModalPostId}
-      />
-
-      {/* 페이지네이션 */}
-      {pagination && (
-        <PostPagination
-          pagination={pagination}
+        {/* 게시글 목록 */}
+        <PostList
+          posts={posts}
           loading={isPostsLoading}
-          onPageChange={setCurrentPage}
+          onOpenModal={setDetailModalPostId}
+          onEdit={(postId) => setEditorModal({ mode: "edit", postId })}
+          onDelete={setRemoveModalPostId}
         />
-      )}
 
-      {/* 모달들 */}
-      {detailModalPostId !== null && (
-        <PostDetailModal
-          isOpen={!!detailModalPostId}
-          postId={detailModalPostId}
-          onClose={() => setDetailModalPostId(null)}
-          onEdit={(id) => setEditorModal({ mode: "edit", postId: id })}
-          onDelete={(id) => setRemoveModalPostId(id)}
-        />
-      )}
+        {/* 페이지네이션 */}
+        {pagination && (
+          <PostPagination
+            pagination={pagination}
+            loading={isPostsLoading}
+            onPageChange={setCurrentPage}
+          />
+        )}
 
-      {removeModalPostId !== null && (
-        <PostRemoveConfirmModal
-          isOpen={!!removeModalPostId}
-          postId={removeModalPostId}
-          onClose={() => setRemoveModalPostId(null)}
-          onConfirm={async () => {
-            await removePost(removeModalPostId);
-            setRemoveModalPostId(null);
-            // 게시글 상세 모달도 닫기
-            setDetailModalPostId(null);
-          }}
-        />
-      )}
+        {/* 모달들 */}
+        {detailModalPostId !== null && (
+          <PostDetailModal
+            isOpen={!!detailModalPostId}
+            postId={detailModalPostId}
+            onClose={() => setDetailModalPostId(null)}
+            onEdit={(id) => setEditorModal({ mode: "edit", postId: id })}
+            onDelete={(id) => setRemoveModalPostId(id)}
+          />
+        )}
 
-      {editorModal && (
-        <PostEditorModal
-          isOpen={!!editorModal}
-          mode={editorModal.mode}
-          postId={editorModal.mode === "edit" ? editorModal.postId : undefined}
-          categories={categories}
-          tags={tags}
-          onClose={() => setEditorModal(null)}
-          onSubmit={async (formData) => {
-            if (editorModal.mode === "edit" && editorModal.postId) {
-              await updatePost({ postId: editorModal.postId, data: formData });
-            } else {
-              await createPost(formData);
+        {removeModalPostId !== null && (
+          <PostRemoveConfirmModal
+            isOpen={!!removeModalPostId}
+            postId={removeModalPostId}
+            onClose={() => setRemoveModalPostId(null)}
+            onConfirm={async () => {
+              await removePost(removeModalPostId);
+              setRemoveModalPostId(null);
+              // 게시글 상세 모달도 닫기
+              setDetailModalPostId(null);
+            }}
+          />
+        )}
+
+        {editorModal && (
+          <PostEditorModal
+            isOpen={!!editorModal}
+            mode={editorModal.mode}
+            postId={
+              editorModal.mode === "edit" ? editorModal.postId : undefined
             }
-            setEditorModal(null);
-          }}
-        />
-      )}
+            categories={categories}
+            tags={tags}
+            onClose={() => setEditorModal(null)}
+            onSubmit={async (formData) => {
+              if (editorModal.mode === "edit" && editorModal.postId) {
+                await updatePost({
+                  postId: editorModal.postId,
+                  data: formData,
+                });
+              } else {
+                await createPost(formData);
+              }
+              setEditorModal(null);
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }
