@@ -13,9 +13,14 @@ export interface UserProfile {
   updated_at?: string;
 }
 
-export async function getServerUserProfile(): Promise<UserProfile> {
+export async function getServerUserProfile(): Promise<UserProfile | null> {
   const supabase = await createServerSupabaseClient();
-  return getUserProfile(supabase);
+  try {
+    return await getUserProfile(supabase);
+  } catch {
+    // 로그인하지 않은 경우 null 반환
+    return null;
+  }
 }
 
 export async function getUserProfile(
@@ -33,7 +38,9 @@ export async function getUserProfile(
 
     const { data: profile, error } = await supabaseClient
       .from("profiles")
-      .select("id, role, full_name, username, avatar_url, created_at, updated_at")
+      .select(
+        "id, role, full_name, username, avatar_url, created_at, updated_at",
+      )
       .eq("id", userId)
       .single();
 

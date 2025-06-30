@@ -116,7 +116,8 @@ export async function getPostList(
   }
 
   const transformedPosts =
-    data?.map((post) => transformPost(post, userProfile?.id)) || [];
+    data?.map((post) => transformPost(post, userProfile?.id || undefined)) ||
+    [];
   console.log("[postAction] Transformed posts:", {
     transformedPostsLength: transformedPosts.length,
   });
@@ -155,7 +156,7 @@ export async function getPost(postId: number) {
 
   if (error) throw error;
 
-  return transformPost(data, userProfile?.id);
+  return transformPost(data, userProfile?.id || undefined);
 }
 
 // 게시글 작성

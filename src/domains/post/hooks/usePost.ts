@@ -47,7 +47,7 @@ export const usePostList = (
       );
       return result;
     },
-    staleTime: 1000 * 60 * 5, // 5분간 fresh 상태 유지
+    staleTime: 0, // 항상 fresh 데이터를 가져오도록 설정
   });
 };
 
