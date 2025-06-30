@@ -64,7 +64,7 @@ export const adminPermissions = {
 
   // 어드민 페이지 접근 권한 체크
   canAccessAdmin: (userRole: Role | undefined | null): boolean => {
-    return adminPermissions.hasMinimumRole(userRole, Role.USER);
+    return adminPermissions.hasMinimumRole(userRole, Role.MANAGER);
   },
 
   // 특정 메뉴 접근 권한 체크
