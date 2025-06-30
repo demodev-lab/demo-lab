@@ -1,0 +1,68 @@
+"use client";
+
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import Image from "next/image";
+import type { Course } from "../types";
+
+interface CourseCardProps {
+  course: Course;
+  showProgress?: boolean;
+}
+
+export function CourseCard({ course, showProgress = false }: CourseCardProps) {
+  return (
+    <Card className="overflow-hidden h-full hover:shadow-md transition-shadow">
+      <div className="aspect-video relative">
+        {course.thumbnail_url ? (
+          <Image
+            src={course.thumbnail_url}
+            alt={course.title}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <span className="text-muted-foreground">No thumbnail</span>
+          </div>
+        )}
+      </div>
+      <CardHeader>
+        <div className="space-y-1">
+          <h3 className="font-semibold leading-none tracking-tight">
+            {course.title}
+          </h3>
+          <p className="text-sm text-muted-foreground">{course.subtitle}</p>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {course.description}
+        </p>
+      </CardContent>
+      <CardFooter className="flex flex-col gap-4">
+        <div className="flex justify-between w-full">
+          <Badge variant="secondary">{course.difficulty}</Badge>
+          <div className="text-sm text-muted-foreground">
+            {course.total_lecture_count}개 강의
+          </div>
+        </div>
+        {showProgress && (
+          <div className="w-full space-y-1">
+            <div className="flex justify-between text-xs">
+              <span>진행률</span>
+              <span>0%</span>
+            </div>
+            <Progress value={0} className="h-1" />
+          </div>
+        )}
+      </CardFooter>
+    </Card>
+  );
+}

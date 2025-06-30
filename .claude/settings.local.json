@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(HUSKY=0 git commit -m \"chore: 사용하지 않는 컴포넌트 및 파일 제거\" -m \"- AdminPageClient.tsx: 새로운 라우팅 구조로 인해 불필요\n- DashboardCards.tsx: 새로운 위치로 이동됨\n- class-hive-landing, course-detail, course-lesson: 더 이상 사용되지 않음\n- useUserProfile: use-profile hook으로 대체됨\")",
+      "Bash(git add:*)",
+      "Bash(HUSKY=0 git commit -m \"feat: use-profile hook 추가 및 프로필 유틸 개선\" -m \"- useUserProfile을 대체하는 새로운 use-profile hook 구현\n- Tanstack Query 기반으로 프로필 데이터 관리\n- profiles.ts에 프로필 관련 유틸리티 함수 추가\")",
+      "Bash(HUSKY=0 git commit -m \"feat: conditional-sidebar 컴포넌트 추가\" -m \"- 경로에 따라 조건부로 사이드바를 표시하는 컴포넌트\n- 특정 페이지에서 사이드바 숨김 처리 가능\")",
+      "Bash(HUSKY=0 git commit -m \"refactor: 페이지 레이아웃 및 컴포넌트 구조 개선\" -m \"- 루트 레이아웃에서 conditional-sidebar 사용\n- 각 페이지의 import 경로 및 구조 정리\n- classroom 페이지 라우팅 구조 개선\n- 불필요한 컴포넌트 참조 제거\")",
+      "Bash(HUSKY=0 git commit -m \"refactor: 탭 네비게이션 및 권한 시스템 개선\" -m \"- tab-navigation 컴포넌트 구조 개선\n- classroom-tab 컴포넌트 업데이트\n- permissions 설정 파일 정리\")",
+      "Bash(HUSKY=0 git commit -m \"feat: course 도메인 구조 추가\" -m \"- 코스 관련 기능을 위한 도메인 구조 생성\n- actions, components, hooks, types 디렉토리 구성\n- 추후 코스 관리 기능 구현을 위한 기반 마련\")",
+      "Bash(HUSKY=0 git commit -m \"refactor: Post와 Comment 도메인 컴포넌트 개선\" -m \"- PostDetailModal, PostEditorModal, PostList 컴포넌트 구조 개선\n- useComment hook 업데이트\n- 타입 안정성 및 코드 품질 향상\")",
+      "Bash(HUSKY=0 git commit -m \"refactor: CourseManager 컴포넌트 import 경로 수정\" -m \"- 새로운 도메인 구조에 맞게 import 경로 업데이트\")",
+      "Bash(git commit:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm run lint)",
+      "Bash(find:*)",
+      "Bash(grep:*)"
+    ],
+    "deny": []
+  }
+}

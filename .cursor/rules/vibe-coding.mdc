@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Core rules for AI-assisted Vibe Coding: Focus on TDD with mandatory external search for error resolution, robust context management (early file documentation, small modules, .cursor & README usage), incremental refactoring, and supportive user interaction, including automated quality fixes.
 globs:
 alwaysApply: true

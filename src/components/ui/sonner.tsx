@@ -12,6 +12,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      position="top-center" // 상단 중앙으로 변경
+      duration={2000} // 2초로 설정 (기본값은 4초)
       toastOptions={{
         classNames: {
           toast:

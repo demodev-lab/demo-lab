@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: This rule defines Toss Frontend's design principles and coding standards, focusing on readability, predictability, cohesion, and loose coupling for maintainable React applications.
 globs: **/*.js,**/*.jsx,**/*.ts,**/*.tsx
 alwaysApply: false
