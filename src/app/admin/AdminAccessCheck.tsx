@@ -53,8 +53,8 @@ export function AdminAccessCheck({
   if (!adminPermissions.canAccessAdmin(userRole)) {
     return (
       <>
-        {/* 배경 오버레이 */}
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+        {/* 배경 오버레이 - z-[100]으로 헤더(z-50)보다 위에 표시 */}
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100]" />
       </>
     );
   }
