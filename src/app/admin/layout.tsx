@@ -3,10 +3,7 @@
 // 유저 role은 로그인 시점에 확인하므로 빌드 시점에는 유저 role을 확인하지 않습니다.
 export const dynamic = "force-dynamic";
 
-import {
-  getUserRole,
-  checkAdminAccess,
-} from "@/domains/admin/actions/adminAction";
+import { getUserRole } from "@/domains/admin/actions/adminAction";
 import { AdminLayoutClient } from "@/domains/admin/components/AdminLayoutClient";
 import { AdminAccessCheck } from "./AdminAccessCheck";
 import { Role } from "@/types/auth";
@@ -17,10 +14,6 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const userRole = await getUserRole();
-  const hasAccess = await checkAdminAccess();
-
-  console.log("AdminLayout - userRole:", userRole);
-  console.log("AdminLayout - hasAccess:", hasAccess);
 
   return (
     <AdminAccessCheck userRole={userRole}>
