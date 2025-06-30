@@ -49,21 +49,12 @@ export function AdminAccessCheck({
     }
   }, [userRole, router]);
 
-  // 권한이 없으면 오버레이와 함께 로딩 상태 표시
+  // 권한이 없으면 오버레이만 표시
   if (!adminPermissions.canAccessAdmin(userRole)) {
     return (
       <>
         {/* 배경 오버레이 */}
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
-
-        {/* 중앙 메시지 */}
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 shadow-xl">
-            <p className="text-lg font-medium text-gray-700">
-              권한을 확인하고 있습니다...
-            </p>
-          </div>
-        </div>
       </>
     );
   }
