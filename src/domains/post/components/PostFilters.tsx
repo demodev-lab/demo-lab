@@ -8,7 +8,7 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/lib/utils";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
 import type { SortOption } from "../types";
