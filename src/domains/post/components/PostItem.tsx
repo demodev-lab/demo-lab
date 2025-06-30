@@ -23,6 +23,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useTogglePostLike } from "../hooks/usePost";
+import { useAuth } from "@/components/auth/auth-provider";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import type { Post } from "../types";
 
 interface PostItemProps {
@@ -43,6 +46,8 @@ export function PostItem({
   canDelete = false,
 }: PostItemProps) {
   const toggleLikeMutation = useTogglePostLike();
+  const { user } = useAuth();
+  const router = useRouter();
 
   return (
     <Card
@@ -150,6 +155,15 @@ export function PostItem({
             className="gap-1"
             onClick={(e) => {
               e.stopPropagation();
+              if (!user) {
+                toast.error("로그인이 필요합니다", {
+                  action: {
+                    label: "로그인",
+                    onClick: () => router.push("/login"),
+                  },
+                });
+                return;
+              }
               toggleLikeMutation.mutate(post.id);
             }}
             disabled={toggleLikeMutation.isPending}

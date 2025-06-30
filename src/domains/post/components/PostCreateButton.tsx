@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlusCircle, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-provider";
+import { toast } from "sonner";
 
 interface PostCreateButtonProps {
   onCreateClick: () => void;
@@ -22,7 +23,12 @@ export function PostCreateButton({
 
   const handleCreateClick = () => {
     if (!user) {
-      router.push("/login");
+      toast.error("로그인이 필요합니다", {
+        action: {
+          label: "로그인",
+          onClick: () => router.push("/login"),
+        },
+      });
       return;
     }
     onCreateClick();

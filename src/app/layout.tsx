@@ -7,6 +7,7 @@ import Providers from "./providers";
 import { Header } from "@/components/header";
 import { TabNavigation } from "@/components/tab-navigation";
 import { ConditionalSidebar } from "@/components/conditional-sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,6 +41,7 @@ export default function RootLayout({
               <ConditionalSidebar />
             </div>
           </div>
+          <Toaster />
         </Providers>
         <Script
           src="https://assets.lemonsqueezy.com/lemon.js"

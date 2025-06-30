@@ -11,6 +11,8 @@ import {
 import type { ExtendedComment } from "../types";
 import { toast } from "sonner";
 import { useProfile } from "@/hooks/use-profile";
+import { useAuth } from "@/components/auth/auth-provider";
+import { useRouter } from "next/navigation";
 
 interface CommentListProps {
   postId: number;
@@ -19,6 +21,8 @@ interface CommentListProps {
 
 export function CommentList({ postId, className = "" }: CommentListProps) {
   const { data: userProfile } = useProfile();
+  const { user } = useAuth();
+  const router = useRouter();
 
   // 댓글 목록 조회
   const { data: comments = [], isLoading } = useCommentList(postId);
@@ -43,6 +47,16 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
    * 댓글 작성 처리
    */
   const handleCreateComment = async (content: string, parentId?: number) => {
+    if (!user) {
+      toast.error("로그인이 필요합니다", {
+        action: {
+          label: "로그인",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
+
     try {
       await createCommentMutation.mutateAsync({ postId, content, parentId });
       toast.success(
@@ -107,6 +121,16 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
    * 댓글 좋아요 토글
    */
   const handleToggleLike = async (commentId: number) => {
+    if (!user) {
+      toast.error("로그인이 필요합니다", {
+        action: {
+          label: "로그인",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
+
     try {
       await toggleLikeCommentMutation.mutateAsync(commentId);
     } catch {
@@ -118,6 +142,15 @@ export function CommentList({ postId, className = "" }: CommentListProps) {
    * 답글 작성 시작
    */
   const handleReplyClick = (commentId: number) => {
+    if (!user) {
+      toast.error("로그인이 필요합니다", {
+        action: {
+          label: "로그인",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
     setReplyToCommentId(commentId);
   };
 

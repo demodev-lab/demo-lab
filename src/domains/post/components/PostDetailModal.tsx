@@ -15,6 +15,9 @@ import { Separator } from "@/components/ui/separator";
 import { Heart, MessageSquare, User } from "lucide-react";
 import { CommentList } from "../../comment/components/CommentList";
 import { usePostDetail, useTogglePostLike } from "../hooks/usePost";
+import { useAuth } from "@/components/auth/auth-provider";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface PostDetailModalProps {
   isOpen: boolean;
@@ -32,6 +35,8 @@ export function PostDetailModal({
   onDelete,
 }: PostDetailModalProps) {
   const { data: profile } = useProfile();
+  const { user } = useAuth();
+  const router = useRouter();
   const toggleLikeMutation = useTogglePostLike();
   const { data: post, isLoading } = usePostDetail(postId);
 
@@ -122,7 +127,18 @@ export function PostDetailModal({
             variant="outline"
             size="sm"
             className="gap-1"
-            onClick={() => toggleLikeMutation.mutate(postId)}
+            onClick={() => {
+              if (!user) {
+                toast.error("로그인이 필요합니다", {
+                  action: {
+                    label: "로그인",
+                    onClick: () => router.push("/login"),
+                  },
+                });
+                return;
+              }
+              toggleLikeMutation.mutate(postId);
+            }}
           >
             <Heart
               className={`h-4 w-4 ${
