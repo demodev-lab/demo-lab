@@ -8,10 +8,10 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
 import type { SortOption } from "../types";
-// 필터 UI는 기존 코드에서 비어있는 상태로 남겨두어서 추후 구현 예정 표시만 합니다.
 
 interface PostFiltersProps {
   categories: Category[];
@@ -35,50 +35,62 @@ export function PostFilters({
   className,
 }: PostFiltersProps) {
   return (
-    <div className={`flex items-center justify-between ${className || ""}`}>
+    <div className={cn("flex items-center justify-between gap-4", className)}>
       {/* 카테고리 필터 */}
       <div className="flex flex-wrap items-center gap-2">
         <Button
-          variant={
-            selectedCategoryId === undefined || selectedCategoryId === null
-              ? "default"
-              : "outline"
-          }
+          variant="ghost"
           size="sm"
+          className={cn(
+            "h-8 rounded-full px-4 transition-all",
+            selectedCategoryId === undefined || selectedCategoryId === null
+              ? "bg-[#5046E4] text-white hover:bg-[#5046E4]/90"
+              : "hover:bg-gray-100",
+          )}
           onClick={() => onCategoryChange(null)}
         >
           전체
         </Button>
-        {categories.map((category) => (
-          <Button
-            key={category.id}
-            variant={selectedCategoryId === category.id ? "default" : "outline"}
-            size="sm"
-            onClick={() => onCategoryChange(category.id)}
-            style={{
-              borderColor: category.color,
-              backgroundColor:
-                selectedCategoryId === category.id
-                  ? category.color
-                  : "transparent",
-              color:
-                selectedCategoryId === category.id ? "white" : category.color,
-            }}
-          >
-            {category.name}
-          </Button>
-        ))}
+        {categories.map((category) => {
+          const isSelected = selectedCategoryId === category.id;
+          return (
+            <Button
+              key={category.id}
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 rounded-full px-4 transition-all",
+                isSelected
+                  ? "text-white hover:opacity-90"
+                  : "hover:bg-gray-100",
+              )}
+              onClick={() => onCategoryChange(category.id)}
+              style={{
+                backgroundColor: isSelected ? category.color : "transparent",
+                color: isSelected ? "white" : "inherit",
+                borderWidth: isSelected ? 0 : 1,
+                borderColor: isSelected ? "transparent" : "#e5e7eb",
+              }}
+            >
+              {category.name}
+            </Button>
+          );
+        })}
       </div>
 
       {/* 정렬 옵션 */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 rounded-full px-4 gap-1 border-gray-200 hover:bg-gray-50"
+          >
             정렬
-            <ChevronDown className="h-4 w-4" />
+            <ChevronDown className="h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="end" className="w-36">
           <DropdownMenuRadioGroup
             onValueChange={(value) => onSortChange(value as SortOption)}
           >
