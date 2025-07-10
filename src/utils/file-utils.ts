@@ -17,23 +17,22 @@ export function getFileExtension(filename: string): string {
 }
 
 /**
- * Storage에 저장할 유니크한 파일 경로를 생성합니다.
- * @param originalFilename 원본 파일명
- * @param folderPath 저장할 폴더 경로 (예: "posts/2024/01")
- * @returns 유니크한 파일 경로
+ * 도메인별 Storage 경로를 생성합니다.
+ * @param userId 사용자 ID
+ * @param domain 도메인명 (예: "posts", "profiles", "courses")
+ * @param filename 원본 파일명
+ * @returns 생성된 경로 (예: "user123/posts/550e8400-e29b-41d4-a716-446655440000.jpg")
  */
-export function generateStorageFilePath(
-  originalFilename: string,
-  folderPath: string,
+export function generateDomainStoragePath(
+  userId: string,
+  domain: string,
+  filename: string,
 ): string {
-  const extension = getFileExtension(originalFilename);
+  const extension = getFileExtension(filename);
   const uniqueId = crypto.randomUUID();
-  const filename = extension ? `${uniqueId}.${extension}` : uniqueId;
+  const uniqueFilename = extension ? `${uniqueId}.${extension}` : uniqueId;
 
-  // 폴더 경로 정규화 (앞뒤 슬래시 제거)
-  const normalizedPath = folderPath.replace(/^\/+|\/+$/g, "");
-
-  return normalizedPath ? `${normalizedPath}/${filename}` : filename;
+  return `${userId}/${domain}/${uniqueFilename}`;
 }
 
 /**
