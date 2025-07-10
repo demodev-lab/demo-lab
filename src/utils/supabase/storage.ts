@@ -8,6 +8,14 @@ import { createBrowserSupabaseClient } from "./client";
 // 환경변수에서 버킷 이름을 읽음
 const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET || "test-bucket";
 
+// 업로드 결과 타입 정의
+export interface UploadResult {
+  success: boolean;
+  path?: string;
+  publicUrl?: string;
+  error?: string;
+}
+
 /**
  * 버킷 내 파일 목록을 조회합니다.
  * @returns 파일 목록 또는 빈 배열
@@ -49,6 +57,82 @@ export function getPublicUrl(path: string): string {
   } catch (err) {
     console.error("Storage getPublicUrl exception:", err);
     return "";
+  }
+}
+
+/**
+ * 파일을 Storage 버킷에 업로드합니다.
+ * @param file 업로드할 파일
+ * @param path 파일 저장 경로 (전체 경로, 파일명 포함)
+ * @returns 업로드 결과 (경로, URL, 성공 여부)
+ */
+export async function uploadFile(
+  file: File,
+  path: string,
+): Promise<UploadResult> {
+  try {
+    console.group("Storage uploadFile");
+    console.log("Uploading file:", {
+      originalName: file.name,
+      size: file.size,
+      type: file.type,
+      storagePath: path,
+    });
+
+    // 파일 유효성 검사
+    if (!file) {
+      console.error("No file provided");
+      console.groupEnd();
+      return { success: false, error: "업로드할 파일이 없습니다." };
+    }
+
+    if (!path) {
+      console.error("No path provided");
+      console.groupEnd();
+      return { success: false, error: "파일 경로가 필요합니다." };
+    }
+
+    const supabase = createBrowserSupabaseClient();
+
+    // 파일 업로드
+    const { data, error } = await supabase.storage
+      .from(BUCKET)
+      .upload(path, file, {
+        cacheControl: "3600", // 1시간 캐시
+        contentType: file.type,
+      });
+
+    if (error) {
+      console.error("Upload error:", error);
+      console.groupEnd();
+      return { success: false, error: error.message };
+    }
+
+    // 업로드 성공 시 공개 URL 생성
+    const publicUrl = getPublicUrl(data.path);
+
+    console.log("Upload successful:", {
+      storedPath: data.path,
+      publicUrl: publicUrl,
+    });
+    console.groupEnd();
+
+    return {
+      success: true,
+      path: data.path,
+      publicUrl: publicUrl,
+    };
+  } catch (err) {
+    console.error("Upload exception:", err);
+    console.groupEnd();
+
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "파일 업로드 중 오류가 발생했습니다.",
+    };
   }
 }
 
