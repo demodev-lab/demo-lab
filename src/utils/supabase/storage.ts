@@ -113,52 +113,6 @@ export function formatFileSize(bytes: number): string {
 }
 
 /**
- * 파일명에서 확장자를 추출합니다.
- * @param filename 파일명
- * @returns 확장자 (점 제외, 소문자)
- */
-export function getFileExtension(filename: string): string {
-  const lastDotIndex = filename.lastIndexOf(".");
-  if (lastDotIndex === -1 || lastDotIndex === filename.length - 1) {
-    return "";
-  }
-  return filename.substring(lastDotIndex + 1).toLowerCase();
-}
-
-/**
- * Storage에 저장할 유니크한 파일 경로를 생성합니다.
- * @param originalFilename 원본 파일명
- * @param folderPath 저장할 폴더 경로 (예: "posts/2024/01")
- * @returns 유니크한 파일 경로
- */
-export function generateStorageFilePath(
-  originalFilename: string,
-  folderPath: string,
-): string {
-  const extension = getFileExtension(originalFilename);
-  const uniqueId = crypto.randomUUID();
-  const filename = extension ? `${uniqueId}.${extension}` : uniqueId;
-
-  // 폴더 경로 정규화 (앞뒤 슬래시 제거)
-  const normalizedPath = folderPath.replace(/^\/+|\/+$/g, "");
-
-  return normalizedPath ? `${normalizedPath}/${filename}` : filename;
-}
-
-/**
- * 날짜 기반 폴더 경로를 생성합니다.
- * @param prefix 경로 접두사 (예: "posts", "profiles")
- * @returns 날짜 기반 폴더 경로 (예: "posts/2024/01")
- */
-export function generateDateBasedPath(prefix: string): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-
-  return `${prefix}/${year}/${month}`;
-}
-
-/**
  * 버킷 내 파일 목록을 조회합니다.
  * @returns 파일 목록 또는 빈 배열
  */
