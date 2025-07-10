@@ -37,19 +37,6 @@ export function generateStorageFilePath(
 }
 
 /**
- * 날짜 기반 폴더 경로를 생성합니다.
- * @param prefix 경로 접두사 (예: "posts", "profiles")
- * @returns 날짜 기반 폴더 경로 (예: "posts/2024/01")
- */
-export function generateDateBasedPath(prefix: string): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-
-  return `${prefix}/${year}/${month}`;
-}
-
-/**
  * MIME 타입이 이미지인지 확인합니다.
  * @param mimeType MIME 타입
  * @returns 이미지 여부

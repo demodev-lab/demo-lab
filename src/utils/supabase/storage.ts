@@ -175,17 +175,19 @@ export async function uploadFile(
       storagePath: path,
     });
 
-    // 파일 유효성 검사
-    if (!file) {
-      console.error("No file provided");
-      console.groupEnd();
-      return { success: false, error: "업로드할 파일이 없습니다." };
-    }
-
+    // 경로 유효성 검사
     if (!path) {
       console.error("No path provided");
       console.groupEnd();
       return { success: false, error: "파일 경로가 필요합니다." };
+    }
+
+    // 파일 유효성 검사
+    const validation = validateFile(file);
+    if (!validation.isValid) {
+      console.error("File validation failed:", validation.error);
+      console.groupEnd();
+      return { success: false, error: validation.error };
     }
 
     const supabase = createBrowserSupabaseClient();
