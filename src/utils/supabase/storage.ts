@@ -16,6 +16,102 @@ export interface UploadResult {
   error?: string;
 }
 
+// 파일 유효성 검사 결과 타입 정의
+export interface FileValidationResult {
+  isValid: boolean;
+  error?: string;
+}
+
+// 허용된 파일 타입 (MIME 타입)
+const ALLOWED_FILE_TYPES = [
+  // 이미지
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  // 문서
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation", // pptx
+  "text/plain",
+  "text/csv",
+  // 압축 파일
+  "application/zip",
+  "application/x-rar-compressed",
+  "application/x-7z-compressed",
+];
+
+// 파일 크기 제한 (바이트 단위)
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
+/**
+ * 파일 유효성을 검사합니다.
+ * @param file 검사할 파일
+ * @returns 유효성 검사 결과
+ */
+export function validateFile(file: File): FileValidationResult {
+  console.group("Storage validateFile");
+  console.log("Validating file:", {
+    name: file.name,
+    size: file.size,
+    type: file.type,
+  });
+
+  // 파일 존재 여부 확인
+  if (!file) {
+    console.error("No file provided");
+    console.groupEnd();
+    return { isValid: false, error: "파일이 없습니다." };
+  }
+
+  // 파일 크기 검사
+  if (file.size > MAX_FILE_SIZE) {
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    const maxSizeMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
+    console.error(`File too large: ${sizeMB}MB > ${maxSizeMB}MB`);
+    console.groupEnd();
+    return {
+      isValid: false,
+      error: `파일 크기가 너무 큽니다. (${sizeMB}MB > ${maxSizeMB}MB)`,
+    };
+  }
+
+  // 파일 타입 검사
+  if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+    console.error(`Invalid file type: ${file.type}`);
+    console.groupEnd();
+    return {
+      isValid: false,
+      error: `허용되지 않는 파일 형식입니다. (${file.type})`,
+    };
+  }
+
+  console.log("File validation passed");
+  console.groupEnd();
+  return { isValid: true };
+}
+
+/**
+ * 파일 크기를 사람이 읽기 쉬운 형식으로 변환합니다.
+ * @param bytes 바이트 크기
+ * @returns 포맷된 크기 문자열
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return "0 Bytes";
+
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+}
+
 /**
  * 버킷 내 파일 목록을 조회합니다.
  * @returns 파일 목록 또는 빈 배열
