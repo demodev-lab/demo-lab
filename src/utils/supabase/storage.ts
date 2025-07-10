@@ -6,7 +6,7 @@
 import { createBrowserSupabaseClient } from "./client";
 
 // 환경변수에서 버킷 이름을 읽음
-const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET || "test-bucket";
+const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET || "demo-lab-storage";
 
 // 업로드 결과 타입 정의
 export interface UploadResult {
