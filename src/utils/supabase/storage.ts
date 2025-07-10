@@ -55,7 +55,7 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
  * @param file 검사할 파일
  * @returns 유효성 검사 결과
  */
-export function validateFile(file: File): FileValidationResult {
+function validateFile(file: File): FileValidationResult {
   console.group("Storage validateFile");
   console.log("Validating file:", {
     name: file.name,
