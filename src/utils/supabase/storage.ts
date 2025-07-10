@@ -98,21 +98,6 @@ function validateFile(file: File): FileValidationResult {
 }
 
 /**
- * 파일 크기를 사람이 읽기 쉬운 형식으로 변환합니다.
- * @param bytes 바이트 크기
- * @returns 포맷된 크기 문자열
- */
-export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return "0 Bytes";
-
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-}
-
-/**
  * 버킷 내 파일 목록을 조회합니다.
  * @returns 파일 목록 또는 빈 배열
  */

@@ -3,8 +3,7 @@
 import React, { useCallback, useState } from "react";
 import { Upload, X, FileIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatFileSize } from "@/utils/supabase/storage";
-import { getFileIconName } from "@/utils/file-utils";
+import { formatFileSize, getFileIconName } from "@/utils/file-utils";
 import * as Icons from "lucide-react";
 
 interface FileUploadProps {
