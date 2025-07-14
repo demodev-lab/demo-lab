@@ -1,12 +1,12 @@
 "use server";
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
-import type { PostFormData, PostWithDetails } from "../types";
+import type { PostFormData, Post, PostAttachment } from "../types";
 import { revalidatePath } from "next/cache";
 import { getServerUserProfile } from "@/utils/supabase/profiles";
 
 // DB에서 가져온 raw post 데이터를 클라이언트에서 사용할 수 있는 형태로 변환
-function transformPost(post: any, userId?: string): PostWithDetails {
+function transformPost(post: any, userId?: string): Post {
   return {
     id: post.id,
     title: post.title,
@@ -26,6 +26,15 @@ function transformPost(post: any, userId?: string): PostWithDetails {
     is_liked: userId
       ? post.post_likes?.some((like: any) => like.user_id === userId)
       : false,
+    attachments: post.post_attachments?.map((attachment: any) => ({
+      id: attachment.id,
+      post_id: attachment.post_id,
+      original_file_name: attachment.original_file_name,
+      stored_file_path: attachment.stored_file_path,
+      file_size: attachment.file_size,
+      file_type: attachment.file_type,
+      created_at: attachment.created_at,
+    })) ?? [],
   };
 }
 
@@ -61,7 +70,16 @@ export async function getPostList(
       author:profiles(full_name),
       category:categories(name, color),
       tags:post_tags(tag:tags(*)),
-      post_likes!left(user_id)
+      post_likes!left(user_id),
+      post_attachments(
+        id,
+        post_id,
+        original_file_name,
+        stored_file_path,
+        file_size,
+        file_type,
+        created_at
+      )
     `,
   );
 
@@ -148,7 +166,16 @@ export async function getPost(postId: number) {
       author:profiles(full_name),
       category:categories(name, color),
       tags:post_tags(tag:tags(*)),
-      post_likes!left(user_id)
+      post_likes!left(user_id),
+      post_attachments(
+        id,
+        post_id,
+        original_file_name,
+        stored_file_path,
+        file_size,
+        file_type,
+        created_at
+      )
     `,
     )
     .eq("id", postId)
