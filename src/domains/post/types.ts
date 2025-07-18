@@ -46,6 +46,13 @@ export interface PostFormData {
   categoryId: number;
   authorId: string;
   tagIds?: number[];
+  attachments?: {
+    originalName: string;
+    storedPath: string;
+    publicUrl?: string;
+    fileSize: number;
+    fileType: string;
+  }[];
 }
 
 export type SortOption = "latest" | "popular" | "comments";

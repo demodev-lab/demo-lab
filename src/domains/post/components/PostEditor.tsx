@@ -19,11 +19,13 @@ import { generateDomainStoragePath } from "@/utils/file-utils";
 import { toast } from "sonner";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
+import type { PostFormData } from "@/domains/post/types";
+import { useProfile } from "@/hooks/use-profile";
 
 interface PostEditorProps {
   categories?: Category[];
   tags?: Tag[];
-  onSubmit: (formData: FormData) => Promise<void>;
+  onSubmit: (data: PostFormData) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
   initialData?: {
@@ -60,6 +62,9 @@ export function PostEditor({
   const [attachments, setAttachments] = useState<FileItem[]>([]);
   const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
+  
+  // 사용자 프로필 정보 가져오기
+  const { data: userProfile } = useProfile();
 
   useEffect(() => {
     if (initialData) {
@@ -89,8 +94,13 @@ export function PostEditor({
       console.group("PostEditor handleFilesSelected");
       console.log("Files selected:", files.length);
 
-      // TODO: 현재는 임시로 user123 사용, 실제로는 로그인한 사용자 ID 필요
-      const userId = "user123";
+      // 사용자 인증 확인
+      if (!userProfile?.id) {
+        toast.error("로그인이 필요합니다.");
+        return;
+      }
+      
+      const userId = userProfile.id;
 
       // 파일 목록에 추가
       const newFiles: FileItem[] = files.map((file) => ({ file, progress: 0 }));
@@ -154,7 +164,7 @@ export function PostEditor({
       setIsUploadingFiles(false);
       console.groupEnd();
     },
-    [attachments.length],
+    [attachments.length, userProfile?.id],
   );
 
   const handleRemoveFile = useCallback((index: number) => {
@@ -165,39 +175,40 @@ export function PostEditor({
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
 
+    // 사용자 인증 확인
+    if (!userProfile?.id) {
+      toast.error("로그인이 필요합니다.");
+      return;
+    }
+
     // 파일 업로드 중이면 대기
     if (isUploadingFiles) {
       toast.error("파일 업로드가 진행 중입니다. 잠시만 기다려주세요.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    if (categoryId !== null && categoryId !== undefined) {
-      formData.append("categoryId", categoryId.toString());
-    }
-    const tagIdArray = Array.from(selectedTagIds);
-    if (tagIdArray.length > 0) {
-      formData.append("tagIds", JSON.stringify(tagIdArray));
-    }
-
     // 업로드된 파일 정보 추가
     const uploadedFiles = attachments.filter(
       (item) => item.uploaded && item.storedPath,
     );
-    if (uploadedFiles.length > 0) {
-      const fileInfos = uploadedFiles.map((item) => ({
-        originalName: item.file.name,
-        storedPath: item.storedPath,
-        publicUrl: item.publicUrl,
-        fileSize: item.file.size,
-        fileType: item.file.type,
-      }));
-      formData.append("attachments", JSON.stringify(fileInfos));
-    }
+    const attachmentData = uploadedFiles.map((item) => ({
+      originalName: item.file.name,
+      storedPath: item.storedPath!,
+      publicUrl: item.publicUrl,
+      fileSize: item.file.size,
+      fileType: item.file.type,
+    }));
 
-    await onSubmit(formData);
+    const postData: PostFormData = {
+      title,
+      content,
+      categoryId: categoryId || 0,
+      authorId: userProfile.id,
+      tagIds: Array.from(selectedTagIds),
+      attachments: attachmentData.length > 0 ? attachmentData : undefined,
+    };
+
+    await onSubmit(postData);
   };
 
   const selectedCategory = categories?.find((c) => c.id === categoryId);

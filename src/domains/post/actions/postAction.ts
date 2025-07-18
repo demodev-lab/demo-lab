@@ -207,6 +207,7 @@ export async function createPost(data: PostFormData) {
     }
   }
 
+  // 트랜잭션 시작: 게시글 생성
   const { data: post, error } = await supabase
     .from("posts")
     .insert([
@@ -222,20 +223,43 @@ export async function createPost(data: PostFormData) {
 
   if (error) throw error;
 
-  // 태그 연결
-  if (data.tagIds?.length) {
-    const { error: tagError } = await supabase.from("post_tags").insert(
-      data.tagIds.map((tag_id) => ({
+  try {
+    // 태그 연결
+    if (data.tagIds?.length) {
+      const { error: tagError } = await supabase.from("post_tags").insert(
+        data.tagIds.map((tag_id) => ({
+          post_id: post.id,
+          tag_id,
+        })),
+      );
+
+      if (tagError) throw tagError;
+    }
+
+    // 첨부파일 메타데이터 저장
+    if (data.attachments?.length) {
+      const attachmentRecords = data.attachments.map((att) => ({
         post_id: post.id,
-        tag_id,
-      })),
-    );
+        original_file_name: att.originalName,
+        stored_file_path: att.storedPath,
+        file_size: att.fileSize,
+        file_type: att.fileType,
+      }));
 
-    if (tagError) throw tagError;
+      const { error: attachmentError } = await supabase
+        .from("post_attachments")
+        .insert(attachmentRecords);
+
+      if (attachmentError) throw attachmentError;
+    }
+
+    revalidatePath("/community");
+    return post;
+  } catch (error) {
+    // 에러 발생 시 생성된 게시글 삭제 (보상 트랜잭션)
+    await supabase.from("posts").delete().eq("id", post.id);
+    throw error;
   }
-
-  revalidatePath("/community");
-  return post;
 }
 
 // 게시글 수정
