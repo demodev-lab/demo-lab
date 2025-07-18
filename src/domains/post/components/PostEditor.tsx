@@ -39,7 +39,6 @@ interface PostEditorProps {
 
 interface FileItem {
   file: File;
-  progress?: number;
   error?: string;
   uploaded?: boolean;
   storedPath?: string;
@@ -103,7 +102,7 @@ export function PostEditor({
       const userId = userProfile.id;
 
       // 파일 목록에 추가
-      const newFiles: FileItem[] = files.map((file) => ({ file, progress: 0 }));
+      const newFiles: FileItem[] = files.map((file) => ({ file }));
       setAttachments((prev) => [...prev, ...newFiles]);
       setIsUploadingFiles(true);
 
@@ -132,7 +131,6 @@ export function PostEditor({
                   ? {
                       ...attachment,
                       uploaded: true,
-                      progress: 100,
                       storedPath: result.path,
                       publicUrl: result.publicUrl,
                     }

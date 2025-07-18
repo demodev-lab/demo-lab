@@ -10,7 +10,8 @@
     "prepare": "husky install",
     "db:push": "npx supabase db push",
     "db:pull": "npx supabase db pull",
-    "gen:types": "npx supabase gen types typescript --project-id 'xzsfhvthxcvpztfdjmla' --schema public > src/types/database.types.ts"
+    "gen:types": "npx supabase gen types typescript --project-id 'xzsfhvthxcvpztfdjmla' --schema public > src/types/database.types.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

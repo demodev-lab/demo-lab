@@ -11,6 +11,8 @@ import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 import {
   formatFileSize,
   getFileIconName,
@@ -40,9 +42,9 @@ function AttachmentItem({
   onDownload,
   onDelete,
   isEditable,
-}: AttachmentItemProps) {
+  onImageClick,
+}: AttachmentItemProps & { onImageClick?: (attachment: PostAttachment) => void }) {
   const [imageError, setImageError] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const isImage = isImageFile(attachment.file_type);
   const IconComponent =
@@ -51,8 +53,11 @@ function AttachmentItem({
   const publicUrl = getPublicUrl(attachment.stored_file_path);
 
   const handleImageClick = () => {
-    if (isImage && !imageError) {
-      setLightboxOpen(true);
+    if (isImage && !imageError && onImageClick) {
+      onImageClick(attachment);
+    } else if (isImage && !imageError) {
+      // Fallback to download if no lightbox handler provided
+      onDownload(attachment);
     } else {
       onDownload(attachment);
     }
@@ -137,31 +142,6 @@ function AttachmentItem({
           </div>
         </div>
       </Card>
-
-      {/* 간단한 이미지 모달 (라이트박스 라이브러리 설치 후 교체 예정) */}
-      {lightboxOpen && isImage && !imageError && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-          onClick={() => setLightboxOpen(false)}
-        >
-          <div className="relative max-w-4xl max-h-4xl p-4">
-            <img
-              src={publicUrl}
-              alt={attachment.original_file_name}
-              className="max-w-full max-h-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="absolute top-4 right-4 bg-white"
-              onClick={() => setLightboxOpen(false)}
-            >
-              닫기
-            </Button>
-          </div>
-        </div>
-      )}
     </>
   );
 }
@@ -172,12 +152,29 @@ export function PostAttachmentList({
   onDelete,
   isEditable = false,
 }: PostAttachmentListProps) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   if (!attachments || attachments.length === 0) {
     return null;
   }
 
   const imageFiles = attachments.filter((att) => isImageFile(att.file_type));
   const otherFiles = attachments.filter((att) => !isImageFile(att.file_type));
+
+  // Prepare lightbox slides
+  const lightboxSlides = imageFiles.map((attachment) => ({
+    src: getPublicUrl(attachment.stored_file_path),
+    alt: attachment.original_file_name,
+  }));
+
+  const handleImageClick = (attachment: PostAttachment) => {
+    const index = imageFiles.findIndex((img) => img.id === attachment.id);
+    if (index !== -1) {
+      setLightboxIndex(index);
+      setLightboxOpen(true);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -200,6 +197,7 @@ export function PostAttachmentList({
             onDownload={onDownload}
             onDelete={onDelete}
             isEditable={isEditable}
+            onImageClick={handleImageClick}
           />
         ))}
 
@@ -214,6 +212,14 @@ export function PostAttachmentList({
           />
         ))}
       </div>
+
+      {/* Lightbox for image viewing */}
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={lightboxSlides}
+      />
     </div>
   );
 }

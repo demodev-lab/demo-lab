@@ -108,7 +108,6 @@ export function FileUpload({
 interface FileListProps {
   files: Array<{
     file: File;
-    progress?: number;
     error?: string;
     uploaded?: boolean;
   }>;
@@ -144,19 +143,6 @@ export function FileList({ files, onRemove }: FileListProps) {
                 <p className="text-xs text-destructive mt-1">{item.error}</p>
               )}
             </div>
-            {item.progress !== undefined && !item.uploaded && (
-              <div className="w-20">
-                <div className="h-1 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary transition-all duration-300"
-                    style={{ width: `${item.progress}%` }}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground text-center mt-1">
-                  {item.progress}%
-                </p>
-              </div>
-            )}
             {item.uploaded && (
               <span className="text-xs text-green-600 font-medium">완료</span>
             )}
