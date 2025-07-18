@@ -19,13 +19,13 @@ import { generateDomainStoragePath } from "@/utils/file-utils";
 import { toast } from "sonner";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
-import type { PostFormData } from "@/domains/post/types";
+import { CreatePostDto } from "@/dtos/create-post.dto";
 import { useProfile } from "@/hooks/use-profile";
 
 interface PostEditorProps {
   categories?: Category[];
   tags?: Tag[];
-  onSubmit: (data: PostFormData) => Promise<void>;
+  onSubmit: (data: CreatePostDto) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
   initialData?: {
@@ -199,7 +199,7 @@ export function PostEditor({
       fileType: item.file.type,
     }));
 
-    const postData: PostFormData = {
+    const postData: CreatePostDto = {
       title,
       content,
       categoryId: categoryId || 0,

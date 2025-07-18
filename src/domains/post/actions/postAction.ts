@@ -1,7 +1,10 @@
 "use server";
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
-import type { PostFormData, Post, PostAttachment } from "../types";
+import type { Post, PostAttachment } from "../types";
+import { CreatePostDto } from "@/dtos/create-post.dto";
+import { UpdatePostDto } from "@/dtos/update-post.dto";
+import { deleteFile } from "@/utils/supabase/storage";
 import { revalidatePath } from "next/cache";
 import { getServerUserProfile } from "@/utils/supabase/profiles";
 
@@ -187,7 +190,7 @@ export async function getPost(postId: number) {
 }
 
 // 게시글 작성
-export async function createPost(data: PostFormData) {
+export async function createPost(data: CreatePostDto) {
   const supabase = await createServerSupabaseClient();
   const userProfile = await getServerUserProfile();
 
@@ -263,39 +266,101 @@ export async function createPost(data: PostFormData) {
 }
 
 // 게시글 수정
-export async function updatePost(postId: number, data: PostFormData) {
+export async function updatePost(postId: number, data: UpdatePostDto) {
   const supabase = await createServerSupabaseClient();
 
-  const { error } = await supabase
-    .from("posts")
-    .update({
-      title: data.title,
-      content: data.content,
-      category_id: data.categoryId,
-    })
-    .eq("id", postId);
-
-  if (error) throw error;
-
-  // 태그 연결 업데이트
-  if (data.tagIds) {
-    // 기존 태그 연결 삭제
-    await supabase.from("post_tags").delete().eq("post_id", postId);
-
-    // 새로운 태그 연결
-    if (data.tagIds.length) {
-      const { error: tagError } = await supabase.from("post_tags").insert(
-        data.tagIds.map((tag_id) => ({
-          post_id: postId,
-          tag_id,
-        })),
-      );
-
-      if (tagError) throw tagError;
+  try {
+    // 삭제할 파일들의 경로 미리 조회 (Storage 삭제용)
+    let filesToDelete: string[] = [];
+    if (data.deleteAttachmentIds?.length) {
+      const { data: attachmentsToDelete } = await supabase
+        .from("post_attachments")
+        .select("stored_file_path")
+        .in("id", data.deleteAttachmentIds);
+      
+      filesToDelete = attachmentsToDelete?.map(att => att.stored_file_path) || [];
     }
-  }
 
-  revalidatePath("/community");
+    // DB 작업 수행 (순서 중요: DB 먼저, Storage 나중에)
+    // 1. 첨부파일 삭제 처리 (DB에서 먼저 삭제)
+    if (data.deleteAttachmentIds?.length) {
+      const { error: deleteError } = await supabase
+        .from("post_attachments")
+        .delete()
+        .in("id", data.deleteAttachmentIds);
+
+      if (deleteError) throw deleteError;
+    }
+
+    // 2. 첨부파일 추가 처리
+    if (data.addAttachments?.length) {
+      const attachmentRecords = data.addAttachments.map((att) => ({
+        post_id: postId,
+        original_file_name: att.originalName,
+        stored_file_path: att.storedPath,
+        file_size: att.fileSize,
+        file_type: att.fileType,
+      }));
+
+      const { error: addError } = await supabase
+        .from("post_attachments")
+        .insert(attachmentRecords);
+
+      if (addError) throw addError;
+    }
+
+    // 3. 게시글 기본 정보 업데이트 (전달된 필드만)
+    const updateData: Record<string, any> = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.content !== undefined) updateData.content = data.content;
+    if (data.categoryId !== undefined) updateData.category_id = data.categoryId;
+
+    if (Object.keys(updateData).length > 0) {
+      const { error: updateError } = await supabase
+        .from("posts")
+        .update(updateData)
+        .eq("id", postId);
+
+      if (updateError) throw updateError;
+    }
+
+    // 4. 태그 연결 업데이트
+    if (data.tagIds !== undefined) {
+      // 기존 태그 연결 삭제
+      await supabase.from("post_tags").delete().eq("post_id", postId);
+
+      // 새로운 태그 연결
+      if (data.tagIds.length > 0) {
+        const { error: tagError } = await supabase.from("post_tags").insert(
+          data.tagIds.map((tag_id) => ({
+            post_id: postId,
+            tag_id,
+          })),
+        );
+
+        if (tagError) throw tagError;
+      }
+    }
+
+    // 5. Storage 파일 실제 삭제 (트랜잭션 성공 후)
+    if (filesToDelete.length > 0) {
+      await Promise.all(
+        filesToDelete.map(async (filePath) => {
+          try {
+            await deleteFile(filePath);
+          } catch (error) {
+            console.error(`Storage 파일 삭제 실패: ${filePath}`, error);
+            // 에러 로그만 기록하고 넘어감 (고아 파일이 되지만 서비스는 정상 동작)
+          }
+        })
+      );
+    }
+
+    revalidatePath("/community");
+  } catch (error) {
+    console.error("게시글 수정 실패:", error);
+    throw error;
+  }
 }
 
 // 게시글 삭제
