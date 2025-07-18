@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,14 +12,20 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2, Paperclip } from "lucide-react";
+import { FileUpload, FileList } from "@/components/ui/file-upload";
+import { uploadFile } from "@/utils/supabase/storage";
+import { generateDomainStoragePath } from "@/utils/file-utils";
+import { toast } from "sonner";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
+import { CreatePostDto } from "@/dtos/create-post.dto";
+import { useProfile } from "@/hooks/use-profile";
 
 interface PostEditorProps {
   categories?: Category[];
   tags?: Tag[];
-  onSubmit: (formData: FormData) => Promise<void>;
+  onSubmit: (data: CreatePostDto) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
   initialData?: {
@@ -29,6 +35,14 @@ interface PostEditorProps {
     tagIds?: number[];
   };
   submitButtonText?: string;
+}
+
+interface FileItem {
+  file: File;
+  error?: string;
+  uploaded?: boolean;
+  storedPath?: string;
+  publicUrl?: string;
 }
 
 export function PostEditor({
@@ -44,6 +58,12 @@ export function PostEditor({
   const [content, setContent] = useState("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
+  const [attachments, setAttachments] = useState<FileItem[]>([]);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  
+  // 사용자 프로필 정보 가져오기
+  const { data: userProfile } = useProfile();
 
   useEffect(() => {
     if (initialData) {
@@ -68,24 +88,125 @@ export function PostEditor({
     });
   };
 
+  const handleFilesSelected = useCallback(
+    async (files: File[]) => {
+      console.group("PostEditor handleFilesSelected");
+      console.log("Files selected:", files.length);
+
+      // 사용자 인증 확인
+      if (!userProfile?.id) {
+        toast.error("로그인이 필요합니다.");
+        return;
+      }
+      
+      const userId = userProfile.id;
+
+      // 파일 목록에 추가
+      const newFiles: FileItem[] = files.map((file) => ({ file }));
+      setAttachments((prev) => [...prev, ...newFiles]);
+      setIsUploadingFiles(true);
+
+      // 파일 업로드
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const index = attachments.length + i;
+
+        try {
+          // 도메인별 저장 경로 생성
+          const storagePath = generateDomainStoragePath(
+            userId,
+            "posts",
+            file.name,
+          );
+
+          console.log(`Uploading file ${i + 1}/${files.length}:`, file.name);
+
+          // 파일 업로드
+          const result = await uploadFile(file, storagePath);
+
+          if (result.success) {
+            setAttachments((prev) =>
+              prev.map((attachment, idx) =>
+                idx === index
+                  ? {
+                      ...attachment,
+                      uploaded: true,
+                      storedPath: result.path,
+                      publicUrl: result.publicUrl,
+                    }
+                  : attachment,
+              ),
+            );
+          } else {
+            setAttachments((prev) =>
+              prev.map((attachment, idx) =>
+                idx === index
+                  ? { ...attachment, error: result.error }
+                  : attachment,
+              ),
+            );
+            toast.error(`파일 업로드 실패: ${file.name}`);
+          }
+        } catch (error) {
+          console.error("File upload error:", error);
+          setAttachments((prev) =>
+            prev.map((attachment, idx) =>
+              idx === index
+                ? { ...attachment, error: "업로드 중 오류가 발생했습니다." }
+                : attachment,
+            ),
+          );
+        }
+      }
+
+      setIsUploadingFiles(false);
+      console.groupEnd();
+    },
+    [attachments.length, userProfile?.id],
+  );
+
+  const handleRemoveFile = useCallback((index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    if (categoryId !== null && categoryId !== undefined) {
-      console.log("\n\n\n[wft] categoryId", categoryId);
-      formData.append("categoryId", categoryId.toString());
-    }
-    const tagIdArray = Array.from(selectedTagIds);
-    if (tagIdArray.length > 0) {
-      console.log("\n\n\n[wft] tagIdArray", tagIdArray);
-      formData.append("tagIds", JSON.stringify(tagIdArray));
+    // 사용자 인증 확인
+    if (!userProfile?.id) {
+      toast.error("로그인이 필요합니다.");
+      return;
     }
 
-    await onSubmit(formData);
+    // 파일 업로드 중이면 대기
+    if (isUploadingFiles) {
+      toast.error("파일 업로드가 진행 중입니다. 잠시만 기다려주세요.");
+      return;
+    }
+
+    // 업로드된 파일 정보 추가
+    const uploadedFiles = attachments.filter(
+      (item) => item.uploaded && item.storedPath,
+    );
+    const attachmentData = uploadedFiles.map((item) => ({
+      originalName: item.file.name,
+      storedPath: item.storedPath!,
+      publicUrl: item.publicUrl,
+      fileSize: item.file.size,
+      fileType: item.file.type,
+    }));
+
+    const postData: CreatePostDto = {
+      title,
+      content,
+      categoryId: categoryId || 0,
+      authorId: userProfile.id,
+      tagIds: Array.from(selectedTagIds),
+      attachments: attachmentData.length > 0 ? attachmentData : undefined,
+    };
+
+    await onSubmit(postData);
   };
 
   const selectedCategory = categories?.find((c) => c.id === categoryId);
@@ -213,6 +334,43 @@ export function PostEditor({
               required
             />
           </div>
+
+          {/* 파일 첨부 섹션 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="font-medium">
+                파일 첨부 (선택사항)
+                {attachments.length > 0 && (
+                  <span className="text-sm text-muted-foreground ml-2">
+                    {attachments.length}개 파일
+                  </span>
+                )}
+              </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFileUpload(!showFileUpload)}
+              >
+                <Paperclip className="w-4 h-4 mr-2" />
+                {showFileUpload ? "숨기기" : "파일 첨부"}
+              </Button>
+            </div>
+
+            {showFileUpload && (
+              <>
+                <FileUpload
+                  onFilesSelected={handleFilesSelected}
+                  maxFiles={10}
+                  disabled={isUploadingFiles}
+                />
+                {attachments.length > 0 && (
+                  <FileList files={attachments} onRemove={handleRemoveFile} />
+                )}
+              </>
+            )}
+          </div>
+
           <div className="flex justify-end gap-2">
             {onCancel && (
               <Button
@@ -227,10 +385,17 @@ export function PostEditor({
             <Button
               type="submit"
               className="bg-[#5046E4] hover:bg-[#5046E4]/90"
-              disabled={isLoading || !title.trim() || !content.trim()}
+              disabled={
+                isLoading ||
+                isUploadingFiles ||
+                !title.trim() ||
+                !content.trim()
+              }
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {submitButtonText}
+              {(isLoading || isUploadingFiles) && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {isUploadingFiles ? "파일 업로드 중..." : submitButtonText}
             </Button>
           </div>
         </form>

@@ -14,8 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Heart, MessageSquare, User } from "lucide-react";
 import { CommentList } from "../../comment/components/CommentList";
+import { PostAttachmentList } from "./PostAttachmentList";
 import { usePostDetail, useTogglePostLike } from "../hooks/usePost";
 import { useAuth } from "@/components/auth/auth-provider";
+import { downloadAttachment } from "@/utils/download";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -44,6 +46,10 @@ export function PostDetailModal({
 
   const canEdit = postPermissions.canEdit(post, profile?.role, profile?.id);
   const canDelete = postPermissions.canDelete(post, profile?.role, profile?.id);
+
+  const handleDownload = async (attachment: any) => {
+    await downloadAttachment(post.id, attachment);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -152,6 +158,17 @@ export function PostDetailModal({
             <span>댓글 {post.comment_count}</span>
           </Button>
         </div>
+
+        {/* 첨부파일 목록 */}
+        {post.attachments && post.attachments.length > 0 && (
+          <>
+            <Separator className="my-4" />
+            <PostAttachmentList
+              attachments={post.attachments}
+              onDownload={handleDownload}
+            />
+          </>
+        )}
 
         <Separator className="my-4" />
 

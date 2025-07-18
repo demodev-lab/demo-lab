@@ -1,8 +1,8 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { PostEditor } from "./PostEditor";
-import type { PostFormData } from "../types";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
+import { CreatePostDto } from "@/dtos/create-post.dto";
 import { usePostDetail } from "../hooks/usePost";
 import { useProfile } from "@/hooks/use-profile";
 import { postPermissions } from "@/config/permissions";
@@ -15,7 +15,7 @@ interface PostEditorModalProps {
   categories?: Category[];
   tags?: Tag[];
   onClose: () => void;
-  onSubmit: (formData: PostFormData) => Promise<void>;
+  onSubmit: (data: CreatePostDto) => Promise<void>;
 }
 
 export function PostEditorModal({
@@ -53,35 +53,8 @@ export function PostEditorModal({
         }
       : undefined;
 
-  const handleSubmit = async (formData: FormData) => {
-    const rawCategoryId = formData.get("categoryId");
-    const categoryId =
-      rawCategoryId && rawCategoryId !== "" ? Number(rawCategoryId) : null;
-
-    let tagIds: number[] | null = null;
-    try {
-      const rawTagIds = formData.get("tagIds");
-      if (rawTagIds) {
-        const parsed = JSON.parse(rawTagIds as string);
-        const filtered = Array.isArray(parsed)
-          ? parsed.filter((id) => !!id && id !== "")
-          : [];
-        tagIds = filtered.length > 0 ? filtered : null;
-      } else {
-        tagIds = null;
-      }
-    } catch {
-      tagIds = null;
-    }
-
-    const postFormData: PostFormData = {
-      title: formData.get("title") as string,
-      content: formData.get("content") as string,
-      categoryId,
-      authorId: userProfile?.id ?? null,
-      tagIds,
-    };
-    await onSubmit(postFormData);
+  const handleSubmit = async (data: CreatePostDto) => {
+    await onSubmit(data);
   };
 
   return (

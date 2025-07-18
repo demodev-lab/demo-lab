@@ -21,27 +21,25 @@ export interface Post {
   is_pinned: boolean;
   is_liked?: boolean;
   tags: Tag[];
+  attachments?: PostAttachment[];
 }
 
-export interface PostWithDetails extends Post {
-  author_name: string;
-  category_name: string;
-  category_color: string;
-  tags: Tag[];
+export interface PostAttachment {
+  id: number;
+  post_id: number;
+  original_file_name: string;
+  stored_file_path: string;
+  file_size: number;
+  file_type: string;
+  created_at: string;
 }
+
 
 export interface PostWithPagination {
   posts: Post[];
   pagination: PaginationState;
 }
 
-export interface PostFormData {
-  title: string;
-  content: string;
-  categoryId: number;
-  authorId: string;
-  tagIds?: number[];
-}
 
 export type SortOption = "latest" | "popular" | "comments";
 
