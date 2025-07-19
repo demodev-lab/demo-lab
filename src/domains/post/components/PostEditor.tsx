@@ -295,6 +295,13 @@ export function PostEditor({
         addAttachments: attachmentData.length > 0 ? attachmentData : undefined,
       };
 
+      console.group("[PostEditor] 수정 데이터");
+      console.log("삭제될 첨부파일 IDs:", deletedIds);
+      console.log("추가될 첨부파일:", attachmentData);
+      console.log("전체 updateData:", updateData);
+      console.log("현재 attachments 상태:", attachments);
+      console.groupEnd();
+
       try {
         await onSubmit(updateData);
         toast.success("게시글이 성공적으로 수정되었습니다.");

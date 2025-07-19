@@ -278,6 +278,14 @@ export async function updatePost(postId: number, data: UpdatePostDto) {
   try {
     console.group("[postAction] updatePost");
     console.log("게시글 수정 시도:", { postId, userId: userProfile.id });
+    console.log("전달될 데이터:", {
+      title: data.title,
+      content: data.content,
+      categoryId: data.categoryId,
+      tagIds: data.tagIds,
+      deleteAttachmentIds: data.deleteAttachmentIds,
+      addAttachments: data.addAttachments,
+    });
     // RPC 함수를 사용하여 트랜잭션 안에서 수행
     const { data: result, error } = await supabase.rpc(
       "update_post_with_attachments",
