@@ -61,7 +61,7 @@ export function PostEditorModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogTitle>
           {mode === "edit" ? "게시글 수정" : "게시글 작성"}
         </DialogTitle>
