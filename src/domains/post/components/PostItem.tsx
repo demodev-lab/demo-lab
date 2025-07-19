@@ -181,7 +181,11 @@ export function PostItem({
           {post.attachments && post.attachments.length > 0 && (
             <Button variant="ghost" size="sm" className="gap-1">
               <Paperclip className="h-4 w-4" />
-              <span>{post.attachments.length}</span>
+              <span className="truncate max-w-32">
+                {post.attachments[0].original_file_name}
+                {post.attachments.length > 1 &&
+                  ` (외 ${post.attachments.length - 1}개)`}
+              </span>
             </Button>
           )}
         </div>
