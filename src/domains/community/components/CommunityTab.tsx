@@ -5,6 +5,8 @@ import { useCommunity } from "../hooks/useCommunity";
 import { usePostList } from "@/domains/post/hooks/usePost";
 import { useCategories } from "@/domains/category/hooks/useCategories";
 import { useTags } from "@/domains/tag/hooks/useTags";
+import type { CreatePostDto } from "@/dtos/create-post.dto";
+import type { UpdatePostDto } from "@/dtos/update-post.dto";
 import {
   PostList,
   PostPagination,
@@ -135,10 +137,10 @@ export function CommunityTab() {
                 if (editorModal.mode === "edit" && editorModal.postId) {
                   await updatePost({
                     postId: editorModal.postId,
-                    data: formData,
+                    data: formData as UpdatePostDto,
                   });
                 } else {
-                  await createPost(formData);
+                  await createPost(formData as CreatePostDto);
                 }
                 setEditorModal(null);
               } catch (error) {
