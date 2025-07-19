@@ -327,7 +327,7 @@ export async function updatePost(postId: number, data: UpdatePostDto) {
   }
 }
 
-// 게시글 삭제
+// 게시글 삭제 (트랜잭션 처리 및 리소스 정리를 위해 RPC 함수 사용)
 export async function removePost(postId: number) {
   const supabase = await createServerSupabaseClient();
   const userProfile = await getServerUserProfile();
@@ -336,29 +336,51 @@ export async function removePost(postId: number) {
     throw new Error("로그인이 필요합니다.");
   }
 
-  // 권한 검증: 게시글 작성자 확인 또는 관리자 권한 확인
-  const { data: post, error: postError } = await supabase
-    .from("posts")
-    .select("author_id")
-    .eq("id", postId)
-    .single();
+  try {
+    console.group("[postAction] removePost");
+    console.log("게시글 삭제 시도:", { postId, userId: userProfile.id });
 
-  if (postError || !post) {
-    throw new Error("게시글을 찾을 수 없습니다.");
+    // RPC 함수를 사용하여 트랜잭션 안에서 수행
+    const { data: result, error } = await supabase.rpc(
+      "delete_post_with_cleanup",
+      {
+        p_post_id: postId,
+        p_user_id: userProfile.id,
+      },
+    );
+
+    if (error) {
+      console.error("게시글 삭제 RPC 에러:", error);
+      throw new Error(error.message || "게시글 삭제에 실패했습니다.");
+    }
+
+    console.log("RPC 결과:", result);
+
+    // Storage 파일 삭제 (트랜잭션 성공 후)
+    if (result.deleted_files && result.deleted_files.length > 0) {
+      console.log("삭제할 Storage 파일들:", result.deleted_files);
+
+      await Promise.all(
+        result.deleted_files.map(async (filePath: string) => {
+          const deleteResult = await deleteStorageFile(filePath);
+          if (!deleteResult.success) {
+            console.error(
+              `Storage 파일 삭제 실패: ${filePath}`,
+              deleteResult.error,
+            );
+            // 에러 로그만 기록하고 넘어감 (고아 파일 남을 수 있지만 서비스는 정상 동작)
+          }
+        }),
+      );
+    }
+
+    revalidatePath("/community");
+    console.groupEnd();
+  } catch (error) {
+    console.error("게시글 삭제 실패:", error);
+    console.groupEnd();
+    throw error;
   }
-
-  // 작성자 본인이거나 관리자만 삭제 가능
-  const isAuthor = post.author_id === userProfile.id;
-  const isAdmin = userProfile.role === "admin";
-
-  if (!isAuthor && !isAdmin) {
-    throw new Error("게시글을 삭제할 권한이 없습니다.");
-  }
-
-  const { error } = await supabase.from("posts").delete().eq("id", postId);
-  if (error) throw error;
-
-  revalidatePath("/community");
 }
 
 // 좋아요 토글
