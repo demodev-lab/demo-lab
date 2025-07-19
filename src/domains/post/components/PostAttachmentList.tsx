@@ -43,7 +43,9 @@ function AttachmentItem({
   onDelete,
   isEditable,
   onImageClick,
-}: AttachmentItemProps & { onImageClick?: (attachment: PostAttachment) => void }) {
+}: AttachmentItemProps & {
+  onImageClick?: (attachment: PostAttachment) => void;
+}) {
   const [imageError, setImageError] = useState(false);
 
   const isImage = isImageFile(attachment.file_type);
@@ -154,6 +156,13 @@ export function PostAttachmentList({
 }: PostAttachmentListProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // 라이트박스 상태를 전역적으로 추적
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__lightboxOpen = lightboxOpen;
+    }
+  }, [lightboxOpen]);
 
   if (!attachments || attachments.length === 0) {
     return null;

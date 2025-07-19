@@ -64,14 +64,34 @@ export function PostDetailModal({
       <DialogContent
         className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
         onPointerDownOutside={(event) => {
-          const target = event.target as Element;
-          // 라이트박스 영역을 클릭했다면,
-          if (target?.closest(".yarl__root, .yarl__container, .yarl__slide")) {
-            // Dialog의 기본 닫기 동작을 '방지'하기만 합니다.
+          // 라이트박스가 열려있는 상태인지 확인
+          const isLightboxOpen =
+            typeof window !== "undefined" && (window as any).__lightboxOpen;
+
+          console.log("onPointerDownOutside triggered", {
+            target: event.target,
+            isLightboxOpen,
+            tagName: (event.target as Element)?.tagName,
+          });
+
+          if (isLightboxOpen) {
+            console.log("Preventing dialog close - lightbox is open");
             event.preventDefault();
+            return;
           }
-          // 그 외의 외부 영역 클릭 시에는 아무것도 하지 않습니다.
-          // Dialog가 기본 동작대로 모달을 닫도록 내버려 둡니다.
+
+          console.log("Allowing dialog to close - lightbox is not open");
+        }}
+        onEscapeKeyDown={(event) => {
+          // 라이트박스가 열려있을 때는 ESC 키로 모달 닫기 방지
+          const isLightboxOpen =
+            typeof window !== "undefined" && (window as any).__lightboxOpen;
+
+          if (isLightboxOpen) {
+            console.log("Preventing dialog close with ESC - lightbox is open");
+            event.preventDefault();
+            return;
+          }
         }}
       >
         <DialogTitle>게시글 상세</DialogTitle>
