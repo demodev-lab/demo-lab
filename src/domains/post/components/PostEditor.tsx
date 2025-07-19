@@ -208,7 +208,17 @@ export function PostEditor({
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
+
+    // 입력값 검증
+    if (!title.trim()) {
+      toast.error("제목을 입력해주세요.");
+      return;
+    }
+
+    if (!content.trim()) {
+      toast.error("내용을 입력해주세요.");
+      return;
+    }
 
     // 사용자 인증 확인
     if (!userProfile?.id) {
@@ -219,6 +229,18 @@ export function PostEditor({
     // 파일 업로드 중이면 대기
     if (isUploadingFiles) {
       toast.error("파일 업로드가 진행 중입니다. 잠시만 기다려주세요.");
+      return;
+    }
+
+    // 업로드 실패한 파일이 있는지 확인
+    const failedFiles = attachments.filter(
+      (item) => item.type === "new" && item.error,
+    );
+
+    if (failedFiles.length > 0) {
+      toast.error(
+        `${failedFiles.length}개 파일 업로드에 실패했습니다. 해당 파일을 제거 후 다시 시도해주세요.`,
+      );
       return;
     }
 
@@ -244,7 +266,17 @@ export function PostEditor({
         tagIds: Array.from(selectedTagIds),
         attachments: attachmentData.length > 0 ? attachmentData : undefined,
       };
-      await onSubmit(postData);
+      try {
+        await onSubmit(postData);
+        toast.success("게시글이 성공적으로 작성되었습니다.");
+      } catch (error) {
+        console.error("게시글 작성 에러:", error);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "게시글 작성에 실패했습니다. 다시 시도해주세요.",
+        );
+      }
     } else {
       // 수정 모드
       const deletedIds = attachments
@@ -262,7 +294,18 @@ export function PostEditor({
         deleteAttachmentIds: deletedIds.length > 0 ? deletedIds : undefined,
         addAttachments: attachmentData.length > 0 ? attachmentData : undefined,
       };
-      await onSubmit(updateData);
+
+      try {
+        await onSubmit(updateData);
+        toast.success("게시글이 성공적으로 수정되었습니다.");
+      } catch (error) {
+        console.error("게시글 수정 에러:", error);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "게시글 수정에 실패했습니다. 다시 시도해주세요.",
+        );
+      }
     }
   };
 

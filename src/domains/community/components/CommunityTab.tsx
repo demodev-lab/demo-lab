@@ -131,15 +131,20 @@ export function CommunityTab() {
             tags={tags}
             onClose={() => setEditorModal(null)}
             onSubmit={async (formData) => {
-              if (editorModal.mode === "edit" && editorModal.postId) {
-                await updatePost({
-                  postId: editorModal.postId,
-                  data: formData,
-                });
-              } else {
-                await createPost(formData);
+              try {
+                if (editorModal.mode === "edit" && editorModal.postId) {
+                  await updatePost({
+                    postId: editorModal.postId,
+                    data: formData,
+                  });
+                } else {
+                  await createPost(formData);
+                }
+                setEditorModal(null);
+              } catch (error) {
+                // 에러는 PostEditor에서 처리되므로 여기서는 모달을 닫지 않음
+                console.error("게시글 작업 에러:", error);
               }
-              setEditorModal(null);
             }}
           />
         )}

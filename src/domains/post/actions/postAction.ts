@@ -266,100 +266,63 @@ export async function createPost(data: CreatePostDto) {
   }
 }
 
-// 게시글 수정
+// 게시글 수정 (트랜잭션 처리를 위해 RPC 함수 사용)
 export async function updatePost(postId: number, data: UpdatePostDto) {
   const supabase = await createServerSupabaseClient();
+  const userProfile = await getServerUserProfile();
+
+  if (!userProfile) {
+    throw new Error("로그인이 필요합니다.");
+  }
 
   try {
-    // 삭제할 파일들의 경로 미리 조회 (Storage 삭제용)
-    let filesToDelete: string[] = [];
-    if (data.deleteAttachmentIds?.length) {
-      const { data: attachmentsToDelete } = await supabase
-        .from("post_attachments")
-        .select("stored_file_path")
-        .in("id", data.deleteAttachmentIds);
+    console.group("[postAction] updatePost");
+    console.log("게시글 수정 시도:", { postId, userId: userProfile.id });
+    // RPC 함수를 사용하여 트랜잭션 안에서 수행
+    const { data: result, error } = await supabase.rpc(
+      "update_post_with_attachments",
+      {
+        p_post_id: postId,
+        p_user_id: userProfile.id,
+        p_title: data.title,
+        p_content: data.content,
+        p_category_id: data.categoryId,
+        p_tag_ids: data.tagIds,
+        p_delete_attachment_ids: data.deleteAttachmentIds,
+        p_add_attachments: data.addAttachments,
+      },
+    );
 
-      filesToDelete =
-        attachmentsToDelete?.map((att) => att.stored_file_path) || [];
+    if (error) {
+      console.error("게시글 수정 RPC 에러:", error);
+      throw new Error(error.message || "게시글 수정에 실패했습니다.");
     }
 
-    // DB 작업 수행 (순서 중요: DB 먼저, Storage 나중에)
-    // 1. 첨부파일 삭제 처리 (DB에서 먼저 삭제)
-    if (data.deleteAttachmentIds?.length) {
-      const { error: deleteError } = await supabase
-        .from("post_attachments")
-        .delete()
-        .in("id", data.deleteAttachmentIds);
+    console.log("RPC 결과:", result);
 
-      if (deleteError) throw deleteError;
-    }
+    // Storage 파일 삭제 (트랜잭션 성공 후)
+    if (result.deleted_files && result.deleted_files.length > 0) {
+      console.log("삭제할 Storage 파일들:", result.deleted_files);
 
-    // 2. 첨부파일 추가 처리
-    if (data.addAttachments?.length) {
-      const attachmentRecords = data.addAttachments.map((att) => ({
-        post_id: postId,
-        original_file_name: att.originalName,
-        stored_file_path: att.storedPath,
-        file_size: att.fileSize,
-        file_type: att.fileType,
-      }));
-
-      const { error: addError } = await supabase
-        .from("post_attachments")
-        .insert(attachmentRecords);
-
-      if (addError) throw addError;
-    }
-
-    // 3. 게시글 기본 정보 업데이트 (전달된 필드만)
-    const updateData: Record<string, any> = {};
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.content !== undefined) updateData.content = data.content;
-    if (data.categoryId !== undefined) updateData.category_id = data.categoryId;
-
-    if (Object.keys(updateData).length > 0) {
-      const { error: updateError } = await supabase
-        .from("posts")
-        .update(updateData)
-        .eq("id", postId);
-
-      if (updateError) throw updateError;
-    }
-
-    // 4. 태그 연결 업데이트
-    if (data.tagIds !== undefined) {
-      // 기존 태그 연결 삭제
-      await supabase.from("post_tags").delete().eq("post_id", postId);
-
-      // 새로운 태그 연결
-      if (data.tagIds.length > 0) {
-        const { error: tagError } = await supabase.from("post_tags").insert(
-          data.tagIds.map((tag_id) => ({
-            post_id: postId,
-            tag_id,
-          })),
-        );
-
-        if (tagError) throw tagError;
-      }
-    }
-
-    // 5. Storage 파일 실제 삭제 (트랜잭션 성공 후)
-    if (filesToDelete.length > 0) {
       await Promise.all(
-        filesToDelete.map(async (filePath) => {
-          const result = await deleteStorageFile(filePath);
-          if (!result.success) {
-            console.error(`Storage 파일 삭제 실패: ${filePath}`, result.error);
-            // 에러 로그만 기록하고 넘어감 (고아 파일이 되지만 서비스는 정상 동작)
+        result.deleted_files.map(async (filePath: string) => {
+          const deleteResult = await deleteStorageFile(filePath);
+          if (!deleteResult.success) {
+            console.error(
+              `Storage 파일 삭제 실패: ${filePath}`,
+              deleteResult.error,
+            );
+            // 에러 로그만 기록하고 넘어감
           }
         }),
       );
     }
 
     revalidatePath("/community");
+    console.groupEnd();
   } catch (error) {
     console.error("게시글 수정 실패:", error);
+    console.groupEnd();
     throw error;
   }
 }
@@ -367,6 +330,30 @@ export async function updatePost(postId: number, data: UpdatePostDto) {
 // 게시글 삭제
 export async function removePost(postId: number) {
   const supabase = await createServerSupabaseClient();
+  const userProfile = await getServerUserProfile();
+
+  if (!userProfile) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  // 권한 검증: 게시글 작성자 확인 또는 관리자 권한 확인
+  const { data: post, error: postError } = await supabase
+    .from("posts")
+    .select("author_id")
+    .eq("id", postId)
+    .single();
+
+  if (postError || !post) {
+    throw new Error("게시글을 찾을 수 없습니다.");
+  }
+
+  // 작성자 본인이거나 관리자만 삭제 가능
+  const isAuthor = post.author_id === userProfile.id;
+  const isAdmin = userProfile.role === "admin";
+
+  if (!isAuthor && !isAdmin) {
+    throw new Error("게시글을 삭제할 권한이 없습니다.");
+  }
 
   const { error } = await supabase.from("posts").delete().eq("id", postId);
   if (error) throw error;
