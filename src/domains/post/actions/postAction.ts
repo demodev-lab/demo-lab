@@ -1,10 +1,10 @@
 "use server";
 
 import { createServerSupabaseClient } from "@/utils/supabase/server";
-import type { Post, PostAttachment } from "../types";
+import type { Post } from "../types";
 import { CreatePostDto } from "@/dtos/create-post.dto";
 import { UpdatePostDto } from "@/dtos/update-post.dto";
-import { deleteFile } from "@/utils/supabase/storage";
+import { deleteStorageFile } from "@/utils/supabase/storage-server";
 import { revalidatePath } from "next/cache";
 import { getServerUserProfile } from "@/utils/supabase/profiles";
 
@@ -29,15 +29,16 @@ function transformPost(post: any, userId?: string): Post {
     is_liked: userId
       ? post.post_likes?.some((like: any) => like.user_id === userId)
       : false,
-    attachments: post.post_attachments?.map((attachment: any) => ({
-      id: attachment.id,
-      post_id: attachment.post_id,
-      original_file_name: attachment.original_file_name,
-      stored_file_path: attachment.stored_file_path,
-      file_size: attachment.file_size,
-      file_type: attachment.file_type,
-      created_at: attachment.created_at,
-    })) ?? [],
+    attachments:
+      post.post_attachments?.map((attachment: any) => ({
+        id: attachment.id,
+        post_id: attachment.post_id,
+        original_file_name: attachment.original_file_name,
+        stored_file_path: attachment.stored_file_path,
+        file_size: attachment.file_size,
+        file_type: attachment.file_type,
+        created_at: attachment.created_at,
+      })) ?? [],
   };
 }
 
@@ -277,8 +278,9 @@ export async function updatePost(postId: number, data: UpdatePostDto) {
         .from("post_attachments")
         .select("stored_file_path")
         .in("id", data.deleteAttachmentIds);
-      
-      filesToDelete = attachmentsToDelete?.map(att => att.stored_file_path) || [];
+
+      filesToDelete =
+        attachmentsToDelete?.map((att) => att.stored_file_path) || [];
     }
 
     // DB 작업 수행 (순서 중요: DB 먼저, Storage 나중에)
@@ -346,13 +348,12 @@ export async function updatePost(postId: number, data: UpdatePostDto) {
     if (filesToDelete.length > 0) {
       await Promise.all(
         filesToDelete.map(async (filePath) => {
-          try {
-            await deleteFile(filePath);
-          } catch (error) {
-            console.error(`Storage 파일 삭제 실패: ${filePath}`, error);
+          const result = await deleteStorageFile(filePath);
+          if (!result.success) {
+            console.error(`Storage 파일 삭제 실패: ${filePath}`, result.error);
             // 에러 로그만 기록하고 넘어감 (고아 파일이 되지만 서비스는 정상 동작)
           }
-        })
+        }),
       );
     }
 
