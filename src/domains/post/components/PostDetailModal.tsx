@@ -51,9 +51,29 @@ export function PostDetailModal({
     await downloadAttachment(post.id, attachment);
   };
 
+  // 부모의 상태를 업데이트하는 onOpenChange 핸들러
+  const handleOpenChange = (open: boolean) => {
+    // 모달이 닫히려고 할 때만 부모의 onClose를 호출
+    if (!open) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent
+        className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
+        onPointerDownOutside={(event) => {
+          const target = event.target as Element;
+          // 라이트박스 영역을 클릭했다면,
+          if (target?.closest(".yarl__root, .yarl__container, .yarl__slide")) {
+            // Dialog의 기본 닫기 동작을 '방지'하기만 합니다.
+            event.preventDefault();
+          }
+          // 그 외의 외부 영역 클릭 시에는 아무것도 하지 않습니다.
+          // Dialog가 기본 동작대로 모달을 닫도록 내버려 둡니다.
+        }}
+      >
         <DialogTitle>게시글 상세</DialogTitle>
         <DialogHeader>
           <div className="flex items-center gap-2 mb-2">
