@@ -3,6 +3,7 @@ import { PostEditor } from "./PostEditor";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
 import { CreatePostDto } from "@/dtos/create-post.dto";
+import { UpdatePostDto } from "@/dtos/update-post.dto";
 import { usePostDetail } from "../hooks/usePost";
 import { useProfile } from "@/hooks/use-profile";
 import { postPermissions } from "@/config/permissions";
@@ -15,7 +16,7 @@ interface PostEditorModalProps {
   categories?: Category[];
   tags?: Tag[];
   onClose: () => void;
-  onSubmit: (data: CreatePostDto) => Promise<void>;
+  onSubmit: (data: CreatePostDto | UpdatePostDto) => Promise<void>;
 }
 
 export function PostEditorModal({
@@ -50,10 +51,11 @@ export function PostEditorModal({
           content: post.content,
           categoryId: post.category_id,
           tagIds: post.tags?.map((tag) => tag.id) ?? [],
+          attachments: post.attachments,
         }
       : undefined;
 
-  const handleSubmit = async (data: CreatePostDto) => {
+  const handleSubmit = async (data: CreatePostDto | UpdatePostDto) => {
     await onSubmit(data);
   };
 
@@ -64,11 +66,13 @@ export function PostEditorModal({
           {mode === "edit" ? "게시글 수정" : "게시글 작성"}
         </DialogTitle>
         <PostEditor
+          mode={mode}
           initialData={initialData}
           categories={availableCategories}
           tags={tags}
           onCancel={onClose}
           onSubmit={handleSubmit}
+          submitButtonText={mode === "edit" ? "수정하기" : "게시하기"}
         />
       </DialogContent>
     </Dialog>
