@@ -157,13 +157,6 @@ export function PostAttachmentList({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  // 라이트박스 상태를 전역적으로 추적
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      (window as any).__lightboxOpen = lightboxOpen;
-    }
-  }, [lightboxOpen]);
-
   if (!attachments || attachments.length === 0) {
     return null;
   }
@@ -228,6 +221,15 @@ export function PostAttachmentList({
         close={() => setLightboxOpen(false)}
         index={lightboxIndex}
         slides={lightboxSlides}
+        on={{
+          click: ({ index }) => {
+            // 배경(빈 공간) 클릭 시에만 라이트박스 닫기
+            if (index === -1) {
+              setLightboxOpen(false);
+            }
+            // 이미지 자체 클릭(index >= 0)은 아무것도 하지 않음 (기본 동작 유지)
+          },
+        }}
       />
     </div>
   );

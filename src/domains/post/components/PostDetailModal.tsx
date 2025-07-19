@@ -51,49 +51,9 @@ export function PostDetailModal({
     await downloadAttachment(post.id, attachment);
   };
 
-  // 부모의 상태를 업데이트하는 onOpenChange 핸들러
-  const handleOpenChange = (open: boolean) => {
-    // 모달이 닫히려고 할 때만 부모의 onClose를 호출
-    if (!open) {
-      onClose();
-    }
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent
-        className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
-        onPointerDownOutside={(event) => {
-          // 라이트박스가 열려있는 상태인지 확인
-          const isLightboxOpen =
-            typeof window !== "undefined" && (window as any).__lightboxOpen;
-
-          console.log("onPointerDownOutside triggered", {
-            target: event.target,
-            isLightboxOpen,
-            tagName: (event.target as Element)?.tagName,
-          });
-
-          if (isLightboxOpen) {
-            console.log("Preventing dialog close - lightbox is open");
-            event.preventDefault();
-            return;
-          }
-
-          console.log("Allowing dialog to close - lightbox is not open");
-        }}
-        onEscapeKeyDown={(event) => {
-          // 라이트박스가 열려있을 때는 ESC 키로 모달 닫기 방지
-          const isLightboxOpen =
-            typeof window !== "undefined" && (window as any).__lightboxOpen;
-
-          if (isLightboxOpen) {
-            console.log("Preventing dialog close with ESC - lightbox is open");
-            event.preventDefault();
-            return;
-          }
-        }}
-      >
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogTitle>게시글 상세</DialogTitle>
         <DialogHeader>
           <div className="flex items-center gap-2 mb-2">
