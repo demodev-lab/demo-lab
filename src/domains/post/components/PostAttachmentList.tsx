@@ -11,8 +11,6 @@ import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
 import {
   formatFileSize,
   getFileIconName,
@@ -26,6 +24,7 @@ interface PostAttachmentListProps {
   onDownload: (attachment: PostAttachment) => void;
   onDelete?: (attachment: PostAttachment) => void; // 수정 모드용
   isEditable?: boolean; // 수정 모드 여부
+  onImageClick?: (attachment: PostAttachment) => void; // 이미지 클릭 핸들러
   // TODO: 전체 다운로드 기능 추가 예정
   // onDownloadAll?: () => void;
 }
@@ -35,6 +34,7 @@ interface AttachmentItemProps {
   onDownload: (attachment: PostAttachment) => void;
   onDelete?: (attachment: PostAttachment) => void;
   isEditable?: boolean;
+  onImageClick?: (attachment: PostAttachment) => void;
 }
 
 function AttachmentItem({
@@ -43,23 +43,18 @@ function AttachmentItem({
   onDelete,
   isEditable,
   onImageClick,
-}: AttachmentItemProps & {
-  onImageClick?: (attachment: PostAttachment) => void;
-}) {
+}: AttachmentItemProps) {
   const [imageError, setImageError] = useState(false);
 
   const isImage = isImageFile(attachment.file_type);
-  const IconComponent =
-    Icons[getFileIconName(attachment.file_type) as keyof typeof Icons] ||
-    Icons.File;
+  const IconComponent = (Icons[
+    getFileIconName(attachment.file_type) as keyof typeof Icons
+  ] || Icons.File) as React.ComponentType<any>;
   const publicUrl = getPublicUrl(attachment.stored_file_path);
 
   const handleImageClick = () => {
     if (isImage && !imageError && onImageClick) {
       onImageClick(attachment);
-    } else if (isImage && !imageError) {
-      // Fallback to download if no lightbox handler provided
-      onDownload(attachment);
     } else {
       onDownload(attachment);
     }
@@ -153,30 +148,14 @@ export function PostAttachmentList({
   onDownload,
   onDelete,
   isEditable = false,
+  onImageClick,
 }: PostAttachmentListProps) {
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-
   if (!attachments || attachments.length === 0) {
     return null;
   }
 
   const imageFiles = attachments.filter((att) => isImageFile(att.file_type));
   const otherFiles = attachments.filter((att) => !isImageFile(att.file_type));
-
-  // Prepare lightbox slides
-  const lightboxSlides = imageFiles.map((attachment) => ({
-    src: getPublicUrl(attachment.stored_file_path),
-    alt: attachment.original_file_name,
-  }));
-
-  const handleImageClick = (attachment: PostAttachment) => {
-    const index = imageFiles.findIndex((img) => img.id === attachment.id);
-    if (index !== -1) {
-      setLightboxIndex(index);
-      setLightboxOpen(true);
-    }
-  };
 
   return (
     <div className="space-y-4">
@@ -199,7 +178,7 @@ export function PostAttachmentList({
             onDownload={onDownload}
             onDelete={onDelete}
             isEditable={isEditable}
-            onImageClick={handleImageClick}
+            onImageClick={onImageClick}
           />
         ))}
 
@@ -211,26 +190,10 @@ export function PostAttachmentList({
             onDownload={onDownload}
             onDelete={onDelete}
             isEditable={isEditable}
+            onImageClick={onImageClick}
           />
         ))}
       </div>
-
-      {/* Lightbox for image viewing */}
-      <Lightbox
-        open={lightboxOpen}
-        close={() => setLightboxOpen(false)}
-        index={lightboxIndex}
-        slides={lightboxSlides}
-        on={{
-          click: ({ index }) => {
-            // 배경(빈 공간) 클릭 시에만 라이트박스 닫기
-            if (index === -1) {
-              setLightboxOpen(false);
-            }
-            // 이미지 자체 클릭(index >= 0)은 아무것도 하지 않음 (기본 동작 유지)
-          },
-        }}
-      />
     </div>
   );
 }
