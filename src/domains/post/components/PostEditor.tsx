@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronDown, Loader2, Paperclip } from "lucide-react";
 import { FileUpload } from "@/components/ui/file-upload";
 import { PostFileList } from "./PostFileList";
-import { uploadFile } from "@/utils/supabase/storage";
+import { uploadFile, getPublicUrl } from "@/utils/supabase/storage";
 import { generateDomainStoragePath } from "@/utils/file-utils";
 import { toast } from "sonner";
 import type { Category } from "@/domains/category/types";
