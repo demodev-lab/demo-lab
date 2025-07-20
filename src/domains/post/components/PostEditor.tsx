@@ -13,36 +13,38 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, Loader2, Paperclip } from "lucide-react";
-import { FileUpload, FileList } from "@/components/ui/file-upload";
-import { uploadFile } from "@/utils/supabase/storage";
+import { FileUpload } from "@/components/ui/file-upload";
+import { PostFileList } from "./PostFileList";
+import { uploadFile, getPublicUrl } from "@/utils/supabase/storage";
 import { generateDomainStoragePath } from "@/utils/file-utils";
 import { toast } from "sonner";
 import type { Category } from "@/domains/category/types";
 import type { Tag } from "@/domains/tag/types";
 import { CreatePostDto } from "@/dtos/create-post.dto";
+import { UpdatePostDto } from "@/dtos/update-post.dto";
+import type { PostAttachment } from "@/domains/post/types";
+import type {
+  FileItem,
+  NewFileItem,
+  ExistingFileItem,
+} from "../types/file.types";
 import { useProfile } from "@/hooks/use-profile";
 
 interface PostEditorProps {
   categories?: Category[];
   tags?: Tag[];
-  onSubmit: (data: CreatePostDto) => Promise<void>;
+  onSubmit: (data: CreatePostDto | UpdatePostDto) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
+  mode?: "create" | "edit";
   initialData?: {
     title: string;
     content: string;
     categoryId?: number | null;
     tagIds?: number[];
+    attachments?: PostAttachment[];
   };
   submitButtonText?: string;
-}
-
-interface FileItem {
-  file: File;
-  error?: string;
-  uploaded?: boolean;
-  storedPath?: string;
-  publicUrl?: string;
 }
 
 export function PostEditor({
@@ -51,6 +53,7 @@ export function PostEditor({
   onSubmit,
   onCancel,
   isLoading = false,
+  mode = "create",
   initialData,
   submitButtonText = "게시하기",
 }: PostEditorProps) {
@@ -61,7 +64,7 @@ export function PostEditor({
   const [attachments, setAttachments] = useState<FileItem[]>([]);
   const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
-  
+
   // 사용자 프로필 정보 가져오기
   const { data: userProfile } = useProfile();
 
@@ -71,10 +74,28 @@ export function PostEditor({
       setContent(initialData.content);
       setCategoryId(initialData.categoryId);
       setSelectedTagIds(new Set(initialData.tagIds));
+
+      // 수정 모드일 때 기존 첨부파일 설정
+      if (mode === "edit" && initialData.attachments) {
+        const existingFiles: ExistingFileItem[] = initialData.attachments.map(
+          (att) => ({
+            type: "existing" as const,
+            id: att.id,
+            fileName: att.original_file_name,
+            storedPath: att.stored_file_path,
+            publicUrl: getPublicUrl(att.stored_file_path),
+            fileSize: att.file_size,
+            fileType: att.file_type,
+            markedForDeletion: false,
+          }),
+        );
+        setAttachments(existingFiles);
+        setShowFileUpload(true); // 첨부파일이 있으면 자동으로 표시
+      }
     } else if (categories && categories.length > 0) {
       setCategoryId(categories[0].id);
     }
-  }, [initialData, categories]);
+  }, [initialData, categories, mode]);
 
   const handleTagClick = (tagId: number) => {
     setSelectedTagIds((prev) => {
@@ -98,18 +119,22 @@ export function PostEditor({
         toast.error("로그인이 필요합니다.");
         return;
       }
-      
+
       const userId = userProfile.id;
 
-      // 파일 목록에 추가
-      const newFiles: FileItem[] = files.map((file) => ({ file }));
+      // 파일 목록에 추가 (고유 ID 부여)
+      const newFiles: NewFileItem[] = files.map((file) => ({
+        type: "new" as const,
+        id: crypto.randomUUID(),
+        file,
+      }));
       setAttachments((prev) => [...prev, ...newFiles]);
       setIsUploadingFiles(true);
 
       // 파일 업로드
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const index = attachments.length + i;
+      for (let i = 0; i < newFiles.length; i++) {
+        const fileItem = newFiles[i];
+        const file = fileItem.file;
 
         try {
           // 도메인별 저장 경로 생성
@@ -119,15 +144,15 @@ export function PostEditor({
             file.name,
           );
 
-          console.log(`Uploading file ${i + 1}/${files.length}:`, file.name);
+          console.log(`Uploading file ${i + 1}/${newFiles.length}:`, file.name);
 
           // 파일 업로드
           const result = await uploadFile(file, storagePath);
 
           if (result.success) {
             setAttachments((prev) =>
-              prev.map((attachment, idx) =>
-                idx === index
+              prev.map((attachment) =>
+                attachment.type === "new" && attachment.id === fileItem.id
                   ? {
                       ...attachment,
                       uploaded: true,
@@ -139,8 +164,8 @@ export function PostEditor({
             );
           } else {
             setAttachments((prev) =>
-              prev.map((attachment, idx) =>
-                idx === index
+              prev.map((attachment) =>
+                attachment.type === "new" && attachment.id === fileItem.id
                   ? { ...attachment, error: result.error }
                   : attachment,
               ),
@@ -150,8 +175,8 @@ export function PostEditor({
         } catch (error) {
           console.error("File upload error:", error);
           setAttachments((prev) =>
-            prev.map((attachment, idx) =>
-              idx === index
+            prev.map((attachment) =>
+              attachment.type === "new" && attachment.id === fileItem.id
                 ? { ...attachment, error: "업로드 중 오류가 발생했습니다." }
                 : attachment,
             ),
@@ -165,13 +190,35 @@ export function PostEditor({
     [attachments.length, userProfile?.id],
   );
 
-  const handleRemoveFile = useCallback((index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveNewFile = useCallback((fileId: string) => {
+    setAttachments((prev) =>
+      prev.filter((att) => !(att.type === "new" && att.id === fileId)),
+    );
+  }, []);
+
+  const handleToggleExistingFile = useCallback((fileId: number) => {
+    setAttachments((prev) =>
+      prev.map((att) =>
+        att.type === "existing" && att.id === fileId
+          ? { ...att, markedForDeletion: !att.markedForDeletion }
+          : att,
+      ),
+    );
   }, []);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
+
+    // 입력값 검증
+    if (!title.trim()) {
+      toast.error("제목을 입력해주세요.");
+      return;
+    }
+
+    if (!content.trim()) {
+      toast.error("내용을 입력해주세요.");
+      return;
+    }
 
     // 사용자 인증 확인
     if (!userProfile?.id) {
@@ -185,9 +232,22 @@ export function PostEditor({
       return;
     }
 
+    // 업로드 실패한 파일이 있는지 확인
+    const failedFiles = attachments.filter(
+      (item) => item.type === "new" && item.error,
+    );
+
+    if (failedFiles.length > 0) {
+      toast.error(
+        `${failedFiles.length}개 파일 업로드에 실패했습니다. 해당 파일을 제거 후 다시 시도해주세요.`,
+      );
+      return;
+    }
+
     // 업로드된 파일 정보 추가
     const uploadedFiles = attachments.filter(
-      (item) => item.uploaded && item.storedPath,
+      (item): item is NewFileItem =>
+        item.type === "new" && item.uploaded === true && !!item.storedPath,
     );
     const attachmentData = uploadedFiles.map((item) => ({
       originalName: item.file.name,
@@ -197,16 +257,63 @@ export function PostEditor({
       fileType: item.file.type,
     }));
 
-    const postData: CreatePostDto = {
-      title,
-      content,
-      categoryId: categoryId || 0,
-      authorId: userProfile.id,
-      tagIds: Array.from(selectedTagIds),
-      attachments: attachmentData.length > 0 ? attachmentData : undefined,
-    };
+    if (mode === "create") {
+      const postData: CreatePostDto = {
+        title,
+        content,
+        categoryId: categoryId || 0,
+        authorId: userProfile.id,
+        tagIds: Array.from(selectedTagIds),
+        attachments: attachmentData.length > 0 ? attachmentData : undefined,
+      };
+      try {
+        await onSubmit(postData);
+        toast.success("게시글이 성공적으로 작성되었습니다.");
+      } catch (error) {
+        console.error("게시글 작성 에러:", error);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "게시글 작성에 실패했습니다. 다시 시도해주세요.",
+        );
+      }
+    } else {
+      // 수정 모드
+      const deletedIds = attachments
+        .filter(
+          (att): att is ExistingFileItem =>
+            att.type === "existing" && att.markedForDeletion === true,
+        )
+        .map((att) => att.id);
 
-    await onSubmit(postData);
+      const updateData: UpdatePostDto = {
+        title,
+        content,
+        categoryId: categoryId || 0,
+        tagIds: Array.from(selectedTagIds),
+        deleteAttachmentIds: deletedIds.length > 0 ? deletedIds : undefined,
+        addAttachments: attachmentData.length > 0 ? attachmentData : undefined,
+      };
+
+      console.group("[PostEditor] 수정 데이터");
+      console.log("삭제될 첨부파일 IDs:", deletedIds);
+      console.log("추가될 첨부파일:", attachmentData);
+      console.log("전체 updateData:", updateData);
+      console.log("현재 attachments 상태:", attachments);
+      console.groupEnd();
+
+      try {
+        await onSubmit(updateData);
+        toast.success("게시글이 성공적으로 수정되었습니다.");
+      } catch (error) {
+        console.error("게시글 수정 에러:", error);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "게시글 수정에 실패했습니다. 다시 시도해주세요.",
+        );
+      }
+    }
   };
 
   const selectedCategory = categories?.find((c) => c.id === categoryId);
@@ -365,7 +472,12 @@ export function PostEditor({
                   disabled={isUploadingFiles}
                 />
                 {attachments.length > 0 && (
-                  <FileList files={attachments} onRemove={handleRemoveFile} />
+                  <PostFileList
+                    files={attachments}
+                    onRemoveNewFile={handleRemoveNewFile}
+                    onToggleExistingFile={handleToggleExistingFile}
+                    isEditMode={mode === "edit"}
+                  />
                 )}
               </>
             )}

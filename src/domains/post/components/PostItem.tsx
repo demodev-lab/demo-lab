@@ -14,6 +14,7 @@ import {
   Edit,
   Trash2,
   MoreHorizontal,
+  Paperclip,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -177,6 +178,16 @@ export function PostItem({
             <MessageSquare className="h-4 w-4" />
             <span>{post.comment_count}</span>
           </Button>
+          {post.attachments && post.attachments.length > 0 && (
+            <Button variant="ghost" size="sm" className="gap-1">
+              <Paperclip className="h-4 w-4" />
+              <span className="truncate max-w-48">
+                {post.attachments[0].original_file_name}
+                {post.attachments.length > 1 &&
+                  ` (외 ${post.attachments.length - 1}개)`}
+              </span>
+            </Button>
+          )}
         </div>
       </CardFooter>
     </Card>

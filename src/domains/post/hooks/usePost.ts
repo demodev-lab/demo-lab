@@ -11,7 +11,9 @@ import {
 } from "@/domains/post/actions/postAction";
 import { getCategoryList } from "@/domains/category/actions/categoryAction";
 import { getTagList } from "@/domains/tag/actions/tagAction";
-import type { Post, PostFormData, SortOption } from "../types";
+import type { Post, SortOption } from "../types";
+import type { CreatePostDto } from "@/dtos/create-post.dto";
+import type { UpdatePostDto } from "@/dtos/update-post.dto";
 
 /**
  * 게시글 목록 조회 훅
@@ -72,7 +74,7 @@ export const usePostDetail = (
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: PostFormData) => createPost(data),
+    mutationFn: (data: CreatePostDto) => createPost(data),
     onSuccess: () => {
       // posts로 시작하는 모든 쿼리를 무효화
       queryClient.invalidateQueries({ queryKey: ["posts"], exact: false });
@@ -86,7 +88,7 @@ export const useCreatePost = () => {
 export const useUpdatePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postId, data }: { postId: number; data: PostFormData }) =>
+    mutationFn: ({ postId, data }: { postId: number; data: UpdatePostDto }) =>
       updatePost(postId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });

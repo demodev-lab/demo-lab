@@ -5,6 +5,8 @@ import { useCommunity } from "../hooks/useCommunity";
 import { usePostList } from "@/domains/post/hooks/usePost";
 import { useCategories } from "@/domains/category/hooks/useCategories";
 import { useTags } from "@/domains/tag/hooks/useTags";
+import type { CreatePostDto } from "@/dtos/create-post.dto";
+import type { UpdatePostDto } from "@/dtos/update-post.dto";
 import {
   PostList,
   PostPagination,
@@ -131,15 +133,20 @@ export function CommunityTab() {
             tags={tags}
             onClose={() => setEditorModal(null)}
             onSubmit={async (formData) => {
-              if (editorModal.mode === "edit" && editorModal.postId) {
-                await updatePost({
-                  postId: editorModal.postId,
-                  data: formData,
-                });
-              } else {
-                await createPost(formData);
+              try {
+                if (editorModal.mode === "edit" && editorModal.postId) {
+                  await updatePost({
+                    postId: editorModal.postId,
+                    data: formData as UpdatePostDto,
+                  });
+                } else {
+                  await createPost(formData as CreatePostDto);
+                }
+                setEditorModal(null);
+              } catch (error) {
+                // 에러는 PostEditor에서 처리되므로 여기서는 모달을 닫지 않음
+                console.error("게시글 작업 에러:", error);
               }
-              setEditorModal(null);
             }}
           />
         )}

@@ -13,19 +13,19 @@ export function TabNavigation() {
 
   const tabs = [
     { id: "community", label: "Community", path: "/" },
-    { id: "classroom", label: "Classroom", path: "/classroom" },
-    { id: "calendar", label: "Calendar", path: "/calendar" },
-    { id: "members", label: "Members", path: "/members" },
-    { id: "about", label: "About", path: "/about" },
+    // { id: "classroom", label: "Classroom", path: "/classroom" }, // 미완료 기능 숨김
+    // { id: "calendar", label: "Calendar", path: "/calendar" }, // 미완료 기능 숨김
+    // { id: "members", label: "Members", path: "/members" }, // 미완료 기능 숨김
+    // { id: "about", label: "About", path: "/about" }, // 미완료 기능 숨김
   ];
 
   // 현재 경로를 기반으로 활성 탭 결정
   const getActiveTab = () => {
     if (pathname === "/") return "community";
-    if (pathname.startsWith("/classroom")) return "classroom";
-    if (pathname.startsWith("/calendar")) return "calendar";
-    if (pathname.startsWith("/members")) return "members";
-    if (pathname.startsWith("/about")) return "about";
+    // if (pathname.startsWith("/classroom")) return "classroom"; // 미완료 기능 숨김
+    // if (pathname.startsWith("/calendar")) return "calendar"; // 미완료 기능 숨김
+    // if (pathname.startsWith("/members")) return "members"; // 미완료 기능 숨김
+    // if (pathname.startsWith("/about")) return "about"; // 미완료 기능 숨김
     return "community"; // 기본값
   };
 
