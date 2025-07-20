@@ -615,7 +615,7 @@ export function MultiStepCourseApplicationForm({
                 <TabsContent value="step-4" className="space-y-4">
                   <PricingFields control={form.control} />
 
-                  <FormField
+                  <FormField<CourseApplicationFormData>
                     control={form.control}
                     name="target_audience"
                     render={({ field }) => (
@@ -634,7 +634,7 @@ export function MultiStepCourseApplicationForm({
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
+                    <FormField<CourseApplicationFormData>
                       control={form.control}
                       name="expected_duration_weeks"
                       render={({ field }) => (
@@ -672,7 +672,7 @@ export function MultiStepCourseApplicationForm({
                     />
                   </div>
 
-                  <FormField
+                  <FormField<CourseApplicationFormData>
                     control={form.control}
                     name="additional_materials"
                     render={({ field }) => (
@@ -690,7 +690,7 @@ export function MultiStepCourseApplicationForm({
                     )}
                   />
 
-                  <FormField
+                  <FormField<CourseApplicationFormData>
                     control={form.control}
                     name="additional_message"
                     render={({ field }) => (
