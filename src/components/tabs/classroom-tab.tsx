@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CourseApplicationForm } from "@/domains/course/components/CourseApplicationForm";
+import { MultiStepCourseApplicationForm } from "@/domains/course/components/MultiStepCourseApplicationForm";
 import { useProfile } from "@/hooks/use-profile";
 
 export function ClassroomTab() {
@@ -82,14 +82,14 @@ export function ClassroomTab() {
         </div>
 
         <Dialog open={isApplicationOpen} onOpenChange={setIsApplicationOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>코스 등록 신청</DialogTitle>
               <DialogDescription>
                 코스 정보를 입력해주세요. 관리자 승인 후 코스가 공개됩니다.
               </DialogDescription>
             </DialogHeader>
-            <CourseApplicationForm
+            <MultiStepCourseApplicationForm
               userId={userProfile?.id || ""}
               userEmail={userProfile?.email}
               onSuccess={() => setIsApplicationOpen(false)}
@@ -162,16 +162,18 @@ export function ClassroomTab() {
       </div>
 
       <Dialog open={isApplicationOpen} onOpenChange={setIsApplicationOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>코스 등록 신청</DialogTitle>
             <DialogDescription>
               코스 정보를 입력해주세요. 관리자 승인 후 코스가 공개됩니다.
             </DialogDescription>
           </DialogHeader>
-          <CourseApplicationForm
+          <MultiStepCourseApplicationForm
             userId={userProfile?.id || ""}
             userEmail={userProfile?.email}
+            onSuccess={() => setIsApplicationOpen(false)}
+            onCancel={() => setIsApplicationOpen(false)}
           />
         </DialogContent>
       </Dialog>

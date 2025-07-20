@@ -1,4 +1,4 @@
-import { CourseApplicationForm } from "@/domains/course/components/CourseApplicationForm";
+import { MultiStepCourseApplicationForm } from "@/domains/course/components/MultiStepCourseApplicationForm";
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -19,7 +19,7 @@ export default async function CourseApplicationPage() {
         새로운 코스를 등록하려면 아래 양식을 작성해주세요. 관리자가 검토 후 승인
         여부를 알려드립니다.
       </p>
-      <CourseApplicationForm userId={user.id} userEmail={user.email} />
+      <MultiStepCourseApplicationForm userId={user.id} userEmail={user.email} />
     </div>
   );
 }
