@@ -101,7 +101,6 @@ export function CourseCategorySelect({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">선택 없음</SelectItem>
           {flatCategories.map((category) => {
             const selectable = isSelectable(category);
             return (
