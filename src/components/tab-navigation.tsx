@@ -13,7 +13,7 @@ export function TabNavigation() {
 
   const tabs = [
     { id: "community", label: "Community", path: "/" },
-    // { id: "classroom", label: "Classroom", path: "/classroom" }, // 미완료 기능 숨김
+    { id: "classroom", label: "Classroom", path: "/classroom" },
     // { id: "calendar", label: "Calendar", path: "/calendar" }, // 미완료 기능 숨김
     // { id: "members", label: "Members", path: "/members" }, // 미완료 기능 숨김
     // { id: "about", label: "About", path: "/about" }, // 미완료 기능 숨김
@@ -22,7 +22,7 @@ export function TabNavigation() {
   // 현재 경로를 기반으로 활성 탭 결정
   const getActiveTab = () => {
     if (pathname === "/") return "community";
-    // if (pathname.startsWith("/classroom")) return "classroom"; // 미완료 기능 숨김
+    if (pathname.startsWith("/classroom")) return "classroom";
     // if (pathname.startsWith("/calendar")) return "calendar"; // 미완료 기능 숨김
     // if (pathname.startsWith("/members")) return "members"; // 미완료 기능 숨김
     // if (pathname.startsWith("/about")) return "about"; // 미완료 기능 숨김

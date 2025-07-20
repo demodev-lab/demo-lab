@@ -22,7 +22,7 @@ import {
   Folder,
   FolderOpen,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/lib/utils";
 import type { CategoryTreeNode } from "../types";
 
 // 카테고리 아이템 Props 타입

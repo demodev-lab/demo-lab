@@ -43,9 +43,9 @@ import {
   DollarSign,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/lib/utils";
 import { CourseCategorySelect } from "@/domains/category/components";
-import { createCourseApplication } from "../actions/courseApplicationAction";
+import { createCourseApplication } from "../actions/courseApplicationActions";
 import type { CourseApplicationFormData } from "../types";
 
 // Step 1: 기본 정보
