@@ -30,10 +30,7 @@ export async function getCourseCategoryList(
 
   const supabase = await createServerSupabaseClient();
 
-  let query = supabase
-    .from("course_category")
-    .select("*")
-    .order("display_order");
+  let query = supabase.from("course_category").select("*").order("sequence");
 
   // 비활성 카테고리 제외
   if (!options.include_inactive) {
@@ -361,7 +358,7 @@ export async function deleteCourseCategory(id: number): Promise<void> {
 
 // 카테고리 순서 변경 (배치 업데이트 최적화)
 export async function reorderCourseCategories(
-  updates: { id: number; display_order: number }[],
+  updates: { id: number; sequence: number }[],
 ): Promise<void> {
   console.group("🔄 [Server Action] reorderCourseCategories");
   console.log("순서 변경할 카테고리:", updates);
@@ -377,8 +374,8 @@ export async function reorderCourseCategories(
     console.error("RPC 순서 변경 실패, 개별 업데이트로 fallback:", error);
 
     // RPC 함수가 없는 경우 개별 업데이트
-    const updatePromises = updates.map(({ id, display_order }) =>
-      supabase.from("course_category").update({ display_order }).eq("id", id),
+    const updatePromises = updates.map(({ id, sequence }) =>
+      supabase.from("course_category").update({ sequence }).eq("id", id),
     );
 
     const results = await Promise.all(updatePromises);
