@@ -661,7 +661,10 @@ export function MultiStepCourseApplicationForm({
                       )}
                     />
 
-                    <DatePickerFormField
+                    <DatePickerFormField<
+                      CourseApplicationFormData,
+                      "course_start_date"
+                    >
                       control={form.control}
                       name="course_start_date"
                       label="코스 시작 예정일"
