@@ -59,7 +59,7 @@ const step1Schema = z.object({
     .string()
     .min(50, "설명은 최소 50글자 이상이어야 합니다")
     .max(2000),
-  difficulty: z.enum(["beginner", "elementary", "intermediate", "advanced"]),
+  difficulty: z.enum(["입문", "초급", "중급", "고급"]),
   category_id: z.number().min(1, "카테고리를 선택해주세요"),
   thumbnail_url: z
     .string()
@@ -241,7 +241,7 @@ export function MultiStepCourseApplicationForm({
       title: "",
       subtitle: "",
       description: "",
-      difficulty: "beginner",
+      difficulty: "입문",
       category_id: undefined,
       thumbnail_url: "",
       // Step 2
@@ -459,10 +459,10 @@ export function MultiStepCourseApplicationForm({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="beginner">입문</SelectItem>
-                              <SelectItem value="elementary">초급</SelectItem>
-                              <SelectItem value="intermediate">중급</SelectItem>
-                              <SelectItem value="advanced">고급</SelectItem>
+                              <SelectItem value="입문">입문</SelectItem>
+                              <SelectItem value="초급">초급</SelectItem>
+                              <SelectItem value="중급">중급</SelectItem>
+                              <SelectItem value="고급">고급</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -615,7 +615,7 @@ export function MultiStepCourseApplicationForm({
                 <TabsContent value="step-4" className="space-y-4">
                   <PricingFields control={form.control} />
 
-                  <FormField<CourseApplicationFormData>
+                  <FormField
                     control={form.control}
                     name="target_audience"
                     render={({ field }) => (
@@ -634,7 +634,7 @@ export function MultiStepCourseApplicationForm({
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField<CourseApplicationFormData>
+                    <FormField
                       control={form.control}
                       name="expected_duration_weeks"
                       render={({ field }) => (
@@ -672,7 +672,7 @@ export function MultiStepCourseApplicationForm({
                     />
                   </div>
 
-                  <FormField<CourseApplicationFormData>
+                  <FormField
                     control={form.control}
                     name="additional_materials"
                     render={({ field }) => (
@@ -690,7 +690,7 @@ export function MultiStepCourseApplicationForm({
                     )}
                   />
 
-                  <FormField<CourseApplicationFormData>
+                  <FormField
                     control={form.control}
                     name="additional_message"
                     render={({ field }) => (

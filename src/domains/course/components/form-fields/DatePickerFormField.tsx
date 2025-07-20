@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/lib/utils";
 
 interface DatePickerFormFieldProps<
   TFieldValues extends FieldValues,

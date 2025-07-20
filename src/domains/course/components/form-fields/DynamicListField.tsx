@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Trash2, GripVertical } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/lib/utils";
 
 // 더 정확한 타입 추론을 위한 helper type
 type ArrayElement<T> = T extends readonly (infer U)[] ? U : never;
