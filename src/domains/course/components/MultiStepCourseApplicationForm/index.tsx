@@ -121,10 +121,15 @@ export function MultiStepCourseApplicationForm({
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // 폼 제출은 handleSubmitClick에서 처리
+  };
 
-    // 마지막 Step에서만 실제 폼 제출
-    if (currentStepIndex === FORM_STEPS.length - 1) {
-      form.handleSubmit(onSubmit)(e);
+  const handleSubmitClick = async () => {
+    // 마지막 스텝에서 제출 버튼을 직접 클릭했을 때만 실행
+    const isValid = await validateCurrentStep();
+    if (isValid) {
+      const formData = form.getValues();
+      await onSubmit(formData);
     }
   };
 
@@ -205,7 +210,7 @@ export function MultiStepCourseApplicationForm({
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button type="button" onClick={handleSubmitClick} disabled={isSubmitting}>
                     {isSubmitting ? "제출 중..." : "신청 완료"}
                   </Button>
                 )}
