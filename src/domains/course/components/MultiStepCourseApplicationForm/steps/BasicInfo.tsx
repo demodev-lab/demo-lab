@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Control } from "react-hook-form";
+import { Info } from "lucide-react";
+import * as z from "zod";
 import {
   FormControl,
   FormDescription,
@@ -20,13 +21,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CourseCategorySelect } from "@/domains/category/components";
-import type { CourseApplicationFormData } from "../../../types";
+import type { StepConfig, StepProps } from "../types";
 
-interface Step1BasicInfoProps {
-  control: Control<CourseApplicationFormData>;
-}
+// 스키마 정의
+const schema = z.object({
+  title: z.string().min(5, "제목은 최소 5글자 이상이어야 합니다").max(100),
+  subtitle: z.string().max(150).optional(),
+  description: z
+    .string()
+    .min(50, "설명은 최소 50글자 이상이어야 합니다")
+    .max(2000),
+  difficulty: z.enum(["입문", "초급", "중급", "고급"]),
+  category_id: z.number().min(1, "카테고리를 선택해주세요"),
+  thumbnail_url: z
+    .string()
+    .url("올바른 URL을 입력해주세요")
+    .optional()
+    .or(z.literal("")),
+});
 
-export function Step1BasicInfo({ control }: Step1BasicInfoProps) {
+// 컴포넌트
+function BasicInfoFields({ control }: StepProps) {
   return (
     <div className="space-y-4">
       <FormField
@@ -36,7 +51,10 @@ export function Step1BasicInfo({ control }: Step1BasicInfoProps) {
           <FormItem>
             <FormLabel>코스 제목 *</FormLabel>
             <FormControl>
-              <Input placeholder="예: React 기초부터 실전까지" {...field} />
+              <Input
+                placeholder="예: React 기초부터 실전까지"
+                {...field}
+              />
             </FormControl>
             <FormDescription>
               수강생들이 쉽게 이해할 수 있는 명확한 제목을 입력해주세요
@@ -76,7 +94,9 @@ export function Step1BasicInfo({ control }: Step1BasicInfoProps) {
                 {...field}
               />
             </FormControl>
-            <FormDescription>최소 50자 이상 작성해주세요</FormDescription>
+            <FormDescription>
+              최소 50자 이상 작성해주세요
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -89,7 +109,10 @@ export function Step1BasicInfo({ control }: Step1BasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>난이도 *</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="난이도를 선택하세요" />
@@ -133,7 +156,10 @@ export function Step1BasicInfo({ control }: Step1BasicInfoProps) {
           <FormItem>
             <FormLabel>썸네일 이미지 URL</FormLabel>
             <FormControl>
-              <Input placeholder="https://example.com/image.jpg" {...field} />
+              <Input
+                placeholder="https://example.com/image.jpg"
+                {...field}
+              />
             </FormControl>
             <FormDescription>
               코스를 대표하는 이미지 URL (선택사항)
@@ -145,3 +171,24 @@ export function Step1BasicInfo({ control }: Step1BasicInfoProps) {
     </div>
   );
 }
+
+// Step 설정 export
+export const BasicInfoStep: StepConfig = {
+  metadata: {
+    id: "basic-info",
+    title: "기본 정보",
+    description: "코스의 기본 정보를 입력해주세요",
+    icon: Info,
+  },
+  component: BasicInfoFields,
+  schema,
+  fields: ["title", "subtitle", "description", "difficulty", "category_id", "thumbnail_url"],
+  defaultValues: {
+    title: "",
+    subtitle: "",
+    description: "",
+    difficulty: "입문",
+    category_id: undefined as any,
+    thumbnail_url: "",
+  },
+};

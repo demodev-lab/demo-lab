@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Control } from "react-hook-form";
+import { DollarSign } from "lucide-react";
+import * as z from "zod";
 import {
   FormControl,
   FormField,
@@ -14,12 +15,50 @@ import { Textarea } from "@/components/ui/textarea";
 import { PricingFields } from "../../form-fields/PricingFields";
 import { DatePickerFormField } from "../../form-fields/DatePickerFormField";
 import type { CourseApplicationFormData } from "../../../types";
+import type { StepConfig, StepProps } from "../types";
 
-interface Step4PricingInfoProps {
-  control: Control<CourseApplicationFormData>;
-}
+// 스키마 정의
+const schema = z.object({
+  price_info: z
+    .object({
+      is_free: z.boolean(),
+      original_price: z.number().min(0).optional(),
+      sale_price: z.number().min(0).optional(),
+      currency: z.string().default("KRW"),
+      discount_percentage: z.number().min(0).max(100).optional(),
+      promotion_end_date: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        // 유료 코스인 경우 가격 검증
+        if (!data.is_free) {
+          // 정가는 필수
+          if (!data.original_price || data.original_price === 0) {
+            return false;
+          }
+          // 판매가가 있는 경우 정가보다 낮아야 함
+          if (
+            data.sale_price !== undefined &&
+            data.sale_price > data.original_price
+          ) {
+            return false;
+          }
+        }
+        return true;
+      },
+      {
+        message: "유료 코스는 정가가 필요하며, 판매가는 정가보다 낮아야 합니다",
+      },
+    ),
+  target_audience: z.string().max(500).optional(),
+  expected_duration_weeks: z.number().min(1).max(52).optional(),
+  course_start_date: z.string().optional(),
+  additional_materials: z.string().max(1000).optional(),
+  additional_message: z.string().max(2000).optional(),
+});
 
-export function Step4PricingInfo({ control }: Step4PricingInfoProps) {
+// 컴포넌트
+function PricingInfoFields({ control }: StepProps) {
   return (
     <div className="space-y-4">
       <PricingFields control={control} />
@@ -58,7 +97,9 @@ export function Step4PricingInfo({ control }: Step4PricingInfoProps) {
                   {...field}
                   onChange={(e) =>
                     field.onChange(
-                      e.target.value ? parseInt(e.target.value) : undefined,
+                      e.target.value
+                        ? parseInt(e.target.value)
+                        : undefined,
                     )
                   }
                 />
@@ -68,7 +109,10 @@ export function Step4PricingInfo({ control }: Step4PricingInfoProps) {
           )}
         />
 
-        <DatePickerFormField<CourseApplicationFormData, "course_start_date">
+        <DatePickerFormField<
+          CourseApplicationFormData,
+          "course_start_date"
+        >
           control={control}
           name="course_start_date"
           label="코스 시작 예정일"
@@ -114,3 +158,31 @@ export function Step4PricingInfo({ control }: Step4PricingInfoProps) {
     </div>
   );
 }
+
+// Step 설정 export
+export const PricingInfoStep: StepConfig = {
+  metadata: {
+    id: "pricing-info",
+    title: "가격 및 추가 정보",
+    description: "가격 정책과 추가 정보를 입력해주세요",
+    icon: DollarSign,
+  },
+  component: PricingInfoFields,
+  schema,
+  fields: ["price_info", "target_audience", "expected_duration_weeks", "course_start_date", "additional_materials", "additional_message"],
+  defaultValues: {
+    price_info: {
+      is_free: true,
+      original_price: 0,
+      sale_price: 0,
+      currency: "KRW",
+      discount_percentage: 0,
+      promotion_end_date: "",
+    },
+    target_audience: "",
+    expected_duration_weeks: 4,
+    course_start_date: "",
+    additional_materials: "",
+    additional_message: "",
+  },
+};

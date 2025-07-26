@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Control } from "react-hook-form";
+import { User } from "lucide-react";
+import * as z from "zod";
 import {
   FormControl,
   FormDescription,
@@ -12,13 +13,31 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { CourseApplicationFormData } from "../../../types";
+import type { StepConfig, StepProps } from "../types";
 
-interface Step2InstructorInfoProps {
-  control: Control<CourseApplicationFormData>;
-}
+// 스키마 정의
+const schema = z.object({
+  instructor_info: z.object({
+    name: z.string().min(2, "이름을 입력해주세요"),
+    email: z.string().email("올바른 이메일을 입력해주세요"),
+    bio: z
+      .string()
+      .min(50, "자기소개는 최소 50글자 이상이어야 합니다")
+      .max(500),
+    experience: z
+      .string()
+      .min(30, "경력사항은 최소 30글자 이상이어야 합니다")
+      .max(1000),
+    avatar_url: z.string().url().optional().or(z.literal("")),
+    certifications: z.array(z.string()).optional(),
+  }),
+  applicant_phone: z
+    .string()
+    .regex(/^[0-9-]+$/, "올바른 전화번호를 입력해주세요"),
+});
 
-export function Step2InstructorInfo({ control }: Step2InstructorInfoProps) {
+// 컴포넌트
+function InstructorInfoFields({ control }: StepProps) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -68,7 +87,9 @@ export function Step2InstructorInfo({ control }: Step2InstructorInfoProps) {
                 {...field}
               />
             </FormControl>
-            <FormDescription>최소 50자 이상 작성해주세요</FormDescription>
+            <FormDescription>
+              최소 50자 이상 작성해주세요
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -87,7 +108,9 @@ export function Step2InstructorInfo({ control }: Step2InstructorInfoProps) {
                 {...field}
               />
             </FormControl>
-            <FormDescription>최소 30자 이상 작성해주세요</FormDescription>
+            <FormDescription>
+              최소 30자 이상 작성해주세요
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -112,3 +135,27 @@ export function Step2InstructorInfo({ control }: Step2InstructorInfoProps) {
     </div>
   );
 }
+
+// Step 설정 export
+export const InstructorInfoStep: StepConfig = {
+  metadata: {
+    id: "instructor-info",
+    title: "강사 정보",
+    description: "강사 프로필을 작성해주세요",
+    icon: User,
+  },
+  component: InstructorInfoFields,
+  schema,
+  fields: ["instructor_info", "applicant_phone"],
+  defaultValues: {
+    instructor_info: {
+      name: "",
+      email: "",
+      bio: "",
+      experience: "",
+      avatar_url: "",
+      certifications: [],
+    },
+    applicant_phone: "",
+  },
+};
