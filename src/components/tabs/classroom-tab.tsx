@@ -90,8 +90,6 @@ export function ClassroomTab() {
               </DialogDescription>
             </DialogHeader>
             <MultiStepCourseApplicationForm
-              userId={userProfile?.id || ""}
-              userEmail={userProfile?.email}
               onSuccess={() => setIsApplicationOpen(false)}
               onCancel={() => setIsApplicationOpen(false)}
             />
@@ -170,8 +168,6 @@ export function ClassroomTab() {
             </DialogDescription>
           </DialogHeader>
           <MultiStepCourseApplicationForm
-            userId={userProfile?.id || ""}
-            userEmail={userProfile?.email}
             onSuccess={() => setIsApplicationOpen(false)}
             onCancel={() => setIsApplicationOpen(false)}
           />
