@@ -25,15 +25,11 @@ import { FORM_STEPS, getDefaultFormValues } from "./config";
 
 // Props 타입
 interface MultiStepCourseApplicationFormProps {
-  userId: string;
-  userEmail?: string;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
 export function MultiStepCourseApplicationForm({
-  userId,
-  userEmail,
   onSuccess,
   onCancel,
 }: MultiStepCourseApplicationFormProps) {
@@ -53,11 +49,8 @@ export function MultiStepCourseApplicationForm({
     }, {} as z.ZodRawShape)
   );
 
-  // 기본값에 userEmail 추가
+  // 기본값 설정
   const defaultValues = getDefaultFormValues();
-  if (userEmail && defaultValues.instructor_info) {
-    defaultValues.instructor_info.email = userEmail;
-  }
 
   const form = useForm<CourseApplicationFormData>({
     resolver: zodResolver(formSchema),
@@ -92,25 +85,27 @@ export function MultiStepCourseApplicationForm({
       console.log("폼 데이터:", values);
       console.groupEnd();
 
-      await createCourseApplication({
-        ...values,
-        applicant_id: userId,
-        applicant_email: userEmail || null,
-        status: "pending",
-      });
+      // 🔐 보안: 서버 액션에서 인증 정보를 직접 가져오므로 클라이언트 정보는 전달하지 않음
+      const result = await createCourseApplication(values);
 
-      toast.success(
-        "코스 등록 신청이 완료되었습니다! 관리자 승인 후 코스가 공개됩니다.",
-      );
+      if (result.success) {
+        console.log("✅ 신청 성공! Application ID:", result.applicationId);
+        toast.success(
+          "코스 등록 신청이 완료되었습니다! 관리자 승인 후 코스가 공개됩니다.",
+        );
 
-      if (onSuccess) {
-        onSuccess();
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push("/my-courses");
+        }
       } else {
-        router.push("/my-courses");
+        console.error("❌ 신청 실패:", result.error);
+        toast.error(result.error || "코스 등록 신청에 실패했습니다.");
       }
     } catch (error) {
-      console.error("Course application error:", error);
-      toast.error("코스 등록 신청에 실패했습니다.");
+      console.error("❌ 예상치 못한 에러:", error);
+      toast.error("시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }

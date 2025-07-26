@@ -2,7 +2,6 @@
 
 import React from "react";
 import { BookOpen } from "lucide-react";
-import * as z from "zod";
 import {
   FormControl,
   FormField,
@@ -21,51 +20,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DynamicListField } from "../../form-fields/DynamicListField";
+import { curriculumSchema } from "../../../schemas/courseApplicationSchema";
 import type { CourseApplicationFormData } from "../../../types";
 import type { StepConfig, StepProps } from "../types";
 
-// 스키마 정의
-const schema = z.object({
-  learning_goals: z
-    .array(
-      z.object({
-        id: z.string(),
-        content: z
-          .string()
-          .min(10, "학습 목표는 최소 10글자 이상이어야 합니다"),
-        sequence: z.number(),
-      }),
-    )
-    .min(3, "최소 3개 이상의 학습 목표를 입력해주세요"),
-  background_knowledge: z.array(
-    z.object({
-      id: z.string(),
-      content: z.string().min(5),
-      sequence: z.number(),
-    }),
-  ),
-  modules_plan: z
-    .array(
-      z.object({
-        id: z.string(),
-        title: z.string().min(5),
-        sequence: z.number(),
-        lectures: z
-          .array(
-            z.object({
-              id: z.string(),
-              title: z.string().min(5),
-              description: z.string().optional(),
-              duration_mins: z.number().optional(),
-              sequence: z.number(),
-              access_type: z.enum(["free", "preview", "paid"]),
-            }),
-          )
-          .min(1, "각 모듈에는 최소 1개 이상의 강의가 필요합니다"),
-      }),
-    )
-    .min(1, "최소 1개 이상의 모듈을 입력해주세요"),
-});
+// 공유 스키마 사용
+const schema = curriculumSchema;
 
 // 타입 안전한 경로 생성을 위한 헬퍼 타입
 type ModuleLecturesPath = `modules_plan.${number}.lectures`;

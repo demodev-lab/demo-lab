@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Info } from "lucide-react";
-import * as z from "zod";
 import {
   FormControl,
   FormDescription,
@@ -21,24 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CourseCategorySelect } from "@/domains/category/components";
+import { basicInfoSchema } from "../../../schemas/courseApplicationSchema";
 import type { StepConfig, StepProps } from "../types";
 
-// 스키마 정의
-const schema = z.object({
-  title: z.string().min(5, "제목은 최소 5글자 이상이어야 합니다").max(100),
-  subtitle: z.string().max(150).optional(),
-  description: z
-    .string()
-    .min(50, "설명은 최소 50글자 이상이어야 합니다")
-    .max(2000),
-  difficulty: z.enum(["입문", "초급", "중급", "고급"]),
-  category_id: z.number().min(1, "카테고리를 선택해주세요"),
-  thumbnail_url: z
-    .string()
-    .url("올바른 URL을 입력해주세요")
-    .optional()
-    .or(z.literal("")),
-});
+// 공유 스키마 사용
+const schema = basicInfoSchema;
 
 // 컴포넌트
 function BasicInfoFields({ control }: StepProps) {

@@ -2,7 +2,6 @@
 
 import React from "react";
 import { User } from "lucide-react";
-import * as z from "zod";
 import {
   FormControl,
   FormDescription,
@@ -13,28 +12,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { instructorInfoSchema } from "../../../schemas/courseApplicationSchema";
 import type { StepConfig, StepProps } from "../types";
 
-// 스키마 정의
-const schema = z.object({
-  instructor_info: z.object({
-    name: z.string().min(2, "이름을 입력해주세요"),
-    email: z.string().email("올바른 이메일을 입력해주세요"),
-    bio: z
-      .string()
-      .min(50, "자기소개는 최소 50글자 이상이어야 합니다")
-      .max(500),
-    experience: z
-      .string()
-      .min(30, "경력사항은 최소 30글자 이상이어야 합니다")
-      .max(1000),
-    avatar_url: z.string().url().optional().or(z.literal("")),
-    certifications: z.array(z.string()).optional(),
-  }),
-  applicant_phone: z
-    .string()
-    .regex(/^[0-9-]+$/, "올바른 전화번호를 입력해주세요"),
-});
+// 공유 스키마 사용
+const schema = instructorInfoSchema;
 
 // 컴포넌트
 function InstructorInfoFields({ control }: StepProps) {
